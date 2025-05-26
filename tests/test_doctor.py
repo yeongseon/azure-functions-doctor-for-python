@@ -1,4 +1,4 @@
-from azure_function_doctor import utils
+from azure_functions_doctor import utils
 
 
 def test_python_version():
