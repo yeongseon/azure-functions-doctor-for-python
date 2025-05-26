@@ -1,6 +1,6 @@
-# Azure Function Doctor 🩺
+# Azure Functions Doctor 🩺
 
-**Azure Function Doctor** is a Python-based CLI tool designed to diagnose, validate, and assist in debugging [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) environments. It helps developers identify misconfigurations, missing dependencies, or best practice violations in their local or deployed Azure Function Apps.
+**Azure Functions Doctor** is a Python-based CLI tool designed to diagnose, validate, and assist in debugging [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) environments. It helps developers identify misconfigurations, missing dependencies, or best practice violations in their local or deployed Azure Function Apps.
 
 ---
 
