@@ -13,16 +13,17 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "ruff",
     "black",
-    "pytest",
-    "coverage",
     "build",
+    "coverage",
+    "hatch",
     "mkdocs",
     "mkdocs-material",
     "mypy",
-    "types-requests",
-    "hatch"
+    "pre-commit",
+    "pytest",
+    "ruff",
+    "types-requests"
 ]
 
 [project.scripts]

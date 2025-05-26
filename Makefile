@@ -24,8 +24,7 @@ install:
 	@$(VENV_PYTHON) -m pip install --upgrade pip
 	@$(VENV_PYTHON) -m pip install -e .
 	@$(VENV_PYTHON) -m pip install -e ".[dev]"
-	@$(VENV_PYTHON) -m pre_commit install
-
+	
 .PHONY: reset
 reset: clean-all venv install
 	@echo "🔁 Project reset complete."
@@ -53,6 +52,10 @@ check: lint typecheck test
 .PHONY: precommit
 precommit:
 	@$(VENV_PYTHON) -m pre_commit run --all-files
+
+.PHONY: precommit-install
+precommit-install:
+	@$(VENV_PYTHON) -m pre_commit install
 
 # ------------------------------
 # 🧪 Testing & Coverage
@@ -120,6 +123,8 @@ doctor:
 	@$(VENV_PYTHON) -m pip list
 	@echo "🔍 Azure Function Core Tools version:"
 	@func --version || echo "⚠️ func not found. Install with: npm i -g azure-functions-core-tools@4"
+	@echo "🔍 Pre-commit hook installed:"
+	@if exist .git/hooks/pre-commit (echo ✅ Yes) else (echo ❌ No)
 
 # ------------------------------
 # 🧹 Clean
