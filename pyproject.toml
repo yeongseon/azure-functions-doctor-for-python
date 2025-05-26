@@ -19,7 +19,10 @@ dev = [
     "coverage",
     "build",
     "mkdocs",
-    "mkdocs-material"
+    "mkdocs-material",
+    "mypy",
+    "types-requests",
+    "hatch"
 ]
 
 [project.scripts]
