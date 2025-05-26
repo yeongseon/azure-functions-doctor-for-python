@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = azure_function_doctor
+source = azure_functions_doctor
 
 [report]
 show_missing = True
