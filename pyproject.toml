@@ -1,0 +1,42 @@
+[project]
+name = "azure-function-doctor"
+version = "0.1.0"
+description = "A diagnostic tool for Python Azure Functions"
+authors = [{ name = "Yeongseon Choe", email = "yeongseon.choe@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "typer[all]",
+    "rich",
+    "requests",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "black",
+    "pytest",
+    "coverage",
+    "build",
+    "mkdocs",
+    "mkdocs-material"
+]
+
+[project.scripts]
+azfunc-doctor = "azure_function_doctor.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+exclude = [".venv", "build", "dist", "__pycache__"]
+
+[tool.ruff.format]
+quote-style = "double"
