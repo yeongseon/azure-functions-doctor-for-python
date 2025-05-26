@@ -33,7 +33,7 @@ lint:
 
 .PHONY: test
 test:
-	@$(VENV_PYTHON) -m unittest discover tests
+	@$(VENV_PYTHON) -m pytest tests
 
 .PHONY: clean
 ifeq ($(OS),Windows_NT)
