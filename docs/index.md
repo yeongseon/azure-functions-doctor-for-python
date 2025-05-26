@@ -1,11 +1,11 @@
-# Azure Function Doctor
+# Azure Functions Doctor
 
 🩺 A Python-based diagnostic tool for Azure Function Apps.
 
 ## Features
 
 - Diagnose common issues in `host.json`, `function.json`, or `local.settings.json`
-- Check Python environment and Azure Function Core Tools installation
+- Check Python environment and Azure Functions Core Tools installation
 - Provide suggestions based on best practices
 
 ## Get Started
