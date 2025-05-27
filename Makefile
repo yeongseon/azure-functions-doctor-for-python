@@ -78,6 +78,13 @@ coverage:
 	@echo "📂 Open htmlcov/index.html in your browser to view the coverage report"
 
 # ------------------------------
+# 🧪 Multi-Version Test with tox
+# ------------------------------
+.PHONY: tox
+tox:
+	@$(VENV_PYTHON) -m tox
+	
+# ------------------------------
 # 📦 Build & Release
 # ------------------------------
 .PHONY: build
