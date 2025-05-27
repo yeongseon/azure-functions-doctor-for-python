@@ -1,34 +1,10 @@
-# Azure Functions Doctor
+# Azure Functions Doctor 🩺
 
-🩺 A Python-based diagnostic tool for Azure Function Apps.
+Azure Functions Doctor is a CLI tool to validate and diagnose your Python Azure Functions environment.
 
-## Features
+## Key Features
 
-- Diagnose common issues in `host.json`, `function.json`, or `local.settings.json`
-- Check Python environment and Azure Functions Core Tools installation
-- Provide suggestions based on best practices
-
-## Get Started
-
-```bash
-make venv
-make install
-azfunc-doctor run
-```
-
-## Commands
-
-| Command         | Description                                      |
-|-----------------|--------------------------------------------------|
-| `make venv`     | Create a virtual environment                     |
-| `make install`  | Install package and dev dependencies             |
-| `make format`   | Format code using Ruff and Black                 |
-| `make lint`     | Run linter using Ruff                            |
-| `make test`     | Run unit tests                                   |
-| `make clean`    | Remove build artifacts (preserve `.venv`)       |
-| `make clean-all`| Remove all dev artifacts including `.venv`       |
-| `make docs`     | Start local MkDocs documentation server          |
-
-## License
-
-MIT License. Created by Yeongseon Choe.
+- Diagnose Python version and virtual environment
+- Validate Azure Functions project structure (`host.json`, `function.json`)
+- Developer-friendly output with emoji indicators
+- Linting, typing, test coverage, and release automation support
