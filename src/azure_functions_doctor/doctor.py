@@ -2,6 +2,7 @@
 
 Contains the main diagnostic logic for checking Python Azure Functions environments.
 """
+
 from rich import print
 
 

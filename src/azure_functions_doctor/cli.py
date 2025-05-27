@@ -1,35 +1,28 @@
-"""CLI entry point for Azure Functions Doctor.
-
-Defines the Typer CLI application and commands for running diagnostics and showing the version.
 """
-import typer
+CLI entry point for Azure Functions Doctor.
 
+Defines the Click CLI application and commands for running diagnostics and showing the version.
+"""
+
+import click
+
+from azure_functions_doctor import __version__
 from azure_functions_doctor.doctor import run_diagnostics
 
-from . import __version__
 
-app = typer.Typer(add_completion=False)
-
-
-@app.callback()
-def cli(
-    version: bool = typer.Option(False, "--version", "-v", help="Show version and exit"),
-) -> None:
-    """Main CLI callback for Azure Functions Doctor.
-
-    Handles the --version option and exits if specified.
-    """
-    if version:
-        typer.echo(f"azure-functions-doctor v{__version__}")
-        raise typer.Exit()
+@click.group(help="Azure Functions Doctor CLI Tool")
+@click.version_option(__version__, prog_name="azure-functions-doctor")
+def cli() -> None:
+    """Main CLI group."""
+    pass
 
 
-@app.command()
-def run() -> None:
-    """Run the Azure Function diagnostics."""
+@cli.command(name="run", help="Run the Azure Function diagnostics.")
+def run_command() -> None:
+    """Run diagnostics logic."""
     run_diagnostics()
 
 
 def main() -> None:
     """Entrypoint for the CLI application."""
-    app()
+    cli()
