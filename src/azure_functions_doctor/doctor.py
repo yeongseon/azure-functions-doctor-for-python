@@ -1,7 +1,12 @@
+"""Diagnostic routines for Azure Functions Doctor.
+
+Contains the main diagnostic logic for checking Python Azure Functions environments.
+"""
 from rich import print
 
 
-def run_diagnostics():
+def run_diagnostics() -> None:
+    """Run all diagnostic checks and print results to the terminal."""
     print("[bold blue]🩺 Azure Function Doctor is running...[/bold blue]")
 
     # Example diagnostic step
