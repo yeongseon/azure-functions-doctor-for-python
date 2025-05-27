@@ -80,6 +80,10 @@ exclude_lines = [
 [tool.hatch.metadata]
 allow-direct-references = true
 
+[tool.hatch.version]
+source = "code"
+path = "src/azure_functions_doctor/__init__.py"
+
 [tool.tox]
 envlist = ["py39", "py310", "py311", "py312"]
 skip_missing_interpreters = true
