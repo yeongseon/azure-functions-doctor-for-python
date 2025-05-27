@@ -24,6 +24,7 @@ dev = [
     "pytest",
     "ruff",
     "types-requests",
+    "tox",
 ]
 
 [project.scripts]
@@ -78,3 +79,11 @@ exclude_lines = [
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.tox]
+envlist = ["py39", "py310", "py311", "py312"]
+skip_missing_interpreters = true
+
+[tool.tox.testenv]
+deps = ["pytest"]
+commands = ["pytest", "tests"]
