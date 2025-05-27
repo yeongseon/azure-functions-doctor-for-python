@@ -2,27 +2,34 @@
 ifeq ($(OS),Windows_NT)
     PYTHON := $(shell where python)
     VENV_PYTHON := .venv/Scripts/python.exe
+    UV_EXISTS := $(shell where uv >nul 2>&1 && echo yes || echo no)
 else
     PYTHON := $(shell which python3)
     VENV_PYTHON := .venv/bin/python
+    UV_EXISTS := $(shell command -v uv >/dev/null 2>&1 && echo yes || echo no)
 endif
 
 # ------------------------------
 # 🔧 Environment Setup
 # ------------------------------
-.PHONY: check-python
-check-python:
-	@$(PYTHON) -c "import sys; assert sys.version_info >= (3,9), '❌ Python 3.9+ is required'" || exit 1
-
 .PHONY: venv
-venv: check-python
+venv:
+ifeq ($(UV_EXISTS),yes)
+	@uv venv
+else
 	@$(PYTHON) -m venv .venv
+endif
 	@echo "✅ Virtual environment created at .venv"
 
 .PHONY: install
 install:
+ifeq ($(UV_EXISTS),yes)
+	@uv pip install -e ".[dev]"
+else
+	@echo "⚠️ uv not found, using pip"
 	@$(VENV_PYTHON) -m pip install --upgrade pip
 	@$(VENV_PYTHON) -m pip install -e ".[dev]"
+endif
 
 .PHONY: reset
 reset: clean-all venv install
