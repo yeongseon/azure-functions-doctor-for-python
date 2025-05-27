@@ -1,7 +1,0 @@
-[run]
-branch = True
-source = azure_functions_doctor
-
-[report]
-show_missing = True
-skip_covered = True

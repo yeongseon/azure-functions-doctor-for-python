@@ -22,9 +22,8 @@ venv: check-python
 .PHONY: install
 install:
 	@$(VENV_PYTHON) -m pip install --upgrade pip
-	@$(VENV_PYTHON) -m pip install -e .
 	@$(VENV_PYTHON) -m pip install -e ".[dev]"
-	
+
 .PHONY: reset
 reset: clean-all venv install
 	@echo "🔁 Project reset complete."
@@ -46,7 +45,7 @@ typecheck:
 	@$(VENV_PYTHON) -m mypy src tests
 
 .PHONY: check
-check: lint typecheck test
+check: format lint typecheck test
 	@echo "✅ All checks passed!"
 
 .PHONY: precommit
@@ -124,7 +123,7 @@ doctor:
 	@echo "🔍 Azure Function Core Tools version:"
 	@func --version || echo "⚠️ func not found. Install with: npm i -g azure-functions-core-tools@4"
 	@echo "🔍 Pre-commit hook installed:"
-	@if exist .git/hooks/pre-commit (echo ✅ Yes) else (echo ❌ No)
+	@$(VENV_PYTHON) -c "import os; print('✅ Yes' if os.path.exists('.git/hooks/pre-commit') else '❌ No')"
 
 # ------------------------------
 # 🧹 Clean

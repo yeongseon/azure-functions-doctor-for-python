@@ -23,7 +23,7 @@ dev = [
     "pre-commit",
     "pytest",
     "ruff",
-    "types-requests"
+    "types-requests",
 ]
 
 [project.scripts]
@@ -50,6 +50,15 @@ select = ["E", "F", "I"]
 [tool.ruff.isort]
 known-first-party = ["azure_functions_doctor"]
 
+[tool.mypy]
+python_version = "3.9"
+check_untyped_defs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+strict_optional = true
+namespace_packages = true
+explicit_package_bases = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
@@ -61,3 +70,11 @@ source = ["azure_functions_doctor"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
