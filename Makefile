@@ -1,12 +1,12 @@
 # Detect Python command
 ifeq ($(OS),Windows_NT)
-	PYTHON := $(shell where python)
-	VENV_PYTHON := .venv/Scripts/python.exe
-	UV_EXISTS := $(shell where uv >NUL 2>&1 && echo yes || echo no)
+    PYTHON := $(shell where python)
+    VENV_PYTHON := .venv/Scripts/python.exe
+    UV_EXISTS := $(shell cmd /c "where uv >nul 2>&1 && echo yes || echo no")
 else
-	PYTHON := $(shell which python3)
-	VENV_PYTHON := .venv/bin/python
-	UV_EXISTS := $(shell command -v uv >/dev/null 2>&1 && echo yes || echo no)
+    PYTHON := $(shell which python3)
+    VENV_PYTHON := .venv/bin/python
+    UV_EXISTS := $(shell command -v uv >/dev/null 2>&1 && echo yes || echo no)
 endif
 
 # ------------------------------
