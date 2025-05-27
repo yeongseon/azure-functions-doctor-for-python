@@ -1,12 +1,12 @@
 # Detect Python command
 ifeq ($(OS),Windows_NT)
-    PYTHON := $(shell where python)
-    VENV_PYTHON := .venv/Scripts/python.exe
-    UV_EXISTS := $(shell where uv >nul 2>&1 && echo yes || echo no)
+	PYTHON := $(shell where python)
+	VENV_PYTHON := .venv/Scripts/python.exe
+	UV_EXISTS := $(shell where uv >NUL 2>&1 && echo yes || echo no)
 else
-    PYTHON := $(shell which python3)
-    VENV_PYTHON := .venv/bin/python
-    UV_EXISTS := $(shell command -v uv >/dev/null 2>&1 && echo yes || echo no)
+	PYTHON := $(shell which python3)
+	VENV_PYTHON := .venv/bin/python
+	UV_EXISTS := $(shell command -v uv >/dev/null 2>&1 && echo yes || echo no)
 endif
 
 # ------------------------------
@@ -83,7 +83,7 @@ coverage:
 .PHONY: tox
 tox:
 	@$(VENV_PYTHON) -m tox
-	
+
 # ------------------------------
 # 📦 Build & Release
 # ------------------------------
@@ -145,25 +145,18 @@ doctor:
 .PHONY: clean
 ifeq ($(OS),Windows_NT)
 clean:
-	@for /d %%D in (*.egg-info dist build __pycache__ .pytest_cache) do if exist %%D rmdir /s /q %%D
+	@cmd /c scripts\clean-win.bat
 else
 clean:
-	rm -rf *.egg-info dist build __pycache__ .pytest_cache
+	@rm -rf *.egg-info dist build __pycache__ .pytest_cache
 endif
 
 .PHONY: clean-all
-clean-all: clean
 ifeq ($(OS),Windows_NT)
-	@if exist .venv rmdir /s /q .venv
-	@for /r %%D in (__pycache__) do if exist %%D rmdir /s /q %%D
-	@for /r %%F in (*.pyc *.pyo) do if exist %%F del /q %%F
-	@if exist .mypy_cache rmdir /s /q .mypy_cache
-	@if exist .ruff_cache rmdir /s /q .ruff_cache
-	@if exist .pytest_cache rmdir /s /q .pytest_cache
-	@if exist .coverage del /q .coverage
-	@if exist coverage.xml del /q coverage.xml
-	@if exist .DS_Store del /q .DS_Store
+clean-all: clean
+	@cmd /c scripts\clean-all-win.bat
 else
+clean-all: clean
 	rm -rf .venv
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.py[co]" -delete
