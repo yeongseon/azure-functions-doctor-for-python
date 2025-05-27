@@ -5,6 +5,7 @@ description = "A diagnostic tool for Python Azure Functions"
 authors = [{ name = "Yeongseon Choe", email = "yeongseon.choe@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.9"
+
 dependencies = [
     "click",
     "rich",
@@ -25,6 +26,7 @@ dev = [
     "ruff",
     "types-requests",
     "tox",
+    "commitizen",
 ]
 
 [project.scripts]
@@ -33,6 +35,10 @@ azfunc-doctor = "azure_functions_doctor.cli:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+# -------------------------
+# Formatting & Linting Tools
+# -------------------------
 
 [tool.black]
 line-length = 100
@@ -51,6 +57,10 @@ select = ["E", "F", "I"]
 [tool.ruff.lint.isort]
 known-first-party = ["azure_functions_doctor"]
 
+# -------------------------
+# Type Checking
+# -------------------------
+
 [tool.mypy]
 python_version = "3.9"
 check_untyped_defs = true
@@ -59,6 +69,10 @@ ignore_missing_imports = true
 strict_optional = true
 namespace_packages = true
 explicit_package_bases = true
+
+# -------------------------
+# Testing
+# -------------------------
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -77,12 +91,31 @@ exclude_lines = [
     "raise NotImplementedError",
 ]
 
+# -------------------------
+# Version & Build
+# -------------------------
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.version]
 source = "code"
 path = "src/azure_functions_doctor/__init__.py"
+
+# -------------------------
+# Commitizen (changelog)
+# -------------------------
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "v$version"
+update_changelog_on_bump = true
+changelog_file = "CHANGELOG.md"
+
+# -------------------------
+# Tox (multi Python version)
+# -------------------------
 
 [tool.tox]
 envlist = ["py39", "py310", "py311", "py312"]

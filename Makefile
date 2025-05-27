@@ -93,26 +93,19 @@ build:
 
 .PHONY: release
 release:
-ifndef VERSION
-	$(error VERSION is not set. Usage: make release VERSION=0.1.0)
-endif
-	@git tag -a v$(VERSION) -m "Release v$(VERSION)"
-	@git push origin v$(VERSION)
+	@cz bump --changelog
 
 .PHONY: release-patch
 release-patch:
-	@hatch version patch
-	@make release VERSION=$(shell hatch version)
+	@cz bump --increment patch --changelog
 
 .PHONY: release-minor
 release-minor:
-	@hatch version minor
-	@make release VERSION=$(shell hatch version)
+	@cz bump --increment minor --changelog
 
 .PHONY: release-major
 release-major:
-	@hatch version major
-	@make release VERSION=$(shell hatch version)
+	@cz bump --increment major --changelog
 
 .PHONY: publish
 publish:
