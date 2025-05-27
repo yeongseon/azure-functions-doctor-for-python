@@ -161,6 +161,7 @@ clean-all: clean
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.py[co]" -delete
 	rm -rf .mypy_cache .ruff_cache .pytest_cache .coverage coverage.xml .DS_Store
+	rm -rf .tox htmlcov
 endif
 
 # ------------------------------

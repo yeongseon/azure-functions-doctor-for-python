@@ -21,3 +21,7 @@ if exist .pytest_cache rmdir /S /Q .pytest_cache
 if exist .coverage del /Q .coverage
 if exist coverage.xml del /Q coverage.xml
 if exist .DS_Store del /Q .DS_Store
+
+REM Also remove tox and coverage HTML outputs
+if exist .tox rmdir /S /Q .tox
+if exist htmlcov rmdir /S /Q htmlcov
