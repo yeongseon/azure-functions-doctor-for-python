@@ -1,24 +1,23 @@
 # ------------------------------
-# 🔧 Environment Setup
+# 🧰 Hatch Environment Management
 # ------------------------------
 
 .PHONY: install
 install:
-	hatch env create
-	hatch run precommit-install
+	@hatch env create
+	@make precommit-install
 
 .PHONY: shell
 shell:
-	hatch shell
+	@hatch shell
+
+.PHONY: reset
+reset: clean-all install
+	@echo "🔁 Project reset complete."
 
 .PHONY: hatch-clean
 hatch-clean:
-	hatch env remove default || true
-	rm -rf .hatch
-
-.PHONY: reset
-reset: clean-all hatch-clean install
-	@echo "🔁 Project reset complete."
+	@hatch env remove || echo "⚠️ No hatch environment to remove"
 
 # ------------------------------
 # 🧹 Code Quality
@@ -26,27 +25,39 @@ reset: clean-all hatch-clean install
 
 .PHONY: format
 format:
-	hatch run format
+	@hatch run format
 
-.PHONY: lint
-lint:
-	hatch run lint
+.PHONY: style
+style:
+	@hatch run style
 
 .PHONY: typecheck
 typecheck:
-	hatch run typecheck
+	@hatch run typecheck
+
+.PHONY: lint
+lint:
+	@hatch run lint
 
 .PHONY: check
 check:
-	hatch run check
+	@make lint
+	@make typecheck
+	@echo "✅ Lint & type check passed!"
+
+.PHONY: check-all
+check-all:
+	@make check
+	@make test
+	@echo "✅ All checks passed including tests!"
 
 .PHONY: precommit
 precommit:
-	hatch run precommit
+	@hatch run precommit
 
 .PHONY: precommit-install
 precommit-install:
-	hatch run precommit-install
+	@hatch run precommit-install
 
 # ------------------------------
 # 🧪 Testing & Coverage
@@ -54,15 +65,13 @@ precommit-install:
 
 .PHONY: test
 test:
-	hatch run test
+	@echo "🔬 Running tests..."
+	@hatch run test
 
 .PHONY: cov
 cov:
-	hatch run cov
-
-.PHONY: tox
-tox:
-	hatch run tox
+	@hatch run cov
+	@echo "📂 Open htmlcov/index.html in your browser to view the coverage report"
 
 # ------------------------------
 # 📦 Build & Release
@@ -70,27 +79,34 @@ tox:
 
 .PHONY: build
 build:
-	hatch build
+	@hatch build
 
 .PHONY: release
 release:
-	cz bump --changelog
+ifndef VERSION
+	$(error VERSION is not set. Usage: make release VERSION=0.1.0)
+endif
+	@git tag -a v$(VERSION) -m "Release v$(VERSION)"
+	@git push origin v$(VERSION)
 
 .PHONY: release-patch
 release-patch:
-	cz bump --increment patch --changelog
+	@hatch version patch
+	@make release VERSION=$(shell hatch version)
 
 .PHONY: release-minor
 release-minor:
-	cz bump --increment minor --changelog
+	@hatch version minor
+	@make release VERSION=$(shell hatch version)
 
 .PHONY: release-major
 release-major:
-	cz bump --increment major --changelog
+	@hatch version major
+	@make release VERSION=$(shell hatch version)
 
 .PHONY: publish
 publish:
-	hatch publish
+	@hatch publish
 
 # ------------------------------
 # 📚 Documentation
@@ -98,7 +114,7 @@ publish:
 
 .PHONY: docs
 docs:
-	hatch run docs
+	@hatch run docs
 
 # ------------------------------
 # 🩺 Diagnostic
@@ -106,14 +122,11 @@ docs:
 
 .PHONY: doctor
 doctor:
-	@echo "🔍 Python version:"
-	@python --version
-	@echo "🔍 Installed packages:"
-	@hatch run pip list
-	@echo "🔍 Azure Function Core Tools version:"
-	@func --version || echo "⚠️ func not found. Install with: npm i -g azure-functions-core-tools@4"
+	@echo "🔍 Python version:" && python --version
+	@echo "🔍 Installed packages:" && hatch env run pip list || echo "⚠️ No hatch env found"
+	@echo "🔍 Azure Function Core Tools version:" && func --version || echo "⚠️ func not found. Install with: npm i -g azure-functions-core-tools@4"
 	@echo "🔍 Pre-commit hook installed:"
-	@test -e .git/hooks/pre-commit && echo "✅ Yes" || echo "❌ No"
+	@if [ -f .git/hooks/pre-commit ]; then echo ✅ Yes; else echo ❌ No; fi
 
 # ------------------------------
 # 🧹 Clean
@@ -121,13 +134,13 @@ doctor:
 
 .PHONY: clean
 clean:
-	rm -rf dist build .mypy_cache .ruff_cache .pytest_cache .coverage coverage.xml htmlcov .DS_Store
+	@rm -rf *.egg-info dist build __pycache__ .pytest_cache
 
 .PHONY: clean-all
 clean-all: clean
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type f -name "*.py[co]" -delete
-	rm -rf .hatch .venv .tox
+	@find . -type d -name "__pycache__" -exec rm -rf {} +
+	@find . -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete
+	@rm -rf .mypy_cache .ruff_cache .pytest_cache .coverage coverage.xml htmlcov .DS_Store
 
 # ------------------------------
 # 🆘 Help
@@ -135,5 +148,5 @@ clean-all: clean
 
 .PHONY: help
 help:
-	@echo "📖 Available commands:"
-	@grep -E '^\.PHONY: ' Makefile | cut -d ':' -f2 | xargs -n1 echo "  - make"
+	@echo "📖 Available commands:" && \
+	grep -E '^\.PHONY: ' Makefile | cut -d ':' -f2 | xargs -n1 echo "  - make"

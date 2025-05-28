@@ -17,14 +17,17 @@ readme = "README.md"
 requires-python = ">=3.9"
 
 # ----------------------------------------
-# 📚 Dependencies
+# 📚 Runtime Dependencies
 # ----------------------------------------
 dependencies = [
-    "click",
+    "typer[all]",
     "rich",
     "requests"
 ]
 
+# ----------------------------------------
+# 🔧 Optional (Dev) Dependencies
+# ----------------------------------------
 [project.optional-dependencies]
 dev = [
     "black",
@@ -38,8 +41,7 @@ dev = [
     "pytest",
     "ruff",
     "types-requests",
-    "tox",
-    "commitizen"
+    "tox"
 ]
 
 # ----------------------------------------
@@ -49,58 +51,32 @@ dev = [
 azfunc-doctor = "azure_functions_doctor.cli:main"
 
 # ----------------------------------------
-# 🛠 Hatch Environments & Scripts
+# 🐍 Hatch Environment Configuration
 # ----------------------------------------
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.version]
-source = "code"
-path = "src/azure_function_doctor/__init__.py"
-
 [tool.hatch.envs.default]
-dependencies = [
-    "black",
-    "coverage",
-    "mypy",
-    "pytest",
-    "ruff",
-    "pre-commit"
-]
+features = ["dev"]
 
 [tool.hatch.envs.default.scripts]
-format = "black src tests"
-lint = "ruff check src tests"
+format = "ruff format src tests && black src tests"
+style = "ruff check src tests"
 typecheck = "mypy src tests"
-test = "pytest"
-cov = [
-    "coverage run -m pytest",
-    "coverage report",
-    "coverage html"
-]
-check = [
-    "hatch run format",
-    "hatch run lint",
-    "hatch run typecheck",
-    "hatch run test"
-]
+lint = "hatch run style && hatch run typecheck"
+test = "pytest -v tests"
+cov = "coverage run -m pytest && coverage report && coverage html"
 docs = "mkdocs serve"
 precommit = "pre-commit run --all-files"
 precommit-install = "pre-commit install"
 
 # ----------------------------------------
-# 📦 Hatch Build Target
-# ----------------------------------------
-[tool.hatch.build.targets.wheel]
-packages = ["src/azure_function_doctor"]
-
-# ----------------------------------------
-# 🧹 Formatting & Linting
+# 🎨 Code Formatting - Black
 # ----------------------------------------
 [tool.black]
 line-length = 100
 target-version = ["py39"]
 
+# ----------------------------------------
+# 🔍 Linting - Ruff
+# ----------------------------------------
 [tool.ruff]
 line-length = 100
 target-version = "py39"
@@ -109,60 +85,35 @@ src = ["src"]
 fix = true
 
 [tool.ruff.lint]
-select = ["E", "F", "I"]
+select = ["E", "F", "I", "B"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["azure_functions_doctor"]
 
 # ----------------------------------------
-# 🧠 Type Checking
+# 🧪 Type Checking - Mypy
 # ----------------------------------------
 [tool.mypy]
 python_version = "3.9"
-check_untyped_defs = true
-disallow_untyped_defs = true
-ignore_missing_imports = true
-strict_optional = true
-namespace_packages = true
-explicit_package_bases = true
+strict = true
+warn_unused_configs = true
+show_error_codes = true
+pretty = true
 
 # ----------------------------------------
-# 🧪 Testing & Coverage
+# 🧪 Testing - Pytest
 # ----------------------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
 
+# ----------------------------------------
+# 📊 Coverage Reporting
+# ----------------------------------------
 [tool.coverage.run]
 branch = true
-source = ["azure_functions_doctor"]
+source = ["src/azure_functions_doctor"]
 
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-exclude_lines = [
-    "pragma: no cover",
-    "if __name__ == .__main__.:",
-    "raise NotImplementedError",
-]
-
-# ----------------------------------------
-# 📝 Commitizen
-# ----------------------------------------
-[tool.commitizen]
-name = "cz_conventional_commits"
-version = "0.1.0"
-tag_format = "v$version"
-update_changelog_on_bump = true
-changelog_file = "CHANGELOG.md"
-
-# ----------------------------------------
-# 🧪 Tox (Multi-Python Support)
-# ----------------------------------------
-[tool.tox]
-envlist = ["py39", "py310", "py311", "py312"]
-skip_missing_interpreters = true
-
-[tool.tox.testenv]
-deps = ["pytest"]
-commands = ["pytest", "tests"]
