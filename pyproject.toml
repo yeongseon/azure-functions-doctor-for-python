@@ -30,16 +30,16 @@ dependencies = [
 # ----------------------------------------
 [project.optional-dependencies]
 dev = [
-    "black",
+    "black==24.4.2",  
     "build",
     "coverage",
     "hatch",
     "mkdocs",
     "mkdocs-material",
-    "mypy",
+    "mypy==1.15.0",
     "pre-commit",
     "pytest",
-    "ruff",
+    "ruff==0.11.11",
     "types-requests",
     "tox"
 ]
