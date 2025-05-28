@@ -1,5 +1,0 @@
-[build.targets.sdist]
-include = ["src/**", "README.md", "pyproject.toml"]
-
-[build.targets.wheel]
-packages = ["src/azure_functions_doctor"]

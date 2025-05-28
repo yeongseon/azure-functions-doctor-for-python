@@ -1,3 +1,13 @@
+# ----------------------------------------
+# 📦 Build System
+# ----------------------------------------
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# ----------------------------------------
+# 🧾 Project Metadata
+# ----------------------------------------
 [project]
 name = "azure-function-doctor"
 version = "0.1.0"
@@ -6,10 +16,13 @@ authors = [{ name = "Yeongseon Choe", email = "yeongseon.choe@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.9"
 
+# ----------------------------------------
+# 📚 Dependencies
+# ----------------------------------------
 dependencies = [
     "click",
     "rich",
-    "requests",
+    "requests"
 ]
 
 [project.optional-dependencies]
@@ -26,20 +39,64 @@ dev = [
     "ruff",
     "types-requests",
     "tox",
-    "commitizen",
+    "commitizen"
 ]
 
+# ----------------------------------------
+# 🖥️ CLI Entrypoint
+# ----------------------------------------
 [project.scripts]
 azfunc-doctor = "azure_functions_doctor.cli:main"
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+# ----------------------------------------
+# 🛠 Hatch Environments & Scripts
+# ----------------------------------------
+[tool.hatch.metadata]
+allow-direct-references = true
 
-# -------------------------
-# Formatting & Linting Tools
-# -------------------------
+[tool.hatch.version]
+source = "code"
+path = "src/azure_function_doctor/__init__.py"
 
+[tool.hatch.envs.default]
+dependencies = [
+    "black",
+    "coverage",
+    "mypy",
+    "pytest",
+    "ruff",
+    "pre-commit"
+]
+
+[tool.hatch.envs.default.scripts]
+format = "black src tests"
+lint = "ruff check src tests"
+typecheck = "mypy src tests"
+test = "pytest"
+cov = [
+    "coverage run -m pytest",
+    "coverage report",
+    "coverage html"
+]
+check = [
+    "hatch run format",
+    "hatch run lint",
+    "hatch run typecheck",
+    "hatch run test"
+]
+docs = "mkdocs serve"
+precommit = "pre-commit run --all-files"
+precommit-install = "pre-commit install"
+
+# ----------------------------------------
+# 📦 Hatch Build Target
+# ----------------------------------------
+[tool.hatch.build.targets.wheel]
+packages = ["src/azure_function_doctor"]
+
+# ----------------------------------------
+# 🧹 Formatting & Linting
+# ----------------------------------------
 [tool.black]
 line-length = 100
 target-version = ["py39"]
@@ -57,10 +114,9 @@ select = ["E", "F", "I"]
 [tool.ruff.lint.isort]
 known-first-party = ["azure_functions_doctor"]
 
-# -------------------------
-# Type Checking
-# -------------------------
-
+# ----------------------------------------
+# 🧠 Type Checking
+# ----------------------------------------
 [tool.mypy]
 python_version = "3.9"
 check_untyped_defs = true
@@ -70,10 +126,9 @@ strict_optional = true
 namespace_packages = true
 explicit_package_bases = true
 
-# -------------------------
-# Testing
-# -------------------------
-
+# ----------------------------------------
+# 🧪 Testing & Coverage
+# ----------------------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
@@ -91,21 +146,9 @@ exclude_lines = [
     "raise NotImplementedError",
 ]
 
-# -------------------------
-# Version & Build
-# -------------------------
-
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.version]
-source = "code"
-path = "src/azure_functions_doctor/__init__.py"
-
-# -------------------------
-# Commitizen (changelog)
-# -------------------------
-
+# ----------------------------------------
+# 📝 Commitizen
+# ----------------------------------------
 [tool.commitizen]
 name = "cz_conventional_commits"
 version = "0.1.0"
@@ -113,10 +156,9 @@ tag_format = "v$version"
 update_changelog_on_bump = true
 changelog_file = "CHANGELOG.md"
 
-# -------------------------
-# Tox (multi Python version)
-# -------------------------
-
+# ----------------------------------------
+# 🧪 Tox (Multi-Python Support)
+# ----------------------------------------
 [tool.tox]
 envlist = ["py39", "py310", "py311", "py312"]
 skip_missing_interpreters = true
