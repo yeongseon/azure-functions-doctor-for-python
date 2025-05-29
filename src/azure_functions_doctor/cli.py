@@ -1,44 +1,42 @@
-"""
-CLI entry point for Azure Functions Doctor.
-
-Defines the Typer CLI application and commands for running diagnostics and showing the version.
-"""
+import json
+import traceback
 
 import typer
 
-from azure_functions_doctor import __version__
-from azure_functions_doctor.doctor import run_diagnostics
+from azure_functions_doctor.api import run_diagnostics
 
-app = typer.Typer(help="Azure Functions Doctor CLI Tool")
-
-
-@app.command("run", help="Run the Azure Function diagnostics.")
-def run_command() -> None:
-    """Run diagnostics logic."""
-    run_diagnostics()
+cli = typer.Typer()
 
 
-@app.callback()
-def main_callback(
-    version: bool = typer.Option(
-        None,
-        "--version",
-        is_eager=True,
-        help="Show the version and exit.",
-        callback=lambda value: _handle_version_option(value),
-    )
-) -> None:
-    """Azure Functions Doctor CLI Tool"""
-    pass
+@cli.command()
+def diagnose(path: str = ".", json_output: bool = False) -> None:
+    """Run diagnostics on an Azure Functions project directory.
+    Args:
+        path (str): The file system path to the Azure Functions application.
+                    Defaults to the current directory.
+        json_output (bool): If true, output results in JSON format. Defaults to false.
+    Returns:
+        None: Prints the results of the diagnostics to the console.
+    """
+    try:
+        results = run_diagnostics(path)
+
+        if json_output:
+            print(json.dumps(results, indent=2))
+        else:
+            for r in results:
+                symbol = {"pass": "✅", "warn": "⚠️", "fail": "❌"}.get(r["result"], "❓")
+                print(f"{symbol} {r['check']}: {r['detail']}")
+    except Exception as e:
+        print("❌ CLI internal error:", str(e))
+        traceback.print_exc()
+        raise typer.Exit(code=2) from e
 
 
-def _handle_version_option(value: bool) -> None:
-    """Handle --version option."""
-    if value:
-        print(f"azure-functions-doctor v{__version__}")
-        raise typer.Exit()
+# Register the diagnose command with the CLI
+cli.command(name="diagnose", help="Run diagnostics on an Azure Functions project directory.")(
+    diagnose
+)
 
-
-def main() -> None:
-    """Entrypoint for the CLI application."""
-    app()
+if __name__ == "__main__":
+    cli()

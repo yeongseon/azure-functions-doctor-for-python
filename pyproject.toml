@@ -6,6 +6,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 # ----------------------------------------
+# 📦 Hatch Build Target (wheel + src layout)
+# ----------------------------------------
+[tool.hatch.build.targets.wheel]
+packages = ["src/azure_functions_doctor"]
+
+# ----------------------------------------
 # 🧾 Project Metadata
 # ----------------------------------------
 [project]
@@ -16,18 +22,14 @@ authors = [{ name = "Yeongseon Choe", email = "yeongseon.choe@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.9"
 
-# ----------------------------------------
 # 📚 Runtime Dependencies
-# ----------------------------------------
 dependencies = [
-    "typer[all]",
+    "typer",
     "rich",
     "requests"
 ]
 
-# ----------------------------------------
 # 🔧 Optional (Dev) Dependencies
-# ----------------------------------------
 [project.optional-dependencies]
 dev = [
     "black==24.4.2",  
@@ -44,15 +46,11 @@ dev = [
     "tox"
 ]
 
-# ----------------------------------------
 # 🖥️ CLI Entrypoint
-# ----------------------------------------
 [project.scripts]
-azfunc-doctor = "azure_functions_doctor.cli:main"
+azfunc-doctor = "azure_functions_doctor.cli:cli"
 
-# ----------------------------------------
 # 🐍 Hatch Environment Configuration
-# ----------------------------------------
 [tool.hatch.envs.default]
 features = ["dev"]
 
@@ -67,16 +65,12 @@ docs = "mkdocs serve"
 precommit = "pre-commit run --all-files"
 precommit-install = "pre-commit install"
 
-# ----------------------------------------
 # 🎨 Code Formatting - Black
-# ----------------------------------------
 [tool.black]
 line-length = 100
 target-version = ["py39"]
 
-# ----------------------------------------
 # 🔍 Linting - Ruff
-# ----------------------------------------
 [tool.ruff]
 line-length = 100
 target-version = "py39"
@@ -90,9 +84,7 @@ select = ["E", "F", "I", "B"]
 [tool.ruff.lint.isort]
 known-first-party = ["azure_functions_doctor"]
 
-# ----------------------------------------
 # 🧪 Type Checking - Mypy
-# ----------------------------------------
 [tool.mypy]
 python_version = "3.9"
 strict = true
@@ -100,16 +92,12 @@ warn_unused_configs = true
 show_error_codes = true
 pretty = true
 
-# ----------------------------------------
 # 🧪 Testing - Pytest
-# ----------------------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
 
-# ----------------------------------------
 # 📊 Coverage Reporting
-# ----------------------------------------
 [tool.coverage.run]
 branch = true
 source = ["src/azure_functions_doctor"]
