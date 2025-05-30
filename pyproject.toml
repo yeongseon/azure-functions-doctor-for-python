@@ -6,8 +6,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 # ----------------------------------------
-# 📦 Hatch Build Target (wheel + src layout)
+# 📦 Hatch Build Configuration
 # ----------------------------------------
+[tool.hatch.build]
+include = ["src/azure_functions_doctor/py.typed"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/azure_functions_doctor"]
 
@@ -18,39 +21,41 @@ packages = ["src/azure_functions_doctor"]
 name = "azure-function-doctor"
 version = "0.1.0"
 description = "A diagnostic tool for Python Azure Functions"
-authors = [{ name = "Yeongseon Choe", email = "yeongseon.choe@gmail.com" }]
+authors = [
+  { name = "Yeongseon Choe", email = "yeongseon.choe@gmail.com" }
+]
 readme = "README.md"
 requires-python = ">=3.9"
 
 # 📚 Runtime Dependencies
 dependencies = [
-    "typer",
-    "rich",
-    "requests"
+  "typer",
+  "rich",
+  "requests"
 ]
 
-# 🔧 Optional (Dev) Dependencies
+# 🧪 Optional Development Dependencies
 [project.optional-dependencies]
 dev = [
-    "black==24.4.2",  
-    "build",
-    "coverage",
-    "hatch",
-    "mkdocs",
-    "mkdocs-material",
-    "mypy==1.15.0",
-    "pre-commit",
-    "pytest",
-    "ruff==0.11.11",
-    "types-requests",
-    "tox"
+  "black==24.4.2",
+  "build",
+  "coverage",
+  "hatch",
+  "mkdocs",
+  "mkdocs-material",
+  "mypy==1.15.0",
+  "pre-commit",
+  "pytest",
+  "ruff==0.11.11",
+  "types-requests",
+  "tox"
 ]
 
 # 🖥️ CLI Entrypoint
 [project.scripts]
 azfunc-doctor = "azure_functions_doctor.cli:cli"
 
-# 🐍 Hatch Environment Configuration
+# 🧪 Hatch Environment (Development)
 [tool.hatch.envs.default]
 features = ["dev"]
 
