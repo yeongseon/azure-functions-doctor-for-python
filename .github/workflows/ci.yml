@@ -34,9 +34,9 @@ jobs:
       - name: Generate Coverage Report (optional)
         run: make cov
 
-      - name: Upload Coverage HTML (optional)
+      - name: Upload Coverage HTML
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-html
+          name: coverage-html-${{ matrix.python-version }}
           path: htmlcov/
