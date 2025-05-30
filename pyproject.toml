@@ -72,12 +72,12 @@ precommit-install = "pre-commit install"
 
 # 🎨 Code Formatting - Black
 [tool.black]
-line-length = 100
+line-length = 120
 target-version = ["py39"]
 
 # 🔍 Linting - Ruff
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py39"
 exclude = [".venv", "build", "dist", "__pycache__"]
 src = ["src"]
