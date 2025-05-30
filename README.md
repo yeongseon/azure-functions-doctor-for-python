@@ -1,122 +1,97 @@
-# Azure Functions Doctor 🩺
+# 🩺 Azure Functions Doctor
 
-**Azure Functions Doctor** is a Python-based CLI tool designed to diagnose, validate, and assist in debugging [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) environments. It helps developers identify misconfigurations, missing dependencies, or best practice violations in their local or deployed Azure Function Apps.
-
----
+**Azure Functions Doctor** is a Python-based CLI tool designed to diagnose and validate your local Azure Functions environment. This tool helps identify configuration issues, missing dependencies, or version mismatches commonly found in Python-based Azure Functions.
 
 ## 🚀 Features
 
-- ✅ Diagnose common issues in Azure Functions (`host.json`, `function.json`, directory structure, etc.)
-- ✅ Check Python version compatibility and venv usage
-- ✅ Validate if Azure Function Core Tools are installed and correctly configured
-- ✅ Ensure best practice configurations for Python-based Azure Functions
-- ✅ Developer-friendly CLI interface with rich terminal output
-- ✅ Built-in linting, type-checking, coverage, and release automation tools
+* ✅ Diagnose common issues in Azure Functions (`host.json`, `function.json`, directory structure, etc.)
+* ✅ Check Python version compatibility and venv usage
+* ✅ Validate if Azure Function Core Tools are installed and correctly configured
+* ✅ Ensure best practice configurations for Python-based Azure Functions
+* ✅ Developer-friendly CLI interface with rich terminal output
+* ✅ Built-in linting, type-checking, coverage, and release automation tools
 
 ---
 
-## 🧰 Requirements
+## 🪠 Requirements
 
-- Python 3.9+
-- Git
-- Optional: Azure Function Core Tools v4 (`npm i -g azure-functions-core-tools@4`)
-- Recommended: Unix-like shell or PowerShell for Makefile support
+* Python 3.9+
+* Git
+* Optional: Azure Function Core Tools v4 (`npm i -g azure-functions-core-tools@4`)
+* Recommended: Unix-like shell or PowerShell for Makefile support
 
 ---
 
 ## 📦 Installation
 
+1. Clone the repository and navigate to the project directory:
+
 ```bash
 git clone https://github.com/yeongseon/azure-functions-doctor.git
 cd azure-functions-doctor
+```
 
-make venv        # Create a virtual environment
-make install     # Install main and development dependencies
-make precommit-install  # Install Git hook for pre-commit
+2. Create and activate a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install the tool:
+
+```bash
+pip install -e .
+```
+
+Alternatively, install from PyPI (when published):
+
+```bash
+pip install azure-functions-doctor
 ```
 
 ---
 
-## 🧪 Usage
+## 🚀 Usage
+
+Navigate to your Azure Functions project directory, then run:
 
 ```bash
-azfunc-doctor run
+azfunc-doctor diagnose
 ```
 
-This command will execute a full diagnostic scan and print results in your terminal.
-
----
-
-## 🛠 Development Workflow
-
-### 🔍 Format, Lint, Type Check, Test
+To see all available commands:
 
 ```bash
-make format        # Format code using ruff & black
-make lint          # Lint using ruff
-make typecheck     # Type checking using mypy
-make test          # Run all tests using pytest
-make check         # Run lint + typecheck + test
+azfunc-doctor --help
 ```
 
----
+### ✅ Sample Output
 
-### 🧼 Cleaning
-
-```bash
-make clean         # Remove build artifacts but keep .venv
-make clean-all     # Remove .venv and all caches
+```
+         Azure Function Diagnostics          
+                                             
+  Check               Result    Detail       
+ ───────────────────────────────── 
+  Python version      ✅ PASS   3.12.3       
+  host.json version   ✅ PASS   version=2.0  
+  requirements.txt    ✅ PASS   Found        
 ```
 
 ---
 
-### 🧪 Code Coverage
+## 💡 Example
 
-```bash
-make coverage
-```
+A full example is available under [`examples/basic-hello`](examples/basic-hello), showing how to:
 
-Generates an HTML report in `htmlcov/index.html`.
-
----
-
-### 🔁 Reset Environment
-
-```bash
-make reset
-```
-
-Performs: `clean-all → venv → install`
+* Initialize an Azure Function locally
+* Use `azure-functions-doctor` to verify configuration
 
 ---
 
-## 📚 Documentation (Live Preview)
+## 📋 Documentation
 
-```bash
-make docs
-```
-
-Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-
----
-
-## 🧹 Git Hooks & Pre-commit
-
-```bash
-make precommit-install  # Install pre-commit hook
-make precommit          # Run all hooks manually (black, ruff, mypy)
-```
-
----
-
-## 🚀 Release & Publishing (with hatch)
-
-```bash
-make release-patch   # bump patch version, tag, push
-make release-minor   # bump minor version, tag, push
-make release-major   # bump major version, tag, push
-make publish         # build and publish to PyPI using hatch
-```
+For advanced usage and developer guides, visit the [project repository](https://github.com/yeongseon/azure-functions-doctor).
 
 ---
 
