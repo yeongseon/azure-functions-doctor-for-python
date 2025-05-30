@@ -1,30 +1,43 @@
-# Development Guide
+# 🛠️ Development Guide (Hatch-based)
 
-## Requirements
+This project uses [Hatch](https://hatch.pypa.io/) as its build and environment manager.
+
+## ✅ Requirements
 
 - Python 3.9+
 - Git
-- Recommended: `uv` for dependency management
+- Recommended: [`uv`](https://github.com/astral-sh/uv) for fast dependency management
 
-## Setup
+## 🚀 Setup
 
 ```bash
-make venv
-make install
-make precommit-install
+make venv               # Create virtual environment
+make install            # Install dependencies using Hatch
+make precommit-install  # Install pre-commit hooks
 ```
 
-## Local Testing
+## 🧪 Local Testing
 
 ```bash
 make check         # Format, lint, typecheck, test
 make test          # Run unit tests
-make coverage      # View test coverage
+make cov           # Generate test coverage report
 ```
 
-## Release
+## 🚢 Release Workflow
 
 ```bash
-make release-patch   # Patch version bump + changelog
-make publish         # Publish to PyPI (requires config)
+make release-patch   # Patch version bump + changelog update
+make release-minor   # Minor version bump + changelog update
+make release-major   # Major version bump + changelog update
+make publish         # Publish to PyPI (requires credentials)
+```
+
+## 🧹 Code Quality Commands
+
+```bash
+make format      # Format code with Black + Ruff
+make lint        # Run Ruff + Mypy
+make typecheck   # Run static type checks
+make docs        # Serve local MkDocs site
 ```
