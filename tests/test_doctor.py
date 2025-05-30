@@ -3,29 +3,35 @@ import os
 import tempfile
 
 from azure_functions_doctor.doctor import Doctor
+from azure_functions_doctor.result import DiagnosticResult
 
 
-def test_check_python_version() -> None:
-    """Test the Python version check."""
-    doctor = Doctor(".")
-    result = doctor.check_python_version()
-    assert result["check"] == "Python version"
-    assert result["result"] in {"pass", "fail"}
-
-
-def test_check_host_json_pass() -> None:
-    """Test the host.json check for a valid version."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        with open(os.path.join(tmpdir, "host.json"), "w") as f:
+def test_doctor_checks_pass() -> None:
+    """Checks that the Doctor runs all checks and returns results."""
+    with tempfile.TemporaryDirectory() as tmp:
+        # Create required files
+        with open(os.path.join(tmp, "host.json"), "w") as f:
             json.dump({"version": "2.0"}, f)
-        doctor = Doctor(tmpdir)
-        result = doctor.check_host_json()
-        assert result["result"] == "pass"
+        with open(os.path.join(tmp, "requirements.txt"), "w") as f:
+            f.write("azure-functions==1.13.0")
+
+        doctor = Doctor(tmp)
+        results = doctor.run_all_checks()
+
+        assert isinstance(results, list)
+        assert all(isinstance(r, DiagnosticResult) for r in results)
+        assert any(r.check == "Python version" for r in results)
+        assert any(r.check == "host.json version" and r.result == "pass" for r in results)
+        assert any(r.check == "requirements.txt" and r.result == "pass" for r in results)
 
 
-def test_check_requirements_txt_fail() -> None:
-    """Test the requirements.txt check when the file does not exist."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        doctor = Doctor(tmpdir)
-        result = doctor.check_requirements_txt()
-        assert result["result"] == "fail"
+def test_missing_files() -> None:
+    """Checks that missing files are detected as failures."""
+    with tempfile.TemporaryDirectory() as tmp:
+        doctor = Doctor(tmp)
+        results = doctor.run_all_checks()
+
+        result_dict = {r.check: r.result for r in results}
+
+        assert result_dict["host.json"] == "fail"
+        assert result_dict["requirements.txt"] == "fail"
