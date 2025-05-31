@@ -9,10 +9,10 @@ build-backend = "hatchling.build"
 # 📦 Hatch Build Configuration
 # ----------------------------------------
 [tool.hatch.build]
-include = ["src/azure_functions_doctor/py.typed"]
+include = ["azure_functions_doctor/py.typed"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/azure_functions_doctor"]
+packages = ["azure_functions_doctor"]
 
 # ----------------------------------------
 # 🧾 Project Metadata
@@ -43,6 +43,7 @@ dev = [
   "hatch",
   "mkdocs",
   "mkdocs-material",
+  "mkdocstrings[python]",
   "mypy==1.15.0",
   "pre-commit",
   "pytest",
@@ -60,9 +61,9 @@ azfunc-doctor = "azure_functions_doctor.cli:cli"
 features = ["dev"]
 
 [tool.hatch.envs.default.scripts]
-format = "ruff format src tests && black src tests"
-style = "ruff check src tests"
-typecheck = "mypy src tests"
+format = "ruff format azure_functions_doctor tests && black azure_functions_doctor tests"
+style = "ruff check azure_functions_doctor tests"
+typecheck = "mypy azure_functions_doctor tests"
 lint = "hatch run style && hatch run typecheck"
 test = "pytest -v tests"
 cov = "coverage run -m pytest && coverage report && coverage html"
@@ -80,7 +81,7 @@ target-version = ["py39"]
 line-length = 120
 target-version = "py39"
 exclude = [".venv", "build", "dist", "__pycache__"]
-src = ["src"]
+src = ["azure_functions_doctor"]
 fix = true
 
 [tool.ruff.lint]
@@ -96,17 +97,17 @@ strict = true
 warn_unused_configs = true
 show_error_codes = true
 pretty = true
-ignore_missing_imports = true 
+ignore_missing_imports = true
 
 # 🧪 Testing - Pytest
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["."]
 
 # 📊 Coverage Reporting
 [tool.coverage.run]
 branch = true
-source = ["src/azure_functions_doctor"]
+source = ["azure_functions_doctor"]
 
 [tool.coverage.report]
 show_missing = true
