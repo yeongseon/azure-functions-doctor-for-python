@@ -8,6 +8,7 @@ from azure_functions_doctor.api import run_diagnostics
 def test_run_diagnostics_minimal() -> None:
     """Test running diagnostics with a minimal setup."""
     with tempfile.TemporaryDirectory() as tmpdir:
+        # Create minimal valid files
         with open(os.path.join(tmpdir, "host.json"), "w") as f:
             json.dump({"version": "2.0"}, f)
         with open(os.path.join(tmpdir, "requirements.txt"), "w") as f:
@@ -15,6 +16,12 @@ def test_run_diagnostics_minimal() -> None:
 
         results = run_diagnostics(tmpdir)
 
+        # Basic structural assertions
         assert isinstance(results, list)
-        assert any(r["check"] == "host.json version" for r in results)
-        assert all("result" in r for r in results)
+        assert all("title" in section and "items" in section for section in results)
+
+        # Ensure 'host.json' check is included in some section
+        host_check_found = any(
+            any("host.json" in item.get("label", "") for item in section["items"]) for section in results
+        )
+        assert host_check_found, "Expected 'host.json' check not found in results"

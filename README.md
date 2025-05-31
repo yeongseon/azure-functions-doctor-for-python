@@ -57,27 +57,35 @@ pip install azure-functions-doctor
 Navigate to your Azure Functions project directory, then run:
 
 ```bash
-azfunc-doctor diagnose
+$ azfunc-doctor diagnose
 ```
 
 To see all available commands:
 
 ```bash
-azfunc-doctor --help
+$ azfunc-doctor --help
 ```
 
 ### ✅ Sample Output
 
-```
-         Azure Function Diagnostics          
-                                             
-  Check               Result    Detail       
- ───────────────────────────────── 
-  Python version      ✅ PASS   3.12.3       
-  host.json version   ✅ PASS   version=2.0  
-  requirements.txt    ✅ PASS   Found        
-```
+```bash
+$ azfunc-doctor diagnose
 
+✖ Python Environment
+  • Python version: Current: 3.12.3, Expected: >=3.9
+  • Virtual environment: VIRTUAL_ENV is set
+  • Python executable: /root/.local/share/hatch/env/virtual/azure-function-doctor/qaLwoID5/azure-function-doctor/bin/python exists
+  • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
+  • azure-functions package: azure_functions is not installed
+
+✖ Project Structure
+  • host.json: /root/Github/azure-functions-doctor/examples/basic-hello/host.json exists
+  • local.settings.json: /root/Github/azure-functions-doctor/examples/basic-hello/local.settings.json is missing
+  • main.py: /root/Github/azure-functions-doctor/examples/basic-hello/main.py is missing
+
+─────────────────────────────────────────────────────────────────────────────── Summary ────────────────────────────────────────────────────────────────────────────────
+✔ 0 Passed    ✖ 2 Failed
+```
 ---
 
 ## 💡 Example

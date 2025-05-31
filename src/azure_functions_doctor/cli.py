@@ -1,69 +1,86 @@
+from pathlib import Path
+from typing import Annotated, Optional
+
 import typer
-from rich import box
 from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
+from rich.text import Text
 
 from azure_functions_doctor.doctor import Doctor
+from azure_functions_doctor.utils import format_detail, format_result, format_status_icon
 
 cli = typer.Typer()
 console = Console()
 
 
-@cli.command("diagnose")
+@cli.command()
 def diagnose(
-    path: str = ".", verbose: bool = False, format: str = typer.Option("table", help="Output format: table or json")
+    path: str = ".",
+    verbose: bool = False,
+    format: Annotated[str, typer.Option(help="Output format: 'table' or 'json'")] = "table",
+    output: Annotated[Optional[Path], typer.Option(help="Optional path to save JSON result")] = None,
 ) -> None:
-    """Run diagnostics on an Azure Functions application.
-    Parameters:
-        path: The file system path to the Azure Functions application. Defaults to the current directory.
-        verbose: If true, display detailed recommendations and documentation links for failed checks.
-        format: The output format for the results. Can be 'table' or 'json'. Defaults to 'table'.
-    Returns:
-        None: This function prints the diagnostic results to the console.
-    Raises:
-        typer.Exit: If an error occurs during diagnostics, this will exit the CLI with an error code.
+    """
+    Run diagnostics on an Azure Functions application.
+
+    Args:
+        path: Path to the Azure Functions app. Defaults to current directory.
+        verbose: Show detailed hints for failed checks.
+        format: Output format: 'table' or 'json'.
+        output: Optional file path to save JSON result.
     """
     doctor = Doctor(path)
     results = doctor.run_all_checks()
 
+    passed = failed = 0
+
     if format == "json":
-        console.print_json(data=[r.__dict__ for r in results])
+        import json
+
+        json_output = results  # Already a list of dictionaries
+        console.print_json(data=json_output)
+
+        if output:
+            output.write_text(json.dumps(json_output, indent=2))
+            console.print(f"[green]✓ JSON output written to:[/green] {output}")
         return
 
-    table = Table(title="Azure Function Diagnostics", box=box.SIMPLE_HEAD)
-    table.add_column("Check", style="cyan", no_wrap=True)
-    table.add_column("Result", style="bold")
-    table.add_column("Detail")
+    # Default: table format
+    for section in results:
+        # Section header with icon and bold title
+        console.print(Text.assemble("\n", format_result(section["status"]), " ", (section["title"], "bold")))
 
-    status_icons = {
-        "pass": "✅",
-        "fail": "❌",
-        "warn": "⚠️",
-    }
+        if section["status"] == "pass":
+            passed += 1
+        else:
+            failed += 1
 
-    for r in results:
-        icon = status_icons.get(r.result, "❓")
-        result_text = f"{icon} {r.result.upper()}"
-        table.add_row(r.check, result_text, r.detail)
+        for item in section["items"]:
+            status = item["status"]
+            label = item["label"]
+            value = item["value"]
 
-    console.print(table)
+            line = Text.assemble(("  • ", "default"), (label, "dim"), (": ", "default"), format_detail(status, value))
+            console.print(line)
 
-    if verbose:
-        for r in results:
-            if r.result != "pass":
-                console.print(
-                    Panel(
-                        f"[bold]{r.check}[/bold]\n\n"
-                        f"[yellow]Recommendation:[/yellow] {r.recommendation}\n"
-                        f"[blue]Docs:[/blue] {r.docs_url}",
-                        title=f"ℹ️ Details: {r.check}",
-                        expand=False,
-                    )
-                )
+            if verbose and status != "pass":
+                if item.get("hint"):
+                    console.print(f"    ↪ {item['hint']}")
+                if item.get("doc"):
+                    console.print(f"    📚 {item['doc']}")
+
+    # Summary section
+    console.print()
+    console.rule("[bold]Summary")
+    summary = Text.assemble(
+        (f"{format_status_icon('pass')} ", "green"),
+        f"{passed} Passed    ",
+        (f"{format_status_icon('fail')} ", "red"),
+        f"{failed} Failed",
+    )
+    console.print(summary)
 
 
-# Explicitly register the command for CLI and testing purposes
+# Explicit command registration (optional but test-friendly)
 cli.command()(diagnose)
 
 if __name__ == "__main__":

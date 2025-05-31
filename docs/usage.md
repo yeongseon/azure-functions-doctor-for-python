@@ -61,12 +61,20 @@ hatch run azfunc-doctor diagnose --help
 ## 💡 Example Output
 
 ```bash
-$ hatch run azfunc-doctor diagnose
-                             Azure Function Diagnostics                             
-                                                                                   
-  Check              Result    Detail                                               
- ───────────────────────────────────────────────────────────────────────────────── 
-  Python version     ✅ PASS   3.12.3                                               
-  host.json          ❌ FAIL   [Errno 2] No such file or directory: './host.json'  
-  requirements.txt   ❌ FAIL   Not found                                            
+$ azfunc-doctor diagnose
+
+✖ Python Environment
+  • Python version: Current: 3.12.3, Expected: >=3.9
+  • Virtual environment: VIRTUAL_ENV is set
+  • Python executable: /root/.local/share/hatch/env/virtual/azure-function-doctor/qaLwoID5/azure-function-doctor/bin/python exists
+  • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
+  • azure-functions package: azure_functions is not installed
+
+✖ Project Structure
+  • host.json: /root/Github/azure-functions-doctor/examples/basic-hello/host.json exists
+  • local.settings.json: /root/Github/azure-functions-doctor/examples/basic-hello/local.settings.json is missing
+  • main.py: /root/Github/azure-functions-doctor/examples/basic-hello/main.py is missing
+
+─────────────────────────────────────────────────────────────────────────────── Summary ────────────────────────────────────────────────────────────────────────────────
+✔ 0 Passed    ✖ 2 Failed
 ```
