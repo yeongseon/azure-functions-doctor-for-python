@@ -9,10 +9,10 @@ build-backend = "hatchling.build"
 # 📦 Hatch Build Configuration
 # ----------------------------------------
 [tool.hatch.build]
-include = ["azure_functions_doctor/py.typed"]
+include = ["src/azure_functions_doctor/py.typed"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["azure_functions_doctor"]
+packages = ["src/azure_functions_doctor"]
 
 # ----------------------------------------
 # 🧾 Project Metadata
@@ -61,9 +61,9 @@ azfunc-doctor = "azure_functions_doctor.cli:cli"
 features = ["dev"]
 
 [tool.hatch.envs.default.scripts]
-format = "ruff format azure_functions_doctor tests && black azure_functions_doctor tests"
-style = "ruff check azure_functions_doctor tests"
-typecheck = "mypy azure_functions_doctor tests"
+format = "ruff format src/azure_functions_doctor tests && black src/azure_functions_doctor tests"
+style = "ruff check src/azure_functions_doctor tests"
+typecheck = "mypy src/azure_functions_doctor tests"
 lint = "hatch run style && hatch run typecheck"
 test = "pytest -v tests"
 cov = "coverage run -m pytest && coverage report && coverage html"
@@ -81,7 +81,7 @@ target-version = ["py39"]
 line-length = 120
 target-version = "py39"
 exclude = [".venv", "build", "dist", "__pycache__"]
-src = ["azure_functions_doctor"]
+src = ["src/azure_functions_doctor"]
 fix = true
 
 [tool.ruff.lint]
@@ -107,12 +107,13 @@ pythonpath = ["."]
 # 📊 Coverage Reporting
 [tool.coverage.run]
 branch = true
-source = ["azure_functions_doctor"]
+source = ["src/azure_functions_doctor"]
 
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
 
+# 📚 Docs (MkDocs)
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
 serve = "mkdocs serve"
