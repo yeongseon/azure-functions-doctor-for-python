@@ -114,7 +114,11 @@ publish:
 
 .PHONY: docs
 docs:
-	@hatch run docs
+	@hatch run mkdocs build
+
+.PHONY: docs-serve
+docs-serve:
+	@hatch run mkdocs serve
 
 # ------------------------------
 # 🩺 Diagnostic

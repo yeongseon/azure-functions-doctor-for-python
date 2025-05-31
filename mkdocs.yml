@@ -16,5 +16,12 @@ nav:
 plugins:
   - search
   - mkdocstrings:
+      default_handler: python
       handlers:
-        python: {}
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_signature: true
+            show_root_full_path: false
+            merge_init_into_class: true

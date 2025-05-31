@@ -112,3 +112,7 @@ source = ["azure_functions_doctor"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
+
+[tool.hatch.envs.docs.scripts]
+build = "mkdocs build"
+serve = "mkdocs serve"
