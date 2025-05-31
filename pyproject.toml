@@ -96,6 +96,7 @@ strict = true
 warn_unused_configs = true
 show_error_codes = true
 pretty = true
+ignore_missing_imports = true 
 
 # 🧪 Testing - Pytest
 [tool.pytest.ini_options]

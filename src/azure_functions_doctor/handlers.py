@@ -1,128 +1,104 @@
+import importlib.util
 import os
 import sys
-from typing import Any, Callable, Dict
+from pathlib import Path
+from typing import Literal, TypedDict
 
-from packaging.version import Version  # type: ignore
 from packaging.version import parse as parse_version
 
 
-def compare_version(rule: Dict[str, Any], path: str) -> Dict[str, str]:
+class Rule(TypedDict, total=False):
     """
-    Compare the current Python version against the expected version.
+    A typed dictionary representing a diagnostic rule from rules.json.
+    Each field is optional and depends on the check type.
+    """
+
+    type: Literal[
+        "compare_version", "env_var_exists", "path_exists", "file_exists", "package_installed"
+    ]  # Type of the check to perform
+    label: str  # Human-readable label (optional)
+    target: str  # Target file path, package name, or value
+    operator: str  # Comparison operator (e.g., >=, ==)
+    value: str  # Expected value for comparison
+    var: str  # Environment variable to check
+    id: str  # Unique identifier for the rule
+    hint: str  # Optional hint or recommendation for the user
+
+
+def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
+    """
+    Dispatch and execute a generic diagnostic rule.
 
     Args:
-        rule: Dictionary with 'value' (expected version) and 'operator' (comparison).
-        path: Project path (unused).
+        rule: A Rule dictionary containing check type and parameters.
+        path: Base path of the Azure Functions project.
 
     Returns:
-        A dictionary containing 'status' and 'detail' about the version comparison.
+        A dictionary with:
+            - 'status': 'pass' or 'fail'
+            - 'detail': explanation of the result
     """
-    expected: str = rule["value"]
-    operator: str = rule["operator"]
-    current_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    check_type = rule.get("type", "")
 
-    # Define operator map with explicit type annotations
-    op_map: Dict[str, Callable[[Version, Version], bool]] = {
-        ">=": lambda a, b: a >= b,
-        "<=": lambda a, b: a <= b,
-        "==": lambda a, b: a == b,
-        ">": lambda a, b: a > b,
-        "<": lambda a, b: a < b,
-    }
+    if check_type == "compare_version":
+        # Compare system Python version to expected
+        expected = rule["value"]
+        operator = rule["operator"]
+        current_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        current = parse_version(current_version)
+        expected_v = parse_version(expected)
 
-    current: Version = parse_version(current_version)
-    expected_v: Version = parse_version(expected)
+        passed = {
+            ">=": current >= expected_v,
+            "<=": current <= expected_v,
+            "==": current == expected_v,
+            ">": current > expected_v,
+            "<": current < expected_v,
+        }.get(operator, False)
 
-    passed: bool = op_map[operator](current, expected_v)
-
-    return {
-        "status": "pass" if passed else "fail",
-        "detail": f"Current: {current_version}, Expected: {operator}{expected}",
-    }
-
-
-def env_var_exists(rule: Dict[str, Any], path: str) -> Dict[str, str]:
-    """
-    Check if a specific environment variable is set.
-
-    Args:
-        rule: Dictionary with 'var' key.
-        path: Project path (unused).
-
-    Returns:
-        A dictionary indicating whether the environment variable is set.
-    """
-    var: str = rule["var"]
-    exists = os.getenv(var) is not None
-    return {
-        "status": "pass" if exists else "fail",
-        "detail": f"{var} is {'set' if exists else 'not set'}",
-    }
-
-
-def path_exists(rule: Dict[str, Any], path: str) -> Dict[str, str]:
-    """
-    Check if a given path exists on the file system.
-
-    Args:
-        rule: Dictionary with 'target' (can be 'sys.executable' or relative path).
-        path: Base directory to resolve the target path.
-
-    Returns:
-        A dictionary indicating whether the path exists.
-    """
-    target: str = rule["target"]
-    if target == "sys.executable":
-        target_path = sys.executable
-    else:
-        target_path = os.path.join(path, target)
-
-    exists = os.path.exists(target_path)
-    return {
-        "status": "pass" if exists else "fail",
-        "detail": f"{target_path} {'exists' if exists else 'is missing'}",
-    }
-
-
-def file_exists(rule: Dict[str, Any], path: str) -> Dict[str, str]:
-    """
-    Check if a specific file exists.
-
-    Args:
-        rule: Dictionary with 'target' (relative file path).
-        path: Base path to check the file existence.
-
-    Returns:
-        A dictionary indicating whether the file exists.
-    """
-    target = os.path.join(path, rule["target"])
-    exists = os.path.isfile(target)
-    return {
-        "status": "pass" if exists else "fail",
-        "detail": f"{target} {'exists' if exists else 'is missing'}",
-    }
-
-
-def package_installed(rule: Dict[str, Any], path: str) -> Dict[str, str]:
-    """
-    Check if a Python package is installed in the current environment.
-
-    Args:
-        rule: Dictionary with 'target' as the package name.
-        path: Project path (unused).
-
-    Returns:
-        A dictionary indicating whether the package is installed.
-    """
-    package_name: str = rule["target"]
-    try:
-        __import__(package_name)
         return {
-            "status": "pass",
-            "detail": f"{package_name} is installed",
+            "status": "pass" if passed else "fail",
+            "detail": f"Current: {current_version}, Expected: {operator}{expected}",
         }
-    except ImportError:
+
+    if check_type == "env_var_exists":
+        # Check if environment variable is set
+        var = rule["var"]
+        exists = os.getenv(var) is not None
         return {
-            "status": "fail",
-            "detail": f"{package_name} is not installed",
+            "status": "pass" if exists else "fail",
+            "detail": f"{var} is {'set' if exists else 'not set'}",
         }
+
+    if check_type == "path_exists":
+        # Check if a specific path exists (can be sys.executable or relative)
+        target = rule["target"]
+        target_path = sys.executable if target == "sys.executable" else os.path.join(path, target)
+        exists = os.path.exists(target_path)
+        return {
+            "status": "pass" if exists else "fail",
+            "detail": f"{target_path} {'exists' if exists else 'is missing'}",
+        }
+
+    if check_type == "file_exists":
+        # Check if a file exists relative to the base path
+        target = os.path.join(path, rule["target"])
+        exists = os.path.isfile(target)
+        return {
+            "status": "pass" if exists else "fail",
+            "detail": f"{target} {'exists' if exists else 'is missing'}",
+        }
+
+    if check_type == "package_installed":
+        # Check if a Python package is importable
+        package_name = rule["target"]
+        found = importlib.util.find_spec(package_name) is not None
+        return {
+            "status": "pass" if found else "fail",
+            "detail": f"{package_name} is {'installed' if found else 'not installed'}",
+        }
+
+    return {
+        "status": "fail",
+        "detail": f"Unsupported check type: {check_type}",
+    }

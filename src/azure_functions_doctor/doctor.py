@@ -1,8 +1,9 @@
 import json
+from collections import defaultdict
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-from .registry import get_checker
+from azure_functions_doctor.handlers import Rule, generic_handler
 
 
 class Doctor:
@@ -12,50 +13,50 @@ class Doctor:
     """
 
     def __init__(self, path: str = ".") -> None:
-        """
-        Initialize the Doctor.
-
-        Args:
-            path (str): Path to the Azure Functions project directory.
-        """
         self.project_path: Path = Path(path).resolve()
         self.rules_path: Path = Path(__file__).parent / "rules.json"
 
     def run_all_checks(self) -> list[dict[str, Any]]:
         """
-        Run all diagnostic checks defined in rules.json.
+        Load rules from rules.json, group them by section,
+        and run each rule through the generic handler.
 
         Returns:
-            list[dict[str, Any]]: List of section results containing individual check results.
+            A list of section results with grouped check outcomes.
         """
         with self.rules_path.open(encoding="utf-8") as f:
-            rule_sections: list[dict[str, Any]] = json.load(f)
+            rules: list[dict[str, Any]] = json.load(f)
 
-        results: list[dict[str, Any]] = []
+        grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for rule in rules:
+            grouped[rule["section"]].append(rule)
 
-        for section in rule_sections:
+        results = []
+
+        for section, checks in grouped.items():
             section_result: dict[str, Any] = {
-                "title": section["title"],
-                "category": section["category"],
+                "title": section.replace("_", " ").title(),
+                "category": section,
                 "status": "pass",
                 "items": [],
             }
 
-            for check in section["checks"]:
-                checker = get_checker(check["type"])
-                result = checker(check, str(self.project_path))
+            for rule in checks:
+                # Cast rule to TypedDict to satisfy mypy
+                typed_rule = cast(Rule, rule)
+                result = generic_handler(typed_rule, self.project_path)
 
-                item: dict[str, Any] = {
-                    "label": check["name"],
-                    "value": result.get("detail", ""),
+                item = {
+                    "label": typed_rule.get("label", typed_rule["id"]),
+                    "value": result["detail"],
                     "status": result["status"],
                 }
 
                 if result["status"] != "pass":
                     section_result["status"] = "fail"
 
-                if "hint" in check:
-                    item["hint"] = check["hint"]
+                if "hint" in typed_rule:
+                    item["hint"] = typed_rule["hint"]
 
                 section_result["items"].append(item)
 

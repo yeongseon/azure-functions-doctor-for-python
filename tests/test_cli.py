@@ -1,40 +1,33 @@
 import json
-import subprocess
-import sys
-from subprocess import CompletedProcess
+
+from typer.testing import CliRunner
+
+from azure_functions_doctor.cli import cli as app
+
+runner = CliRunner()
 
 
-def run_cli_command(*args: str) -> CompletedProcess[str]:
-    """Run the Azure Functions Doctor CLI command with the given arguments."""
-    result = subprocess.run(
-        [sys.executable, "-m", "azure_functions_doctor.cli", *args],
-        capture_output=True,
-        text=True,
-    )
-    return result
+def test_cli_table_output() -> None:
+    """Test CLI outputs result in table format."""
+    result = runner.invoke(app, ["diagnose", "--format", "table"])
+    assert result.exit_code == 0
+    assert any(icon in result.output for icon in ["✔", "✖", "⚠"])
 
 
-def test_run_cli_table_output() -> None:
-    """Checks that the CLI runs and outputs results in table format."""
-    result = run_cli_command("diagnose", "--format", "table")
-    assert result.returncode == 0
-    assert any(icon in result.stdout for icon in ["✔", "✖", "⚠"])
-
-
-def test_run_cli_json_output() -> None:
-    """Checks that the CLI runs and outputs results in JSON format."""
-    result = run_cli_command("diagnose", "--format", "json")
-    assert result.returncode == 0
+def test_cli_json_output() -> None:
+    """Test CLI outputs result in JSON format."""
+    result = runner.invoke(app, ["diagnose", "--format", "json"])
+    assert result.exit_code == 0
     try:
-        output = json.loads(result.stdout)
+        output = json.loads(result.output)
         assert isinstance(output, list)
         assert all("title" in section and "items" in section for section in output)
     except json.JSONDecodeError as err:
         raise AssertionError("Output is not valid JSON") from err
 
 
-def test_run_cli_verbose_output() -> None:
-    """Checks that the CLI runs and outputs verbose details for failed checks."""
-    result = run_cli_command("diagnose", "--verbose")
-    assert result.returncode == 0
-    assert "↪" in result.stdout  # hint prefix
+def test_cli_verbose_output() -> None:
+    """Test CLI outputs verbose hints when enabled."""
+    result = runner.invoke(app, ["diagnose", "--verbose"])
+    assert result.exit_code == 0
+    assert "↪" in result.output  # hint indicator

@@ -6,7 +6,7 @@ from azure_functions_doctor.doctor import Doctor
 
 
 def test_doctor_checks_pass() -> None:
-    """Checks that the Doctor runs all checks and returns results."""
+    """Tests that the Doctor class runs checks and returns results."""
     with tempfile.TemporaryDirectory() as tmp:
         # Create required files
         with open(os.path.join(tmp, "host.json"), "w") as f:
@@ -28,7 +28,7 @@ def test_doctor_checks_pass() -> None:
 
 
 def test_missing_files() -> None:
-    """Checks that missing files are detected as failures."""
+    """Tests that the Doctor class detects missing files."""
     with tempfile.TemporaryDirectory() as tmp:
         doctor = Doctor(tmp)
         results = doctor.run_all_checks()

@@ -1,72 +1,68 @@
 [
   {
-    "title": "Python Environment",
-    "category": "python_env",
-    "checks": [
-      {
-        "id": "check_python_version",
-        "name": "Python version",
-        "type": "compare_version",
-        "target": "python",
-        "operator": ">=",
-        "value": "3.9",
-        "hint": "Install Python 3.9 or higher."
-      },
-      {
-        "id": "check_venv",
-        "name": "Virtual environment",
-        "type": "env_var_exists",
-        "var": "VIRTUAL_ENV",
-        "hint": "Activate a virtual environment using: 'source venv/bin/activate'."
-      },
-      {
-        "id": "check_python_executable",
-        "name": "Python executable",
-        "type": "path_exists",
-        "target": "sys.executable",
-        "hint": "Python executable should exist on your system."
-      },
-      {
-        "id": "check_requirements_txt",
-        "name": "requirements.txt",
-        "type": "file_exists",
-        "target": "requirements.txt",
-        "hint": "Your Azure Function project should have a requirements.txt file at the root."
-      },
-      {
-        "id": "check_azure_functions_package",
-        "name": "azure-functions package",
-        "type": "package_installed",
-        "target": "azure_functions",
-        "hint": "Install with 'pip install azure-functions'."
-      }
-    ]
+    "id": "check_python_version",
+    "section": "python_env",
+    "label": "Python version",
+    "type": "compare_version",
+    "target": "python",
+    "operator": ">=",
+    "value": "3.9",
+    "hint": "Install Python 3.9 or higher."
   },
   {
-    "title": "Project Structure",
-    "category": "project_structure",
-    "checks": [
-      {
-        "id": "check_host_json",
-        "name": "host.json",
-        "type": "file_exists",
-        "target": "host.json",
-        "hint": "Every Azure Functions project must include a host.json file."
-      },
-      {
-        "id": "check_local_settings",
-        "name": "local.settings.json",
-        "type": "file_exists",
-        "target": "local.settings.json",
-        "hint": "Include local.settings.json for local development settings."
-      },
-      {
-        "id": "check_main_py_exists",
-        "name": "main.py",
-        "type": "file_exists",
-        "target": "main.py",
-        "hint": "Ensure your entrypoint (e.g., main.py) is defined for Programming Model v2."
-      }
-    ]
+    "id": "check_venv",
+    "section": "python_env",
+    "label": "Virtual environment",
+    "type": "env_var_exists",
+    "var": "VIRTUAL_ENV",
+    "hint": "Activate a virtual environment using: 'source venv/bin/activate'."
+  },
+  {
+    "id": "check_python_executable",
+    "section": "python_env",
+    "label": "Python executable",
+    "type": "path_exists",
+    "target": "sys.executable",
+    "hint": "Python executable should exist on your system."
+  },
+  {
+    "id": "check_requirements_txt",
+    "section": "python_env",
+    "label": "requirements.txt",
+    "type": "file_exists",
+    "target": "requirements.txt",
+    "hint": "Your Azure Function project should have a requirements.txt file at the root."
+  },
+  {
+    "id": "check_azure_functions_package",
+    "section": "python_env",
+    "label": "azure-functions package",
+    "type": "package_installed",
+    "target": "azure_functions",
+    "hint": "Install with 'pip install azure-functions'."
+  },
+  {
+    "id": "check_host_json",
+    "section": "project_structure",
+    "label": "host.json",
+    "type": "file_exists",
+    "target": "host.json",
+    "hint": "Every Azure Functions project must include a host.json file."
+  },
+  {
+    "id": "check_local_settings",
+    "section": "project_structure",
+    "label": "local.settings.json",
+    "type": "file_exists",
+    "target": "local.settings.json",
+    "hint": "Include local.settings.json for local development settings."
+  },
+  {
+    "id": "check_main_py_exists",
+    "section": "project_structure",
+    "label": "main.py",
+    "type": "file_exists",
+    "target": "main.py",
+    "hint": "Ensure your entrypoint (e.g., main.py) is defined for Programming Model v2."
   }
 ]
