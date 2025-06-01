@@ -2,12 +2,6 @@
   <img src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor/main/logo_assets/logo_full_256px.png" alt="Azure Functions Doctor Logo" width="180" />
 </p>
 
-<h1 align="center">Azure Functions Doctor for Python 🩺⚡</h1>
-
-<p align="center">
-  <strong>Check your Azure Functions environment</strong>
-</p>
-
 ---
 
 ## 🤔 Why Azure Functions Doctor?
