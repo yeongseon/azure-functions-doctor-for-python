@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor/main/logo_assets/logo_full_256px.png" alt="Azure Functions Doctor Logo" width="180" />
+  <img src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor/main/logo_assets/logo_full_256px.png" alt="Azure Functions Doctor Logo" width="320" />
 </p>
 
 ---
