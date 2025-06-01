@@ -12,13 +12,9 @@
         <meta name="author" content="Yeongseon Choe">
       
       
-        <link rel="canonical" href="https://yeongseon.github.io/azure-functions-doctor-for-python/usage/">
+        <link rel="canonical" href="https://yeongseon.github.io/azure-functions-doctor-for-python/release_process/">
       
       
-        <link rel="prev" href="..">
-      
-      
-        <link rel="next" href="../diagnostics/">
       
       
       <link rel="icon" href="../logo_assets/logo_favicon_16px.png">
@@ -26,7 +22,7 @@
     
     
       
-        <title>CLI Usage - Azure Functions Doctor for Python</title>
+        <title>🛠 Release Process - Azure Functions Doctor for Python</title>
       
     
     
@@ -70,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cli-usage-azure-functions-doctor" class="md-skip">
+        <a href="#release-process" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +101,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CLI Usage
+              🛠 Release Process
             
           </span>
         </div>
@@ -243,32 +239,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    CLI Usage
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
         
   
   
@@ -279,62 +253,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      🔧 Basic Usage
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-it-checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      🩺 What It Checks
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      💡 Example Output
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#help" class="md-nav__link">
-    <span class="md-ellipsis">
-      🆘 Help
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -454,36 +372,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
+  <a href="#step-1-update-the-version" class="md-nav__link">
     <span class="md-ellipsis">
-      🔧 Basic Usage
+      🧾 Step 1: Update the Version
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-it-checks" class="md-nav__link">
+  <a href="#step-2-publish-to-pypi" class="md-nav__link">
     <span class="md-ellipsis">
-      🩺 What It Checks
+      📦 Step 2: Publish to PyPI
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-output" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
-      💡 Example Output
+      ✅ Summary
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#help" class="md-nav__link">
+  <a href="#test-on-testpypi-optional" class="md-nav__link">
     <span class="md-ellipsis">
-      🆘 Help
+      🔁 Test on TestPyPI (Optional)
     </span>
   </a>
   
@@ -508,51 +426,60 @@
   
 
 
-<h1 id="cli-usage-azure-functions-doctor">🖥️ CLI Usage: Azure Functions Doctor</h1>
-<p><strong>Azure Functions Doctor</strong> provides a command-line interface (CLI) to validate and troubleshoot your Python Azure Functions project setup.</p>
+<h1 id="release-process">🛠 Release Process</h1>
+<p>This document describes how to release a new version of <strong>Azure Functions Doctor</strong> to PyPI and update the changelog.</p>
 <hr />
-<h2 id="basic-usage">🔧 Basic Usage</h2>
-<p>Run the CLI from your terminal using:</p>
-<pre><code class="language-bash">azfunc-doctor diagnose
+<h2 id="step-1-update-the-version">🧾 Step 1: Update the Version</h2>
+<p>Use Hatch to bump the version and generate changelog:</p>
+<pre><code class="language-bash">make release-patch   # or: release-minor, release-major
 </code></pre>
-<p>You can also specify options:</p>
-<pre><code class="language-bash">azfunc-doctor diagnose --format json --verbose
-</code></pre>
-<hr />
-<h2 id="what-it-checks">🩺 What It Checks</h2>
+<p>This will:</p>
 <ul>
-<li>✅ Python version is ≥ 3.9</li>
-<li>✅ Virtual environment is activated (VIRTUAL_ENV)</li>
-<li>✅ Python executable path is resolvable</li>
-<li>✅ <code>requirements.txt</code> file exists</li>
-<li>✅ <code>azure-functions</code> package is installed</li>
-<li>✅ Project files like <code>host.json</code>, <code>local.settings.json</code>, and <code>main.py</code> exist</li>
+<li>Update the version in <code>pyproject.toml</code></li>
+<li>Generate <code>CHANGELOG.md</code> via <code>git-cliff</code></li>
+<li>Commit changelog</li>
+<li>Tag the commit (e.g. <code>v0.2.0</code>)</li>
+<li>Push the tag to GitHub</li>
 </ul>
 <hr />
-<h2 id="example-output">💡 Example Output</h2>
-<pre><code class="language-bash">🩺 Azure Functions Doctor for Python v0.1.0
-📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
-
-✖ Python Env
-  • Python version: Python version is 3.12.3, expected &gt;=3.9
-  • Virtual environment: VIRTUAL_ENV is set
-  • Python executable: /root/.local/share/hatch/env/virtual/azure-function-doctor/qaLwoID5/azure-function-doctor/bin/python exists
-  • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
-  • azure-functions package: Package 'azure_functions' is not installed
-
-✖ Project Structure
-  • host.json: /root/Github/azure-functions-doctor/examples/basic-hello/host.json exists
-  • local.settings.json: /root/Github/azure-functions-doctor/examples/basic-hello/local.settings.json is missing
-  • main.py: /root/Github/azure-functions-doctor/examples/basic-hello/main.py is missing
-
-Summary
-✔ 0 Passed    ✖ 2 Failed
+<h2 id="step-2-publish-to-pypi">📦 Step 2: Publish to PyPI</h2>
+<p>Build and upload the package:</p>
+<pre><code class="language-bash">make build
+make publish
 </code></pre>
+<p>This will upload the package to <a href="https://pypi.org/project/azure-function-doctor/">PyPI</a>.</p>
+<blockquote>
+<p>🔒 Make sure your <code>~/.pypirc</code> is correctly configured with PyPI credentials.</p>
+</blockquote>
 <hr />
-<h2 id="help">🆘 Help</h2>
-<p>To view available options and subcommands:</p>
-<pre><code class="language-bash">azfunc-doctor --help
-azfunc-doctor diagnose --help
+<h2 id="summary">✅ Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Version bump + changelog</td>
+<td><code>make release-patch</code></td>
+</tr>
+<tr>
+<td>Build package</td>
+<td><code>make build</code></td>
+</tr>
+<tr>
+<td>Publish to PyPI</td>
+<td><code>make publish</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="test-on-testpypi-optional">🔁 Test on TestPyPI (Optional)</h2>
+<pre><code class="language-bash">hatch build
+twine upload --repository testpypi dist/*
+pip install --index-url https://test.pypi.org/simple/ azure-function-doctor
 </code></pre>
 
 
