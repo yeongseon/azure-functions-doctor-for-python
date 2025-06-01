@@ -9,7 +9,7 @@ build-backend = "hatchling.build"
 # 📦 Hatch Build Configuration
 # ----------------------------------------
 [tool.hatch.build]
-include = ["src/azure_functions_doctor/py.typed"]
+sources = ["src"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/azure_functions_doctor"]
@@ -21,17 +21,29 @@ packages = ["src/azure_functions_doctor"]
 name = "azure-function-doctor"
 version = "0.1.0"
 description = "A diagnostic tool for Python Azure Functions"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
 authors = [
   { name = "Yeongseon Choe", email = "yeongseon.choe@gmail.com" }
 ]
-readme = "README.md"
-requires-python = ">=3.9"
 
 # 📚 Runtime Dependencies
 dependencies = [
   "typer",
   "rich",
   "requests"
+]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
 # 🧪 Optional Development Dependencies
