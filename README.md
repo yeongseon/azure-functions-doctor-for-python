@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor-for-python/main/logo_assets/logo_full_256px.png" alt="Azure Functions Doctor Logo" width="320" />
+  <img src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor-for-python/main/logo_assets/logo_full.png" alt="Azure Functions Doctor Logo" width="320" />
 </p>
 
 <p align="center">
@@ -22,6 +22,7 @@
     <img src="https://pepy.tech/badge/azure-functions-doctor" alt="Downloads" />
   </a>
 </p>
+
 ---
 
 ## 🤔 Why Azure Functions Doctor?
