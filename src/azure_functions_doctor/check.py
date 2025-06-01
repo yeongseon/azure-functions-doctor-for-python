@@ -1,10 +1,17 @@
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, TypedDict, cast
 
 from azure_functions_doctor.handlers import Rule, generic_handler
 
 
-def run_check(rule: dict[str, Any], base_path: Path) -> dict[str, Any]:
+class CheckResult(TypedDict, total=False):
+    status: str
+    label: str
+    value: str
+    hint: str
+
+
+def run_check(rule: dict[str, Any], base_path: Path) -> CheckResult:
     """
     Wrap the generic_handler to cast a raw rule into a typed Rule.
 
@@ -15,11 +22,16 @@ def run_check(rule: dict[str, Any], base_path: Path) -> dict[str, Any]:
     Returns:
         Structured result with status, label, value, and optional hint.
     """
-    result = generic_handler(cast(Rule, rule), base_path)
+    typed_rule = cast(Rule, rule)
+    result = generic_handler(typed_rule, base_path)
 
-    return {
+    output: CheckResult = {
         "status": result["status"],
-        "label": rule.get("label", rule.get("id")),
+        "label": typed_rule.get("label", typed_rule["id"]),
         "value": result["detail"],
-        "hint": rule.get("hint"),
     }
+
+    if "hint" in typed_rule:
+        output["hint"] = typed_rule["hint"]
+
+    return output

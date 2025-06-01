@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Azure Functions Doctor Rules Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "id", "category", "section", "label",
+      "description", "type", "required",
+      "severity", "condition", "hint", "check_order"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Unique identifier for the rule."
+      },
+      "category": {
+        "type": "string",
+        "description": "Top-level grouping category.",
+        "enum": ["environment", "dependencies", "structure", "config", "tools"]
+      },
+      "section": {
+        "type": "string",
+        "description": "Section used to group checks in output (e.g., python_env)."
+      },
+      "label": {
+        "type": "string",
+        "description": "Label displayed in CLI output."
+      },
+      "description": {
+        "type": "string",
+        "description": "Description of what this rule checks."
+      },
+      "type": {
+        "type": "string",
+        "description": "Handler type used to execute the check.",
+        "enum": [
+          "compare_version",
+          "file_exists",
+          "env_var_exists",
+          "package_installed",
+          "path_exists"
+        ]
+      },
+      "required": {
+        "type": "boolean",
+        "description": "Whether this check is required to pass."
+      },
+      "severity": {
+        "type": "string",
+        "description": "Severity level of this check.",
+        "enum": ["error", "warning", "info"]
+      },
+      "condition": {
+        "type": "object",
+        "description": "Condition parameters used by the handler.",
+        "properties": {
+          "target": { "type": "string" },
+          "operator": { "type": "string" },
+          "value": {}
+        },
+        "required": ["target"]
+      },
+      "hint": {
+        "type": "string",
+        "description": "Hint message shown to users on failure."
+      },
+      "fix": {
+        "type": "string",
+        "description": "Natural language fix instruction (optional)."
+      },
+      "fix_command": {
+        "type": "string",
+        "description": "CLI command to fix the issue (optional)."
+      },
+      "hint_url": {
+        "type": "string",
+        "description": "URL for documentation or solution (optional).",
+        "format": "uri"
+      },
+      "tags": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Searchable tags or keywords (optional)."
+      },
+      "impact": {
+        "type": "string",
+        "description": "Effect of failure if not resolved (optional)."
+      },
+      "check_order": {
+        "type": "integer",
+        "description": "Display and execution order of the check.",
+        "minimum": 1
+      }
+    },
+    "additionalProperties": false
+  }
+}

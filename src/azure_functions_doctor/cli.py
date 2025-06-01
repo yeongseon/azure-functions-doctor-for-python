@@ -5,6 +5,7 @@ import typer
 from rich.console import Console
 from rich.text import Text
 
+from azure_functions_doctor import __version__
 from azure_functions_doctor.doctor import Doctor
 from azure_functions_doctor.utils import format_detail, format_result, format_status_icon
 
@@ -36,17 +37,22 @@ def diagnose(
     if format == "json":
         import json
 
-        json_output = results  # Already a list of dictionaries
-        console.print_json(data=json_output)
+        json_output = results
 
         if output:
-            output.write_text(json.dumps(json_output, indent=2))
-            console.print(f"[green]✓ JSON output written to:[/green] {output}")
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(json.dumps(json_output, indent=2), encoding="utf-8")
+            console.print(f"[green]✓ JSON output saved to:[/green] {output}")
+        else:
+            print(json.dumps(json_output, indent=2))
         return
+
+    # Print header only for table format
+    console.print(f"[bold blue]🩺 Azure Functions Doctor for Python v{__version__}[/bold blue]")
+    console.print(f"[bold]📁 Path:[/bold] {Path(path).resolve()}\n")
 
     # Default: table format
     for section in results:
-        # Section header with icon and bold title
         console.print(Text.assemble("\n", format_result(section["status"]), " ", (section["title"], "bold")))
 
         if section["status"] == "pass":
@@ -55,32 +61,38 @@ def diagnose(
             failed += 1
 
         for item in section["items"]:
-            status = item["status"]
             label = item["label"]
             value = item["value"]
+            status = item["status"]
 
-            line = Text.assemble(("  • ", "default"), (label, "dim"), (": ", "default"), format_detail(status, value))
+            line = Text.assemble(
+                ("  • ", "default"),
+                (label, "dim"),
+                (": ", "default"),
+                format_detail(status, value),
+            )
             console.print(line)
 
             if verbose and status != "pass":
                 if item.get("hint"):
-                    console.print(f"    ↪ {item['hint']}")
-                if item.get("doc"):
-                    console.print(f"    📚 {item['doc']}")
+                    console.print(f"    ↪ [yellow]{item['hint']}[/yellow]")
+                hint_url = item.get("hint_url", "")
+                if hint_url.strip():
+                    console.print(f"    📚 [blue]{hint_url}[/blue]")
 
-    # Summary section
+    # ✅ Summary section
     console.print()
-    console.rule("[bold]Summary")
+    console.print("[bold]Summary[/bold]")
     summary = Text.assemble(
-        (f"{format_status_icon('pass')} ", "green"),
-        f"{passed} Passed    ",
-        (f"{format_status_icon('fail')} ", "red"),
-        f"{failed} Failed",
+        (f"{format_status_icon('pass')} ", "green bold"),
+        (f"{passed} Passed    ", "bold"),
+        (f"{format_status_icon('fail')} ", "red bold"),
+        (f"{failed} Failed", "bold"),
     )
     console.print(summary)
 
 
-# Explicit command registration (optional but test-friendly)
+# Explicit command registration (test-friendly)
 cli.command()(diagnose)
 
 if __name__ == "__main__":
