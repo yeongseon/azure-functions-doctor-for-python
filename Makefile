@@ -81,13 +81,33 @@ cov:
 build:
 	@hatch build
 
+.PHONY: changelog
+changelog:
+	@git-cliff -o CHANGELOG.md
+	@echo "📝 Changelog generated."
+
+.PHONY: commit-changelog
+commit-changelog:
+	@git add CHANGELOG.md
+	@git commit -m "docs: update changelog" || echo "⚠️ No changes to commit"
+
+.PHONY: tag-release
+tag-release:
+ifndef VERSION
+	$(error VERSION is not set. Usage: make tag-release VERSION=0.1.0)
+endif
+	@git tag -a v$(VERSION) -m "Release v$(VERSION)"
+	@git push origin v$(VERSION)
+	@echo "🚀 Tagged release v$(VERSION)"
+
 .PHONY: release
 release:
 ifndef VERSION
 	$(error VERSION is not set. Usage: make release VERSION=0.1.0)
 endif
-	@git tag -a v$(VERSION) -m "Release v$(VERSION)"
-	@git push origin v$(VERSION)
+	@make changelog
+	@make commit-changelog
+	@make tag-release VERSION=$(VERSION)
 
 .PHONY: release-patch
 release-patch:

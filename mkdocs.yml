@@ -6,8 +6,8 @@ site_url: https://yeongseon.github.io/azure-functions-doctor-for-python/
 
 theme:
   name: material
-  logo: logo_assets/logo_full_256px.png
-  favicon: logo_assets/logo_full_256px.png
+  logo: logo_assets/logo.png
+  favicon: logo_assets/logo_favicon_16px.png
 
 nav:
   - Home: index.md
@@ -15,6 +15,7 @@ nav:
   - Diagnostics: diagnostics.md
   - Development: development.md
   - API Reference: api.md
+  - Release Process: release.md
 
 plugins:
   - search
