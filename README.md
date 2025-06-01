@@ -107,7 +107,7 @@ azfunc-doctor --help
 ### ✅ Sample Output
 
 ```bash
-$ azfunc-doctor diagnose
+azfunc-doctor diagnose
 🩺 Azure Functions Doctor for Python v0.1.0
 📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
 
