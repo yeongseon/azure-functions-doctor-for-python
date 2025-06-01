@@ -447,15 +447,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#azure_functions_doctor.handlers.Rule" class="md-nav__link">
-    <span class="md-ellipsis">
-      Rule
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#azure_functions_doctor.handlers.generic_handler" class="md-nav__link">
     <span class="md-ellipsis">
       generic_handler
@@ -679,15 +670,6 @@
   <a href="#azure_functions_doctor.handlers" class="md-nav__link">
     <span class="md-ellipsis">
       handlers
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#azure_functions_doctor.handlers.Rule" class="md-nav__link">
-    <span class="md-ellipsis">
-      Rule
     </span>
   </a>
   
@@ -944,8 +926,7 @@
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/cli.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
-<span class="normal">16</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">16</span>
 <span class="normal">17</span>
 <span class="normal">18</span>
 <span class="normal">19</span>
@@ -1009,7 +990,19 @@
 <span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
-<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">diagnose</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1033,17 +1026,22 @@
     <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
-        <span class="n">json_output</span> <span class="o">=</span> <span class="n">results</span>  <span class="c1"># Already a list of dictionaries</span>
-        <span class="n">console</span><span class="o">.</span><span class="n">print_json</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">json_output</span><span class="p">)</span>
+        <span class="n">json_output</span> <span class="o">=</span> <span class="n">results</span>
 
         <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
-            <span class="n">output</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_output</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[green]✓ JSON output written to:[/green] </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_output</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[green]✓ JSON output saved to:[/green] </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_output</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
         <span class="k">return</span>
+
+    <span class="c1"># Print header only for table format</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold blue]🩺 Azure Functions Doctor for Python v</span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">[/bold blue]&quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold]📁 Path:[/bold] </span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Default: table format</span>
     <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-        <span class="c1"># Section header with icon and bold title</span>
         <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">format_result</span><span class="p">(</span><span class="n">section</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]),</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">section</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span> <span class="s2">&quot;bold&quot;</span><span class="p">)))</span>
 
         <span class="k">if</span> <span class="n">section</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
@@ -1052,27 +1050,33 @@
             <span class="n">failed</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">section</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]:</span>
-            <span class="n">status</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
             <span class="n">label</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
 
-            <span class="n">line</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">((</span><span class="s2">&quot;  • &quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s2">&quot;dim&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span> <span class="n">format_detail</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span>
+                <span class="p">(</span><span class="s2">&quot;  • &quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s2">&quot;dim&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span>
+                <span class="n">format_detail</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span>
+            <span class="p">)</span>
             <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hint&quot;</span><span class="p">):</span>
-                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    ↪ </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;hint&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doc&quot;</span><span class="p">):</span>
-                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    📚 </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;doc&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    ↪ [yellow]</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;hint&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">[/yellow]&quot;</span><span class="p">)</span>
+                <span class="n">hint_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hint_url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hint_url</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    📚 [blue]</span><span class="si">{</span><span class="n">hint_url</span><span class="si">}</span><span class="s2">[/blue]&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Summary section</span>
+    <span class="c1"># ✅ Summary section</span>
     <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
-    <span class="n">console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="s2">&quot;[bold]Summary&quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold]Summary[/bold]&quot;</span><span class="p">)</span>
     <span class="n">summary</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span>
-        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">format_status_icon</span><span class="p">(</span><span class="s1">&#39;pass&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">),</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">passed</span><span class="si">}</span><span class="s2"> Passed    &quot;</span><span class="p">,</span>
-        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">format_status_icon</span><span class="p">(</span><span class="s1">&#39;fail&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">),</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">failed</span><span class="si">}</span><span class="s2"> Failed&quot;</span><span class="p">,</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">format_status_icon</span><span class="p">(</span><span class="s1">&#39;pass&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="s2">&quot;green bold&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">passed</span><span class="si">}</span><span class="s2"> Passed    &quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">format_status_icon</span><span class="p">(</span><span class="s1">&#39;fail&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="s2">&quot;red bold&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">failed</span><span class="si">}</span><span class="s2"> Failed&quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -1138,9 +1142,9 @@ Loads checks from rules.json and executes them against a target project path.</p
 
                   <details class="quote">
                     <summary>Source code in <code>src/azure_functions_doctor/doctor.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">rules_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;rules.json&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -1169,56 +1173,13 @@ Loads checks from rules.json and executes them against a target project path.</p
 
     <div class="doc doc-contents ">
 
-        <p>Load rules from rules.json, group them by section,
-and run each rule through the generic handler.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="list">list</span>[<span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A list of section results with grouped check outcomes.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Run all rules grouped by their section.
+Each section will include pass/fail status and individual check items.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/doctor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
@@ -1244,25 +1205,38 @@ and run each rule through the generic handler.</p>
 <span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
-<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_all_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_all_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SectionResult</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Load rules from rules.json, group them by section,</span>
-<span class="sd">    and run each rule through the generic handler.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A list of section results with grouped check outcomes.</span>
+<span class="sd">    Run all rules grouped by their section.</span>
+<span class="sd">    Each section will include pass/fail status and individual check items.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">rules_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">rules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_rules</span><span class="p">()</span>
+    <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Rule</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">:</span>
         <span class="n">grouped</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="s2">&quot;section&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
 
-    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SectionResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">checks</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">section_result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">section_result</span><span class="p">:</span> <span class="n">SectionResult</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">section</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span>
             <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span>
             <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span>
@@ -1270,12 +1244,10 @@ and run each rule through the generic handler.</p>
         <span class="p">}</span>
 
         <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
-            <span class="c1"># Cast rule to TypedDict to satisfy mypy</span>
-            <span class="n">typed_rule</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Rule</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">generic_handler</span><span class="p">(</span><span class="n">typed_rule</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">generic_handler</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">)</span>
 
-            <span class="n">item</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">typed_rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">typed_rule</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]),</span>
+            <span class="n">item</span><span class="p">:</span> <span class="n">CheckResult</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]),</span>
                 <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;detail&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">],</span>
             <span class="p">}</span>
@@ -1283,8 +1255,11 @@ and run each rule through the generic handler.</p>
             <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
                 <span class="n">section_result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fail&quot;</span>
 
-            <span class="k">if</span> <span class="s2">&quot;hint&quot;</span> <span class="ow">in</span> <span class="n">typed_rule</span><span class="p">:</span>
-                <span class="n">item</span><span class="p">[</span><span class="s2">&quot;hint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">typed_rule</span><span class="p">[</span><span class="s2">&quot;hint&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;hint&quot;</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">:</span>
+                <span class="n">item</span><span class="p">[</span><span class="s2">&quot;hint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;hint&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s2">&quot;hint_url&quot;</span> <span class="ow">in</span> <span class="n">rule</span> <span class="ow">and</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;hint_url&quot;</span><span class="p">]:</span>
+                <span class="n">item</span><span class="p">[</span><span class="s2">&quot;hint_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;hint_url&quot;</span><span class="p">]</span>
 
             <span class="n">section_result</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
 
@@ -1339,52 +1314,6 @@ and run each rule through the generic handler.</p>
 
 
 
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="azure_functions_doctor.handlers.Rule" class="doc doc-heading">
-            <code>Rule</code>
-
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
-
-
-        <p>A typed dictionary representing a diagnostic rule from rules.json.
-Each field is optional and depends on the check type.</p>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 
 <div class="doc doc-object doc-function">
 
@@ -1397,7 +1326,7 @@ Each field is optional and depends on the check type.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Dispatch and execute a generic diagnostic rule.</p>
+        <p>Execute a diagnostic rule based on its type and condition.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1416,11 +1345,11 @@ Each field is optional and depends on the check type.</p>
                 <code>rule</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Rule (azure_functions_doctor.handlers.Rule)" href="#azure_functions_doctor.handlers.Rule">Rule</a></code>
+                  <code><span title="azure_functions_doctor.handlers.Rule">Rule</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A Rule dictionary containing check type and parameters.</p>
+                <p>The rule dictionary.</p>
               </div>
             </td>
             <td>
@@ -1436,7 +1365,7 @@ Each field is optional and depends on the check type.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Base path of the Azure Functions project.</p>
+                <p>Path to the Azure Functions project.</p>
               </div>
             </td>
             <td>
@@ -1462,9 +1391,7 @@ Each field is optional and depends on the check type.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A dictionary with:
-- 'status': 'pass' or 'fail'
-- 'detail': explanation of the result</p>
+                <p>A result dict with status ('pass' or 'fail') and detail message.</p>
               </div>
             </td>
           </tr>
@@ -1474,12 +1401,7 @@ Each field is optional and depends on the check type.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/handlers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 28</span>
-<span class="normal"> 29</span>
-<span class="normal"> 30</span>
-<span class="normal"> 31</span>
-<span class="normal"> 32</span>
-<span class="normal"> 33</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 33</span>
 <span class="normal"> 34</span>
 <span class="normal"> 35</span>
 <span class="normal"> 36</span>
@@ -1550,77 +1472,96 @@ Each field is optional and depends on the check type.</p>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
-<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generic_handler</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generic_handler</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Dispatch and execute a generic diagnostic rule.</span>
+<span class="sd">    Execute a diagnostic rule based on its type and condition.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        rule: A Rule dictionary containing check type and parameters.</span>
-<span class="sd">        path: Base path of the Azure Functions project.</span>
+<span class="sd">        rule: The rule dictionary.</span>
+<span class="sd">        path: Path to the Azure Functions project.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A dictionary with:</span>
-<span class="sd">            - &#39;status&#39;: &#39;pass&#39; or &#39;fail&#39;</span>
-<span class="sd">            - &#39;detail&#39;: explanation of the result</span>
+<span class="sd">        A result dict with status (&#39;pass&#39; or &#39;fail&#39;) and detail message.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">check_type</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">check_type</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+    <span class="n">condition</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;condition&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">)</span>
+    <span class="n">operator</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;operator&quot;</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;compare_version&quot;</span><span class="p">:</span>
-        <span class="c1"># Compare system Python version to expected</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-        <span class="n">operator</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;operator&quot;</span><span class="p">]</span>
-        <span class="n">current_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">micro</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">current</span> <span class="o">=</span> <span class="n">parse_version</span><span class="p">(</span><span class="n">current_version</span><span class="p">)</span>
-        <span class="n">expected_v</span> <span class="o">=</span> <span class="n">parse_version</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">target</span> <span class="ow">and</span> <span class="n">operator</span> <span class="ow">and</span> <span class="n">value</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing condition fields for compare_version&quot;</span><span class="p">}</span>
 
-        <span class="n">passed</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&gt;=</span> <span class="n">expected_v</span><span class="p">,</span>
-            <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&lt;=</span> <span class="n">expected_v</span><span class="p">,</span>
-            <span class="s2">&quot;==&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">==</span> <span class="n">expected_v</span><span class="p">,</span>
-            <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&gt;</span> <span class="n">expected_v</span><span class="p">,</span>
-            <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&lt;</span> <span class="n">expected_v</span><span class="p">,</span>
-        <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;python&quot;</span><span class="p">:</span>
+            <span class="n">current_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">micro</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">parse_version</span><span class="p">(</span><span class="n">current_version</span><span class="p">)</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="n">parse_version</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">passed</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Current: </span><span class="si">{</span><span class="n">current_version</span><span class="si">}</span><span class="s2">, Expected: </span><span class="si">{</span><span class="n">operator</span><span class="si">}{</span><span class="n">expected</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
+            <span class="n">passed</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&gt;=</span> <span class="n">expected</span><span class="p">,</span>
+                <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&lt;=</span> <span class="n">expected</span><span class="p">,</span>
+                <span class="s2">&quot;==&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">==</span> <span class="n">expected</span><span class="p">,</span>
+                <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&gt;</span> <span class="n">expected</span><span class="p">,</span>
+                <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&lt;</span> <span class="n">expected</span><span class="p">,</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;env_var_exists&quot;</span><span class="p">:</span>
-        <span class="c1"># Check if environment variable is set</span>
-        <span class="n">var</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span>
-        <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">exists</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="s1">&#39;set&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;not set&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">passed</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Python version is </span><span class="si">{</span><span class="n">current_version</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="n">operator</span><span class="si">}{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;path_exists&quot;</span><span class="p">:</span>
-        <span class="c1"># Check if a specific path exists (can be sys.executable or relative)</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
-        <span class="n">target_path</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span> <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;sys.executable&quot;</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-        <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Unknown target for version comparison: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+
+    <span class="k">elif</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;env_var_exists&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing environment variable name&quot;</span><span class="p">}</span>
+        <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">exists</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;exists&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;is missing&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="s1">&#39;set&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;not set&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;file_exists&quot;</span><span class="p">:</span>
-        <span class="c1"># Check if a file exists relative to the base path</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">])</span>
-        <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;path_exists&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing target path&quot;</span><span class="p">}</span>
+        <span class="n">resolved_path</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span> <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;sys.executable&quot;</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">resolved_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">exists</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;exists&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;is missing&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resolved_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;exists&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;is missing&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;package_installed&quot;</span><span class="p">:</span>
-        <span class="c1"># Check if a Python package is importable</span>
-        <span class="n">package_name</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
-        <span class="n">found</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">package_name</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;file_exists&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing file path&quot;</span><span class="p">}</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">exists</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;exists&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;is missing&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">elif</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;package_installed&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing package name&quot;</span><span class="p">}</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">found</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">package_name</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="s1">&#39;installed&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;not installed&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Package &#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&#39; is </span><span class="si">{</span><span class="s1">&#39;installed&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;not installed&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">return</span> <span class="p">{</span>
@@ -1739,7 +1680,7 @@ Each field is optional and depends on the check type.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+                  <code><span title="azure_functions_doctor.check.CheckResult">CheckResult</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1753,14 +1694,7 @@ Each field is optional and depends on the check type.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/check.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">14</span>
 <span class="normal">15</span>
 <span class="normal">16</span>
 <span class="normal">17</span>
@@ -1771,7 +1705,19 @@ Each field is optional and depends on the check type.</p>
 <span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
-<span class="normal">25</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_check</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">base_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_check</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">base_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CheckResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrap the generic_handler to cast a raw rule into a typed Rule.</span>
 
@@ -1782,14 +1728,19 @@ Each field is optional and depends on the check type.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Structured result with status, label, value, and optional hint.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">generic_handler</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">Rule</span><span class="p">,</span> <span class="n">rule</span><span class="p">),</span> <span class="n">base_path</span><span class="p">)</span>
+    <span class="n">typed_rule</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Rule</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">generic_handler</span><span class="p">(</span><span class="n">typed_rule</span><span class="p">,</span> <span class="n">base_path</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">{</span>
+    <span class="n">output</span><span class="p">:</span> <span class="n">CheckResult</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)),</span>
+        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">typed_rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">typed_rule</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]),</span>
         <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;detail&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;hint&quot;</span><span class="p">:</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hint&quot;</span><span class="p">),</span>
     <span class="p">}</span>
+
+    <span class="k">if</span> <span class="s2">&quot;hint&quot;</span> <span class="ow">in</span> <span class="n">typed_rule</span><span class="p">:</span>
+        <span class="n">output</span><span class="p">[</span><span class="s2">&quot;hint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">typed_rule</span><span class="p">[</span><span class="s2">&quot;hint&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">output</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
