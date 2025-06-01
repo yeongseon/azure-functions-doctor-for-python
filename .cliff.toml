@@ -1,0 +1,31 @@
+[changelog]
+header = """
+# 📦 Changelog
+"""
+body = """
+{% for group, commits in commits | group_by(attribute="group") %}
+## {{ group | upper_first }}
+{% for commit in commits %}
+- {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7) }}]({{ commit.remote }}{{ commit.id }}))
+{% endfor %}
+{% endfor %}
+"""
+footer = ""
+
+[git]
+conventional = true
+filter_unconventional = true
+tag_pattern = "v[0-9]*"
+sort_commits = "newest"
+
+[groups]
+feat = "✨ Features"
+fix = "🐛 Fixes"
+docs = "📝 Documentation"
+refactor = "🛠 Refactoring"
+test = "✅ Tests"
+chore = "🔧 Chore"
+ci = "🔁 CI/CD"
+style = "🎨 Style"
+perf = "⚡ Performance"
+build = "🏗 Build"
