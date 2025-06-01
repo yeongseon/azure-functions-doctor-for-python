@@ -1,49 +1,57 @@
 # 🖥️ CLI Usage: Azure Functions Doctor
 
-Azure Functions Doctor provides a CLI to help validate and troubleshoot your Python Azure Functions project.
+**Azure Functions Doctor** provides a command-line interface (CLI) to validate and troubleshoot your Python Azure Functions project setup.
 
 ---
 
 ## 🔧 Basic Usage
 
-Run the CLI from your terminal:
+Run the CLI from your terminal using:
 
 ```bash
-hatch run azfunc-doctor
-```
-
-This will display the help menu and available commands.
-
-Or alternatively:
-
-```bash
-python -m azure_functions_doctor.cli
-```
-
----
-
-## 🩺 Run Diagnostics
-
-To check your local Azure Functions setup:
-
-```bash
-hatch run azfunc-doctor diagnose
+azfunc-doctor diagnose
 ```
 
 You can also specify options:
 
 ```bash
-hatch run azfunc-doctor diagnose --format json --verbose
+azfunc-doctor diagnose --format json --verbose
 ```
 
-### What It Checks:
+---
 
-- ✅ Python version is ≥ 3.9
-- ✅ `.venv` directory exists
-- ✅ Azure Functions Core Tools (`func`) is installed
-- ✅ `host.json` and `function.json` are valid
-- ✅ Expected directory structure is present
-- ⚠️ Optional files like `requirements.txt` (future support)
+## 🩺 What It Checks
+
+* ✅ Python version is ≥ 3.9
+* ✅ Virtual environment is activated (VIRTUAL\_ENV)
+* ✅ Python executable path is resolvable
+* ✅ `requirements.txt` file exists
+* ✅ `azure-functions` package is installed
+* ✅ Project files like `host.json`, `local.settings.json`, and `main.py` exist
+
+---
+
+## 💡 Example Output
+
+```bash
+🩺 Azure Functions Doctor for Python v0.1.0
+📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
+
+✖ Python Env
+  • Python version: Python version is 3.12.3, expected >=3.9
+  • Virtual environment: VIRTUAL_ENV is set
+  • Python executable: /root/.local/share/hatch/env/virtual/azure-function-doctor/qaLwoID5/azure-function-doctor/bin/python exists
+  • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
+  • azure-functions package: Package 'azure_functions' is not installed
+
+✖ Project Structure
+  • host.json: /root/Github/azure-functions-doctor/examples/basic-hello/host.json exists
+  • local.settings.json: /root/Github/azure-functions-doctor/examples/basic-hello/local.settings.json is missing
+  • main.py: /root/Github/azure-functions-doctor/examples/basic-hello/main.py is missing
+
+Summary
+✔ 0 Passed    ✖ 2 Failed
+```
 
 ---
 
@@ -52,29 +60,6 @@ hatch run azfunc-doctor diagnose --format json --verbose
 To view available options and subcommands:
 
 ```bash
-hatch run azfunc-doctor --help
-hatch run azfunc-doctor diagnose --help
-```
-
----
-
-## 💡 Example Output
-
-```bash
-$ azfunc-doctor diagnose
-
-✖ Python Environment
-  • Python version: Current: 3.12.3, Expected: >=3.9
-  • Virtual environment: VIRTUAL_ENV is set
-  • Python executable: /root/.local/share/hatch/env/virtual/azure-function-doctor/qaLwoID5/azure-function-doctor/bin/python exists
-  • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
-  • azure-functions package: azure_functions is not installed
-
-✖ Project Structure
-  • host.json: /root/Github/azure-functions-doctor/examples/basic-hello/host.json exists
-  • local.settings.json: /root/Github/azure-functions-doctor/examples/basic-hello/local.settings.json is missing
-  • main.py: /root/Github/azure-functions-doctor/examples/basic-hello/main.py is missing
-
-─────────────────────────────────────────────────────────────────────────────── Summary ────────────────────────────────────────────────────────────────────────────────
-✔ 0 Passed    ✖ 2 Failed
+azfunc-doctor --help
+azfunc-doctor diagnose --help
 ```
