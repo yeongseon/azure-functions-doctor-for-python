@@ -1,7 +1,27 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor/main/logo_assets/logo_full_256px.png" alt="Azure Functions Doctor Logo" width="320" />
+  <img src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor-for-python/main/logo_assets/logo_full_256px.png" alt="Azure Functions Doctor Logo" width="320" />
 </p>
 
+<p align="center">
+  <a href="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/deploy.yml">
+    <img src="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/deploy.yml/badge.svg" alt="GitHub Workflow Status" />
+  </a>
+  <a href="https://pypi.org/project/azure-functions-doctor/">
+    <img src="https://img.shields.io/pypi/v/azure-functions-doctor.svg" alt="PyPI Version" />
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/yeongseon/azure-functions-doctor-for-python" alt="License" />
+  </a>
+  <a href="https://coveralls.io/github/yeongseon/azure-functions-doctor-for-python?branch=main">
+    <img src="https://coveralls.io/repos/github/yeongseon/azure-functions-doctor-for-python/badge.svg?branch=main" alt="Coverage Status" />
+  </a>
+  <a href="https://pypi.org/project/azure-functions-doctor/">
+    <img src="https://img.shields.io/pypi/pyversions/azure-functions-doctor" alt="Python Versions" />
+  </a>
+  <a href="https://pepy.tech/project/azure-functions-doctor">
+    <img src="https://pepy.tech/badge/azure-functions-doctor" alt="Downloads" />
+  </a>
+</p>
 ---
 
 ## 🤔 Why Azure Functions Doctor?
@@ -121,7 +141,7 @@ A full example is available under [`examples/basic-hello`](examples/basic-hello)
 
 ## 📋 Documentation
 
-For advanced usage and developer guides, visit the [project site](https://yeongseon.github.io/azure-functions-doctor/) or [GitHub repository](https://github.com/yeongseon/azure-functions-doctor).
+For advanced usage and developer guides, visit the [project site](https://yeongseon.github.io/azure-functions-doctor-for-python/) or [GitHub repository](https://github.com/yeongseon/azure-functions-doctor-for-python).
 
 ---
 
