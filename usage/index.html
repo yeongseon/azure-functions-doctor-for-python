@@ -305,33 +305,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-diagnostics" class="md-nav__link">
-    <span class="md-ellipsis">
-      🩺 Run Diagnostics
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🩺 Run Diagnostics">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#what-it-checks" class="md-nav__link">
     <span class="md-ellipsis">
-      What It Checks:
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#help" class="md-nav__link">
-    <span class="md-ellipsis">
-      🆘 Help
+      🩺 What It Checks
     </span>
   </a>
   
@@ -341,6 +317,15 @@
   <a href="#example-output" class="md-nav__link">
     <span class="md-ellipsis">
       💡 Example Output
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help" class="md-nav__link">
+    <span class="md-ellipsis">
+      🆘 Help
     </span>
   </a>
   
@@ -456,33 +441,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-diagnostics" class="md-nav__link">
-    <span class="md-ellipsis">
-      🩺 Run Diagnostics
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🩺 Run Diagnostics">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#what-it-checks" class="md-nav__link">
     <span class="md-ellipsis">
-      What It Checks:
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#help" class="md-nav__link">
-    <span class="md-ellipsis">
-      🆘 Help
+      🩺 What It Checks
     </span>
   </a>
   
@@ -492,6 +453,15 @@
   <a href="#example-output" class="md-nav__link">
     <span class="md-ellipsis">
       💡 Example Output
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help" class="md-nav__link">
+    <span class="md-ellipsis">
+      🆘 Help
     </span>
   </a>
   
@@ -517,57 +487,50 @@
 
 
 <h1 id="cli-usage-azure-functions-doctor">🖥️ CLI Usage: Azure Functions Doctor</h1>
-<p>Azure Functions Doctor provides a CLI to help validate and troubleshoot your Python Azure Functions project.</p>
+<p><strong>Azure Functions Doctor</strong> provides a command-line interface (CLI) to validate and troubleshoot your Python Azure Functions project setup.</p>
 <hr />
 <h2 id="basic-usage">🔧 Basic Usage</h2>
-<p>Run the CLI from your terminal:</p>
-<pre><code class="language-bash">hatch run azfunc-doctor
-</code></pre>
-<p>This will display the help menu and available commands.</p>
-<p>Or alternatively:</p>
-<pre><code class="language-bash">python -m azure_functions_doctor.cli
-</code></pre>
-<hr />
-<h2 id="run-diagnostics">🩺 Run Diagnostics</h2>
-<p>To check your local Azure Functions setup:</p>
-<pre><code class="language-bash">hatch run azfunc-doctor diagnose
+<p>Run the CLI from your terminal using:</p>
+<pre><code class="language-bash">azfunc-doctor diagnose
 </code></pre>
 <p>You can also specify options:</p>
-<pre><code class="language-bash">hatch run azfunc-doctor diagnose --format json --verbose
+<pre><code class="language-bash">azfunc-doctor diagnose --format json --verbose
 </code></pre>
-<h3 id="what-it-checks">What It Checks:</h3>
+<hr />
+<h2 id="what-it-checks">🩺 What It Checks</h2>
 <ul>
 <li>✅ Python version is ≥ 3.9</li>
-<li>✅ <code>.venv</code> directory exists</li>
-<li>✅ Azure Functions Core Tools (<code>func</code>) is installed</li>
-<li>✅ <code>host.json</code> and <code>function.json</code> are valid</li>
-<li>✅ Expected directory structure is present</li>
-<li>⚠️ Optional files like <code>requirements.txt</code> (future support)</li>
+<li>✅ Virtual environment is activated (VIRTUAL_ENV)</li>
+<li>✅ Python executable path is resolvable</li>
+<li>✅ <code>requirements.txt</code> file exists</li>
+<li>✅ <code>azure-functions</code> package is installed</li>
+<li>✅ Project files like <code>host.json</code>, <code>local.settings.json</code>, and <code>main.py</code> exist</li>
 </ul>
 <hr />
-<h2 id="help">🆘 Help</h2>
-<p>To view available options and subcommands:</p>
-<pre><code class="language-bash">hatch run azfunc-doctor --help
-hatch run azfunc-doctor diagnose --help
-</code></pre>
-<hr />
 <h2 id="example-output">💡 Example Output</h2>
-<pre><code class="language-bash">$ azfunc-doctor diagnose
+<pre><code class="language-bash">🩺 Azure Functions Doctor for Python v0.1.0
+📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
 
-✖ Python Environment
-  • Python version: Current: 3.12.3, Expected: &gt;=3.9
+✖ Python Env
+  • Python version: Python version is 3.12.3, expected &gt;=3.9
   • Virtual environment: VIRTUAL_ENV is set
   • Python executable: /root/.local/share/hatch/env/virtual/azure-function-doctor/qaLwoID5/azure-function-doctor/bin/python exists
   • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
-  • azure-functions package: azure_functions is not installed
+  • azure-functions package: Package 'azure_functions' is not installed
 
 ✖ Project Structure
   • host.json: /root/Github/azure-functions-doctor/examples/basic-hello/host.json exists
   • local.settings.json: /root/Github/azure-functions-doctor/examples/basic-hello/local.settings.json is missing
   • main.py: /root/Github/azure-functions-doctor/examples/basic-hello/main.py is missing
 
-─────────────────────────────────────────────────────────────────────────────── Summary ────────────────────────────────────────────────────────────────────────────────
+Summary
 ✔ 0 Passed    ✖ 2 Failed
+</code></pre>
+<hr />
+<h2 id="help">🆘 Help</h2>
+<p>To view available options and subcommands:</p>
+<pre><code class="language-bash">azfunc-doctor --help
+azfunc-doctor diagnose --help
 </code></pre>
 
 
