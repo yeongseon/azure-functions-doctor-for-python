@@ -272,18 +272,63 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-use-this-tool" class="md-nav__link">
+  <a href="#what-is-it" class="md-nav__link">
     <span class="md-ellipsis">
-      🔍 Why Use This Tool?
+      ⚡ What Is It?
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-features" class="md-nav__link">
+  <a href="#when-should-you-use-this" class="md-nav__link">
     <span class="md-ellipsis">
-      🚀 Key Features
+      🚀 When Should You Use This?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧰 Quick Start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      📘 Documentation Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#need-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      💬 Need Help?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 Example Output
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      📄 License
     </span>
   </a>
   
@@ -456,18 +501,63 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-use-this-tool" class="md-nav__link">
+  <a href="#what-is-it" class="md-nav__link">
     <span class="md-ellipsis">
-      🔍 Why Use This Tool?
+      ⚡ What Is It?
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-features" class="md-nav__link">
+  <a href="#when-should-you-use-this" class="md-nav__link">
     <span class="md-ellipsis">
-      🚀 Key Features
+      🚀 When Should You Use This?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧰 Quick Start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      📘 Documentation Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#need-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      💬 Need Help?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 Example Output
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      📄 License
     </span>
   </a>
   
@@ -492,27 +582,95 @@
   
 
 
-<h1 id="azure-functions-doctor">Azure Functions Doctor 🩺⚡</h1>
-<p><strong>Azure Functions Doctor</strong> is a Python-based CLI tool that diagnoses and validates your local Azure Functions environment.
-It helps identify common issues such as missing files, version mismatches, or misconfigurations in your project setup.</p>
+<h1 id="azure-functions-doctor">🩺 Azure Functions Doctor</h1>
+<p>Welcome to <strong>Azure Functions Doctor</strong> — a powerful diagnostic CLI tool built with Python to help you validate and troubleshoot your local Azure Functions environment.</p>
 <hr />
-<h2 id="why-use-this-tool">🔍 Why Use This Tool?</h2>
+<h2 id="what-is-it">⚡ What Is It?</h2>
+<p><strong>Azure Functions Doctor</strong> analyzes your project folder and environment to detect:</p>
 <ul>
-<li>✅ You're getting random 500 errors and suspect a misconfigured environment?</li>
-<li>✅ You want to sanity-check your project before deploying to Azure?</li>
-<li>✅ You prefer structured output over guesswork?</li>
+<li>Missing configuration files (e.g., <code>host.json</code>, <code>requirements.txt</code>)</li>
+<li>Unsupported Python versions</li>
+<li>Missing dependencies (e.g., <code>azure-functions</code>)</li>
+<li>Broken or misnamed function folders</li>
+<li>Other common issues that break Azure Functions locally or in CI/CD</li>
 </ul>
-<p>Let Azure Functions Doctor help you save time and debug faster.</p>
+<p>It provides <strong>clear emoji-based output</strong>, <strong>rule-based extensibility</strong>, and <strong>optional JSON formatting</strong>.</p>
 <hr />
-<h2 id="key-features">🚀 Key Features</h2>
-<ul>
-<li>🐍 Diagnose Python version, virtual environment, and dependencies</li>
-<li>📁 Validate Azure Functions project structure (<code>host.json</code>, <code>function.json</code>, <code>main.py</code>, etc.)</li>
-<li>📦 Check if required packages (like <code>azure-functions</code>) are installed</li>
-<li>📄 Validate presence of config files like <code>requirements.txt</code> and <code>local.settings.json</code></li>
-<li>💡 Developer-friendly output with emoji indicators and summary section</li>
-<li>🛠 Easily extendable via <code>rules.json</code> and handler functions</li>
-</ul>
+<h2 id="when-should-you-use-this">🚀 When Should You Use This?</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Usefulness</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🧪 Developing locally</td>
+<td>Quickly catch broken setup before you run <code>func start</code></td>
+</tr>
+<tr>
+<td>🚢 Before deployment</td>
+<td>Prevent silent 500 errors caused by bad config</td>
+</tr>
+<tr>
+<td>🔁 In CI pipeline</td>
+<td>Automate validation across repos and branches</td>
+</tr>
+<tr>
+<td>🛠 Debugging errors</td>
+<td>Eliminate basic mistakes before diving into logs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="quick-start">🧰 Quick Start</h2>
+<pre><code class="language-bash">pip install azure-functions-doctor
+azfunc-doctor diagnose
+</code></pre>
+<p>View <a href="usage/">Usage Guide</a> →<br />
+See <a href="../examples/basic-hello/README.md">Example Project</a> →</p>
+<hr />
+<h2 id="documentation-overview">📘 Documentation Overview</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="usage/">Usage Guide</a></td>
+<td>How to run and interpret results</td>
+</tr>
+<tr>
+<td><a href="rules/">Rule System</a></td>
+<td>Understand and customize <code>rules.json</code></td>
+</tr>
+<tr>
+<td><a href="diagnostics/">Diagnostics Reference</a></td>
+<td>Full list of built-in checks</td>
+</tr>
+<tr>
+<td><a href="development/">Developer Guide</a></td>
+<td>Contribute and extend the CLI</td>
+</tr>
+<tr>
+<td><a href="release_process/">Release Process</a></td>
+<td>Versioning and PyPI publishing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="need-help">💬 Need Help?</h2>
+<p>Feel free to <a href="https://github.com/yeongseon/azure-functions-doctor-for-python/issues">open an issue</a> or check out our <a href="https://github.com/yeongseon/azure-functions-doctor-for-python/discussions">GitHub Discussions</a>.</p>
+<hr />
+<h2 id="example-output">🧪 Example Output</h2>
+<p><img alt="CLI output" src="assets/azfunc-doctor-example.png" /></p>
+<hr />
+<h2 id="license">📄 License</h2>
+<p>This project is licensed under the <a href="../LICENSE">MIT License</a>.</p>
 
 
 

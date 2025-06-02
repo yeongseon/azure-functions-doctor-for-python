@@ -296,6 +296,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -328,21 +330,14 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#rulesjson-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      📘 rules.json Documentation
-    </span>
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#location" class="md-nav__link">
@@ -573,21 +568,14 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#rulesjson-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      📘 rules.json Documentation
-    </span>
-  </a>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#location" class="md-nav__link">
@@ -746,18 +734,16 @@
   
 
 
-  <h1>Rules</h1>
-
-<h2 id="rulesjson-documentation">📘 <code>rules.json</code> Documentation</h2>
+<h1 id="rulesjson-documentation">📘 <code>rules.json</code> Documentation</h1>
 <p>The <code>rules.json</code> file defines diagnostic checks declaratively for <strong>Azure Functions Doctor</strong>. Each rule specifies what to validate, how to validate it, and what to show when the check passes or fails — without modifying the core Python code.</p>
 <p>This makes the tool extensible and customizable.</p>
 <hr />
 <h2 id="location">📁 Location</h2>
-<p>The file is located at the <strong>project root</strong>:</p>
-<pre><code>azure-functions-doctor/
-├── rules.json  👈
-├── src/
-│   └── azure_functions_doctor/
+<p>The file is located under the <strong>assets/</strong> directory:</p>
+<pre><code>src/
+└── azure_functions_doctor/
+    └── assets/
+        └── rules.json  👈
 </code></pre>
 <hr />
 <h2 id="structure-of-a-rule">⌐ Structure of a Rule</h2>
@@ -859,7 +845,7 @@
 </code></pre>
 <hr />
 <h3 id="4-custom">4. <code>custom</code></h3>
-<p>You may register custom handlers in code using the <code>@handler.register("your_type")</code> decorator.</p>
+<p>You may register custom handlers in code using the <code>@handler.register("your_type")</code> decorator. Add a <code>"type": "custom"</code> field and let your handler interpret additional keys under <code>condition</code>.</p>
 <hr />
 <h2 id="grouping-by-section">📁 Grouping by <code>section</code></h2>
 <p>Sections allow grouping related checks together for better readability in the CLI output:</p>
@@ -883,7 +869,7 @@
 <h2 id="extending-the-rules">🧹 Extending the Rules</h2>
 <p>To add a new rule:</p>
 <ol>
-<li>Open <code>rules.json</code></li>
+<li>Open <code>src/azure_functions_doctor/assets/rules.json</code></li>
 <li>Append your rule object to the array</li>
 <li>Save and rerun <code>azfunc-doctor</code></li>
 </ol>
@@ -911,7 +897,7 @@
 </code></pre>
 <p>To see grouped results and hints.</p>
 <hr />
-<h2 id="example-rulesjson-simplified">📟 Example rules.json (simplified)</h2>
+<h2 id="example-rulesjson-simplified">📟 Example <code>rules.json</code> (simplified)</h2>
 <pre><code class="language-json">[
   {
     &quot;id&quot;: &quot;check_python_version&quot;,
@@ -934,8 +920,8 @@
 </code></pre>
 <hr />
 <h2 id="contribute-new-rules">📬 Contribute New Rules</h2>
-<p>Want to improve the default rules? Feel free to open a PR or discussion on
-👉 <a href="https://github.com/yeongseon/azure-functions-doctor">GitHub Repository</a></p>
+<p>Want to improve the default rules? Feel free to open a PR or discussion on<br />
+👉 <a href="https://github.com/yeongseon/azure-functions-doctor-for-python">GitHub Repository</a></p>
 
 
 

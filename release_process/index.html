@@ -22,7 +22,7 @@
     
     
       
-        <title>🛠 Release Process - Azure Functions Doctor for Python</title>
+        <title>🛠️ Release Process - Azure Functions Doctor for Python</title>
       
     
     
@@ -101,7 +101,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              🛠 Release Process
+              🛠️ Release Process
             
           </span>
         </div>
@@ -394,36 +394,54 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#step-1-update-the-version" class="md-nav__link">
+  <a href="#step-1-bump-version-and-generate-changelog" class="md-nav__link">
     <span class="md-ellipsis">
-      🧾 Step 1: Update the Version
+      🧾 Step 1: Bump Version and Generate Changelog
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-publish-to-pypi" class="md-nav__link">
+  <a href="#step-2-build-and-test-the-package" class="md-nav__link">
     <span class="md-ellipsis">
-      📦 Step 2: Publish to PyPI
+      📦 Step 2: Build and Test the Package
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
+  <a href="#step-3-publish-to-pypi" class="md-nav__link">
     <span class="md-ellipsis">
-      ✅ Summary
+      🚀 Step 3: Publish to PyPI
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#test-on-testpypi-optional" class="md-nav__link">
+  <a href="#step-4-test-on-testpypi-optional" class="md-nav__link">
     <span class="md-ellipsis">
-      🔁 Test on TestPyPI (Optional)
+      🔁 Step 4: Test on TestPyPI (Optional)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-of-release-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Summary of Release Commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔗 Related Documentation
     </span>
   </a>
   
@@ -448,33 +466,78 @@
   
 
 
-<h1 id="release-process">🛠 Release Process</h1>
-<p>This document describes how to release a new version of <strong>Azure Functions Doctor</strong> to PyPI and update the changelog.</p>
+<h1 id="release-process">🛠️ Release Process</h1>
+<p>This document outlines the steps to release a new version of <strong>Azure Functions Doctor</strong> to PyPI and update the changelog, using the existing Makefile and Hatch-based workflows.</p>
 <hr />
-<h2 id="step-1-update-the-version">🧾 Step 1: Update the Version</h2>
-<p>Use Hatch to bump the version and generate changelog:</p>
-<pre><code class="language-bash">make release-patch   # or: release-minor, release-major
+<h2 id="step-1-bump-version-and-generate-changelog">🧾 Step 1: Bump Version and Generate Changelog</h2>
+<p>Use the Makefile targets to bump the version and update the changelog:</p>
+<pre><code class="language-bash"># Patch release (e.g., v0.1.0 → v0.1.1)
+make release-patch
+
+# Minor release (e.g., v0.1.1 → v0.2.0)
+make release-minor
+
+# Major release (e.g., v0.2.0 → v1.0.0)
+make release-major
 </code></pre>
-<p>This will:</p>
-<ul>
-<li>Update the version in <code>pyproject.toml</code></li>
-<li>Generate <code>CHANGELOG.md</code> via <code>git-cliff</code></li>
-<li>Commit changelog</li>
-<li>Tag the commit (e.g. <code>v0.2.0</code>)</li>
-<li>Push the tag to GitHub</li>
-</ul>
-<hr />
-<h2 id="step-2-publish-to-pypi">📦 Step 2: Publish to PyPI</h2>
-<p>Build and upload the package:</p>
-<pre><code class="language-bash">make build
-make publish
-</code></pre>
-<p>This will upload the package to <a href="https://pypi.org/project/azure-functions-doctor/">PyPI</a>.</p>
+<p>Each command will:
+- Update the version in <code>pyproject.toml</code> and <code>src/azure_functions_doctor/__init__.py</code>
+- Generate or update <code>CHANGELOG.md</code> based on Git commit history (<code>git-cliff</code>)
+- Commit the updated changelog and version bump
+- Create a Git tag (e.g., <code>v0.2.0</code>)
+- Push commits and tags to the <code>main</code> branch</p>
 <blockquote>
-<p>🔒 Make sure your <code>~/.pypirc</code> is correctly configured with PyPI credentials.</p>
+<p><strong>Tip</strong>: Ensure your local branch is up-to-date with <code>main</code> before running these commands.</p>
 </blockquote>
 <hr />
-<h2 id="summary">✅ Summary</h2>
+<h2 id="step-2-build-and-test-the-package">📦 Step 2: Build and Test the Package</h2>
+<p>Before publishing, build and verify locally:</p>
+<pre><code class="language-bash"># Create source and wheel distributions
+make build
+
+# (Optional) Install from the local distribution to test
+pip install dist/azure_functions_doctor-&lt;version&gt;-py3-none-any.whl
+</code></pre>
+<p>Verify installation:</p>
+<pre><code class="language-bash">azfunc-doctor --version
+</code></pre>
+<hr />
+<h2 id="step-3-publish-to-pypi">🚀 Step 3: Publish to PyPI</h2>
+<p>Once the build artifacts are validated, upload the package to PyPI:</p>
+<pre><code class="language-bash">make publish
+</code></pre>
+<p>This runs:
+- <code>hatch release</code> under the hood (builds, signs if configured, and uploads)
+- Uses credentials from <code>~/.pypirc</code> or environment variables (<code>PYPI_USERNAME</code>/<code>PYPI_PASSWORD</code>)
+- Verifies successful upload by checking PyPI listing</p>
+<blockquote>
+<p><strong>Security</strong>: Ensure that your PyPI API token or credentials are stored securely and not committed to source control.</p>
+</blockquote>
+<hr />
+<h2 id="step-4-test-on-testpypi-optional">🔁 Step 4: Test on TestPyPI (Optional)</h2>
+<p>If you want to verify the upload workflow without affecting production releases:</p>
+<ol>
+<li>Build the package:</li>
+</ol>
+<p><code>bash
+   make build</code></p>
+<ol>
+<li>Upload to TestPyPI:</li>
+</ol>
+<p><code>bash
+   twine upload --repository testpypi dist/*</code></p>
+<ol>
+<li>Install from TestPyPI:</li>
+</ol>
+<p><code>bash
+   pip install --index-url https://test.pypi.org/simple/ azure-functions-doctor</code></p>
+<ol>
+<li>Verify version:</li>
+</ol>
+<p><code>bash
+   azfunc-doctor --version</code></p>
+<hr />
+<h2 id="summary-of-release-commands">✅ Summary of Release Commands</h2>
 <table>
 <thead>
 <tr>
@@ -488,21 +551,27 @@ make publish
 <td><code>make release-patch</code></td>
 </tr>
 <tr>
-<td>Build package</td>
+<td>Build distributions</td>
 <td><code>make build</code></td>
 </tr>
 <tr>
 <td>Publish to PyPI</td>
 <td><code>make publish</code></td>
 </tr>
+<tr>
+<td>Test on TestPyPI (optional)</td>
+<td><code>twine upload --repository testpypi dist/*</code></td>
+</tr>
 </tbody>
 </table>
 <hr />
-<h2 id="test-on-testpypi-optional">🔁 Test on TestPyPI (Optional)</h2>
-<pre><code class="language-bash">hatch build
-twine upload --repository testpypi dist/*
-pip install --index-url https://test.pypi.org/simple/ azure-functions-doctor
-</code></pre>
+<h2 id="related-documentation">🔗 Related Documentation</h2>
+<ul>
+<li><a href="CHANGELOG.md">CHANGELOG.md</a></li>
+<li><a href="../development/">Development Guide</a></li>
+<li><a href="../development/#%EB%AC%B8%EC%84%9C">Makefile Targets</a></li>
+<li><a href="https://hatch.pypa.io/latest/publishing/">PyPI Publishing with Hatch</a></li>
+</ul>
 
 
 

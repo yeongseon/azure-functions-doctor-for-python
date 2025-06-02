@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cli-usage-azure-functions-doctor" class="md-skip">
+        <a href="#cli-usage-azfunc-doctor" class="md-skip">
           Skip to content
         </a>
       
@@ -298,7 +298,16 @@
         <li class="md-nav__item">
   <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      🔧 Basic Usage
+      🚀 Basic Usage
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      ⚙️ Options
     </span>
   </a>
   
@@ -307,7 +316,7 @@
         <li class="md-nav__item">
   <a href="#what-it-checks" class="md-nav__link">
     <span class="md-ellipsis">
-      🩺 What It Checks
+      ✅ What It Checks
     </span>
   </a>
   
@@ -316,7 +325,7 @@
         <li class="md-nav__item">
   <a href="#example-output" class="md-nav__link">
     <span class="md-ellipsis">
-      💡 Example Output
+      🧪 Example Output
     </span>
   </a>
   
@@ -478,7 +487,16 @@
         <li class="md-nav__item">
   <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      🔧 Basic Usage
+      🚀 Basic Usage
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      ⚙️ Options
     </span>
   </a>
   
@@ -487,7 +505,7 @@
         <li class="md-nav__item">
   <a href="#what-it-checks" class="md-nav__link">
     <span class="md-ellipsis">
-      🩺 What It Checks
+      ✅ What It Checks
     </span>
   </a>
   
@@ -496,7 +514,7 @@
         <li class="md-nav__item">
   <a href="#example-output" class="md-nav__link">
     <span class="md-ellipsis">
-      💡 Example Output
+      🧪 Example Output
     </span>
   </a>
   
@@ -530,52 +548,94 @@
   
 
 
-<h1 id="cli-usage-azure-functions-doctor">🖥️ CLI Usage: Azure Functions Doctor</h1>
-<p><strong>Azure Functions Doctor</strong> provides a command-line interface (CLI) to validate and troubleshoot your Python Azure Functions project setup.</p>
+<h1 id="cli-usage-azfunc-doctor">🖥️ CLI Usage: <code>azfunc-doctor</code></h1>
+<p>The Azure Functions Doctor CLI helps validate your local Python-based Azure Functions project for common issues using an extensible rules system.</p>
 <hr />
-<h2 id="basic-usage">🔧 Basic Usage</h2>
-<p>Run the CLI from your terminal using:</p>
+<h2 id="basic-usage">🚀 Basic Usage</h2>
 <pre><code class="language-bash">azfunc-doctor diagnose
 </code></pre>
-<p>You can also specify options:</p>
-<pre><code class="language-bash">azfunc-doctor diagnose --format json --verbose
+<p>Run diagnostics in the current or specified folder.</p>
+<hr />
+<h2 id="options">⚙️ Options</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--path</code></td>
+<td>Target directory (default: current folder)</td>
+</tr>
+<tr>
+<td><code>--format json</code></td>
+<td>Output in machine-readable JSON</td>
+</tr>
+<tr>
+<td><code>--verbose</code></td>
+<td>Show detailed diagnostics and hints</td>
+</tr>
+<tr>
+<td><code>--help</code></td>
+<td>Show usage for the CLI or subcommand</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre><code class="language-bash">azfunc-doctor diagnose --path ./my-func-app --format json --verbose
 </code></pre>
 <hr />
-<h2 id="what-it-checks">🩺 What It Checks</h2>
-<ul>
-<li>✅ Python version is ≥ 3.9</li>
-<li>✅ Virtual environment is activated (VIRTUAL_ENV)</li>
-<li>✅ Python executable path is resolvable</li>
-<li>✅ <code>requirements.txt</code> file exists</li>
-<li>✅ <code>azure-functions</code> package is installed</li>
-<li>✅ Project files like <code>host.json</code>, <code>local.settings.json</code>, and <code>main.py</code> exist</li>
-</ul>
+<h2 id="what-it-checks">✅ What It Checks</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python Environment</td>
+<td>Python version ≥ 3.9, virtualenv activated, executable exists</td>
+</tr>
+<tr>
+<td>Dependencies</td>
+<td><code>requirements.txt</code> present, <code>azure-functions</code> installed</td>
+</tr>
+<tr>
+<td>Project Files</td>
+<td><code>host.json</code>, <code>local.settings.json</code>, and <code>main.py</code> exist</td>
+</tr>
+</tbody>
+</table>
 <hr />
-<h2 id="example-output">💡 Example Output</h2>
-<pre><code class="language-bash">🩺 Azure Functions Doctor for Python v0.1.0
+<h2 id="example-output">🧪 Example Output</h2>
+<pre><code>🩺 Azure Functions Doctor for Python v0.1.0
 📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
 
 ✖ Python Env
   • Python version: Python version is 3.12.3, expected &gt;=3.9
   • Virtual environment: VIRTUAL_ENV is set
-  • Python executable: /root/.local/share/hatch/env/virtual/azure-functions-doctor/qaLwoID5/azure-functions-doctor/bin/python exists
-  • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
+  • Python executable: .../bin/python exists
+  • requirements.txt: exists
   • azure-functions package: Package 'azure_functions' is not installed
 
 ✖ Project Structure
-  • host.json: /root/Github/azure-functions-doctor/examples/basic-hello/host.json exists
-  • local.settings.json: /root/Github/azure-functions-doctor/examples/basic-hello/local.settings.json is missing
-  • main.py: /root/Github/azure-functions-doctor/examples/basic-hello/main.py is missing
+  • host.json: exists
+  • local.settings.json: is missing
+  • main.py: is missing
 
 Summary
 ✔ 0 Passed    ✖ 2 Failed
 </code></pre>
 <hr />
 <h2 id="help">🆘 Help</h2>
-<p>To view available options and subcommands:</p>
 <pre><code class="language-bash">azfunc-doctor --help
 azfunc-doctor diagnose --help
 </code></pre>
+<p>For more examples, see the <a href="../examples/basic-hello/README.md">example project</a>.</p>
 
 
 
