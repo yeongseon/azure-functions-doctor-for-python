@@ -6,16 +6,20 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 # ----------------------------------------
-# 📦 Hatch Build Configuration
+# 🏗️ Hatch Build Configuration
 # ----------------------------------------
 [tool.hatch.build]
 sources = ["src"]
+
+[tool.hatch.build.targets.wheel]
+# The package name will be resolved under "src/"
+# No need to set "packages" explicitly unless necessary
 
 [tool.hatch.version]
 path = "src/azure_functions_doctor/__init__.py"
 
 # ----------------------------------------
-# 🧾 Project Metadata
+# 📄 Project Metadata
 # ----------------------------------------
 [project]
 name = "azure-functions-doctor"
@@ -29,13 +33,15 @@ authors = [
   { name = "Yeongseon Choe", email = "yeongseon.choe@gmail.com" }
 ]
 
-# 📚 Runtime Dependencies
+# Runtime dependencies
 dependencies = [
   "typer",
   "rich",
-  "requests"
+  "requests",
+  "packaging"
 ]
 
+# Classifiers for PyPI
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
@@ -48,7 +54,7 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
-# 🧪 Optional Development Dependencies
+# Optional development dependencies
 [project.optional-dependencies]
 dev = [
   "black==24.4.2",
@@ -63,15 +69,16 @@ dev = [
   "pytest",
   "ruff==0.11.11",
   "types-requests",
-  "tox",
-  "packaging"
+  "tox"
 ]
 
-# 🖥️ CLI Entrypoint
+# CLI entry point
 [project.scripts]
 azfunc-doctor = "azure_functions_doctor.cli:cli"
 
-# 🧪 Hatch Environment (Development)
+# ----------------------------------------
+# 🧪 Hatch Environments
+# ----------------------------------------
 [tool.hatch.envs.default]
 features = ["dev"]
 
@@ -86,12 +93,20 @@ docs = "mkdocs serve"
 precommit = "pre-commit run --all-files"
 precommit-install = "pre-commit install"
 
-# 🎨 Code Formatting - Black
+[tool.hatch.envs.docs.scripts]
+build = "mkdocs build"
+serve = "mkdocs serve"
+
+# ----------------------------------------
+# 🎨 Code Formatter - Black
+# ----------------------------------------
 [tool.black]
 line-length = 120
 target-version = ["py39"]
 
-# 🔍 Linting - Ruff
+# ----------------------------------------
+# 🔍 Linter - Ruff
+# ----------------------------------------
 [tool.ruff]
 line-length = 120
 target-version = "py39"
@@ -105,7 +120,9 @@ select = ["E", "F", "I", "B"]
 [tool.ruff.lint.isort]
 known-first-party = ["azure_functions_doctor"]
 
-# 🧪 Type Checking - Mypy
+# ----------------------------------------
+# 🧠 Type Checker - Mypy
+# ----------------------------------------
 [tool.mypy]
 python_version = "3.9"
 strict = true
@@ -114,12 +131,16 @@ show_error_codes = true
 pretty = true
 ignore_missing_imports = true
 
-# 🧪 Testing - Pytest
+# ----------------------------------------
+# 🧪 Testing Framework - Pytest
+# ----------------------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
 
+# ----------------------------------------
 # 📊 Coverage Reporting
+# ----------------------------------------
 [tool.coverage.run]
 branch = true
 source = ["src/azure_functions_doctor"]
@@ -127,8 +148,3 @@ source = ["src/azure_functions_doctor"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-
-# 📚 Docs (MkDocs)
-[tool.hatch.envs.docs.scripts]
-build = "mkdocs build"
-serve = "mkdocs serve"
