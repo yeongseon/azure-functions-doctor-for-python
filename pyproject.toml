@@ -11,9 +11,6 @@ build-backend = "hatchling.build"
 [tool.hatch.build]
 sources = ["src"]
 
-[tool.hatch.build.targets.wheel]
-packages = ["azure_functions_doctor"]
-
 [tool.hatch.version]
 path = "src/azure_functions_doctor/__init__.py"
 
@@ -66,7 +63,8 @@ dev = [
   "pytest",
   "ruff==0.11.11",
   "types-requests",
-  "tox"
+  "tox",
+  "packaging"
 ]
 
 # 🖥️ CLI Entrypoint
