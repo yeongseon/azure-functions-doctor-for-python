@@ -22,6 +22,7 @@ path = "src/azure_functions_doctor/__init__.py"
 # ----------------------------------------
 [project]
 name = "azure-functions-doctor"
+dynamic = ["version"]
 description = "A diagnostic tool for Python Azure Functions"
 readme = "README.md"
 requires-python = ">=3.9"
