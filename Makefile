@@ -94,7 +94,7 @@ commit-changelog:
 .PHONY: tag-release
 tag-release:
 ifndef VERSION
-	$(error VERSION is not set. Usage: make tag-release VERSION=0.1.0)
+	$(error VERSION is not set. Usage: make tag-release VERSION=1.0.1)
 endif
 	@git tag -a v$(VERSION) -m "Release v$(VERSION)"
 	@git push origin v$(VERSION)
@@ -103,8 +103,9 @@ endif
 .PHONY: release
 release:
 ifndef VERSION
-	$(error VERSION is not set. Usage: make release VERSION=0.1.0)
+	$(error VERSION is not set. Usage: make release VERSION=1.0.1)
 endif
+	@hatch version $(VERSION)
 	@$(MAKE) changelog
 	@$(MAKE) commit-changelog
 	@$(MAKE) tag-release VERSION=$(VERSION)
