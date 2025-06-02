@@ -2,12 +2,24 @@
 
 ## Build
 
+- Bump version to 0.1.4 ([dfc1a2a…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/dfc1a2aeec65297d5a91fa42a7a1eded1a196ad2))
+
+- Fix packaging path and add missing dependency ([40ae5e2…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/40ae5e2d04a0362dffec03d5ac3992ad8565ee22))
+
+
+## Build
+
 - Bump version to 0.1.3 ([340053c…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/340053cea4359e2156a3269d04ecae5345b2c041))
 
 
 ## Chore
 
 - Add automatic commit after version bump in release targets ([69ba5da…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/69ba5da761dcd850ad96f9eb792b37a3b762e9b4))
+
+
+## Docs
+
+- Update changelog ([3df3a2e…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/3df3a2eb351dc39ba81d287902f48d3e08b6eae1))
 
 
 ## Fix
