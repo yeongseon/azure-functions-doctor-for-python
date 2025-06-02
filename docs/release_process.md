@@ -45,7 +45,7 @@ pip install dist/azure_functions_doctor-<version>-py3-none-any.whl
 Verify installation:
 
 ```bash
-azfunc-doctor --version
+func-doctor --version
 ```
 
 ---
@@ -92,7 +92,7 @@ If you want to verify the upload workflow without affecting production releases:
 4. Verify version:
 
    ```bash
-   azfunc-doctor --version
+   func-doctor --version
    ```
 
 ---

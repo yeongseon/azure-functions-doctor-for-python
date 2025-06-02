@@ -136,7 +136,7 @@ To add a new rule:
 
 1. Open `src/azure_functions_doctor/assets/rules.json`
 2. Append your rule object to the array
-3. Save and rerun `azfunc-doctor`
+3. Save and rerun `func-doctor`
 
 Example:
 
@@ -166,7 +166,7 @@ Example:
 After editing `rules.json`, you can run:
 
 ```bash
-azfunc-doctor diagnose --verbose
+func-doctor diagnose --verbose
 ```
 
 To see grouped results and hints.

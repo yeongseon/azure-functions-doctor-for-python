@@ -33,7 +33,7 @@ It provides **clear emoji-based output**, **rule-based extensibility**, and **op
 
 ```bash
 pip install azure-functions-doctor
-azfunc-doctor diagnose
+func-doctor diagnose
 ```
 
 View [Usage Guide](usage.md) →  
@@ -61,7 +61,7 @@ Feel free to [open an issue](https://github.com/yeongseon/azure-functions-doctor
 
 ## 🧪 Example Output
 
-![CLI output](assets/azfunc-doctor-example.png)
+![CLI output](assets/func-doctor-example.png)
 
 ---
 

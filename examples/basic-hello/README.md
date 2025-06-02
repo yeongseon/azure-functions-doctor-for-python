@@ -49,13 +49,13 @@ func start
 You can validate your setup using the Azure Functions Doctor CLI:
 
 ```bash
-azfunc-doctor diagnose --path .
+func-doctor diagnose --path .
 ```
 
 Example output:
 
 ```bash
-$ azfunc-doctor diagnose
+$ func-doctor diagnose
 🩺 Azure Functions Doctor for Python v0.1.0
 📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
 

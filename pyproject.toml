@@ -74,7 +74,7 @@ dev = [
 
 # CLI entry point
 [project.scripts]
-azfunc-doctor = "azure_functions_doctor.cli:cli"
+func-doctor = "azure_functions_doctor.cli:cli"
 
 # ----------------------------------------
 # 🧪 Hatch Environments

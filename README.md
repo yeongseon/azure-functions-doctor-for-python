@@ -89,15 +89,15 @@ pip install -e .
 ### Run the Doctor
 
 ```bash
-azfunc-doctor diagnose
+func-doctor diagnose
 ```
 
-<img src="docs/assets/azfunc-doctor-example.png" alt="Sample output" width="100%" />
+<img src="docs/assets/func-doctor-example.png" alt="Sample output" width="100%" />
 
 ### Show Help
 
 ```bash
-azfunc-doctor --help
+func-doctor --help
 ```
 
 📌 Sample: [examples/basic-hello/diagnose-output.md](examples/basic-hello/diagnose-output.md)

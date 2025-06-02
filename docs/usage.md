@@ -1,4 +1,4 @@
-# 🖥️ CLI Usage: `azfunc-doctor`
+# 🖥️ CLI Usage: `func-doctor`
 
 The Azure Functions Doctor CLI helps validate your local Python-based Azure Functions project for common issues using an extensible rules system.
 
@@ -7,7 +7,7 @@ The Azure Functions Doctor CLI helps validate your local Python-based Azure Func
 ## 🚀 Basic Usage
 
 ```bash
-azfunc-doctor diagnose
+func-doctor diagnose
 ```
 
 Run diagnostics in the current or specified folder.
@@ -26,7 +26,7 @@ Run diagnostics in the current or specified folder.
 Example:
 
 ```bash
-azfunc-doctor diagnose --path ./my-func-app --format json --verbose
+func-doctor diagnose --path ./my-func-app --format json --verbose
 ```
 
 ---
@@ -68,8 +68,8 @@ Summary
 ## 🆘 Help
 
 ```bash
-azfunc-doctor --help
-azfunc-doctor diagnose --help
+func-doctor --help
+func-doctor diagnose --help
 ```
 
 For more examples, see the [example project](../examples/basic-hello/README.md).
