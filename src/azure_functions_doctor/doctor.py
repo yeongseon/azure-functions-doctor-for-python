@@ -1,3 +1,4 @@
+import importlib.resources
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -29,18 +30,14 @@ class Doctor:
 
     def __init__(self, path: str = ".") -> None:
         self.project_path: Path = Path(path).resolve()
-        self.rules_path: Path = self.project_path / "rules.json"
 
     def load_rules(self) -> list[Rule]:
-        with self.rules_path.open(encoding="utf-8") as f:
+        rules_path = importlib.resources.files("azure_functions_doctor.assets").joinpath("rules.json")
+        with rules_path.open(encoding="utf-8") as f:
             rules: list[Rule] = json.load(f)
         return sorted(rules, key=lambda r: r.get("check_order", 999))
 
     def run_all_checks(self) -> list[SectionResult]:
-        """
-        Run all rules grouped by their section.
-        Each section will include pass/fail status and individual check items.
-        """
         rules = self.load_rules()
         grouped: dict[str, list[Rule]] = defaultdict(list)
 
@@ -60,13 +57,19 @@ class Doctor:
             for rule in checks:
                 result = generic_handler(rule, self.project_path)
 
+                # If the result is empty, skip this rule
+                value_msg = result["detail"]
+                if result["status"] != "pass" and not rule.get("required", True):
+                    value_msg += " (optional)"
+
                 item: CheckResult = {
                     "label": rule.get("label", rule["id"]),
-                    "value": result["detail"],
+                    "value": value_msg,
                     "status": result["status"],
                 }
 
-                if result["status"] != "pass":
+                # If the rule is not passing and is required, set section status to fail
+                if result["status"] != "pass" and rule.get("required", True):
                     section_result["status"] = "fail"
 
                 if "hint" in rule:
