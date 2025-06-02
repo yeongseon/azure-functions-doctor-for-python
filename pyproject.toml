@@ -12,7 +12,7 @@ build-backend = "hatchling.build"
 sources = ["src"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/azure_functions_doctor"]
+packages = ["azure_functions_doctor"]
 
 [tool.hatch.version]
 path = "src/azure_functions_doctor/__init__.py"
