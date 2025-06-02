@@ -2,23 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.1] - 2025-06-02
-
-### ⚙️ Miscellaneous Tasks
-
-- *(release)* Switch to dynamic versioning and fix Makefile targets
+## [unreleased]
 
 ## [0.1.1] - 2025-06-02
 
 ### 📚 Documentation
-
-- Update changelog
+- Generate changelog for v0.1.1
 - Update changelog
 
 ### ⚙️ Miscellaneous Tasks
-
+- *(release)* Switch to dynamic versioning and fix Makefile targets
 - Trigger PyPI publish on tag push
-- Use twine for PyPI upload on tag push
 
 ## [0.1.0] - 2025-06-02
 
