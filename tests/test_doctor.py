@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import tempfile
 
 from azure_functions_doctor.doctor import Doctor
@@ -8,6 +9,9 @@ from azure_functions_doctor.doctor import Doctor
 def test_doctor_checks_pass() -> None:
     """Tests that the Doctor class runs checks and returns results."""
     with tempfile.TemporaryDirectory() as tmp:
+        # Copy rules.json to temp directory
+        shutil.copy("rules.json", os.path.join(tmp, "rules.json"))
+
         # Create required files
         with open(os.path.join(tmp, "host.json"), "w") as f:
             json.dump({"version": "2.0"}, f)
@@ -30,6 +34,8 @@ def test_doctor_checks_pass() -> None:
 def test_missing_files() -> None:
     """Tests that the Doctor class detects missing files."""
     with tempfile.TemporaryDirectory() as tmp:
+        shutil.copy("rules.json", os.path.join(tmp, "rules.json"))
+
         doctor = Doctor(tmp)
         results = doctor.run_all_checks()
 

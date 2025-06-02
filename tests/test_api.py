@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import tempfile
 
 from azure_functions_doctor.api import run_diagnostics
@@ -8,6 +9,9 @@ from azure_functions_doctor.api import run_diagnostics
 def test_run_diagnostics_minimal() -> None:
     """Test running diagnostics with a minimal setup."""
     with tempfile.TemporaryDirectory() as tmpdir:
+        # Copy rules.json to temp directory
+        shutil.copy("rules.json", os.path.join(tmpdir, "rules.json"))
+
         # Create minimal valid files
         with open(os.path.join(tmpdir, "host.json"), "w") as f:
             json.dump({"version": "2.0"}, f)
