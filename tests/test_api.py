@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import tempfile
+from importlib.resources import files
 
 from azure_functions_doctor.api import run_diagnostics
 
@@ -9,10 +10,9 @@ from azure_functions_doctor.api import run_diagnostics
 def test_run_diagnostics_minimal() -> None:
     """Test running diagnostics with a minimal setup."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        # Copy rules.json to temp directory
-        shutil.copy("rules.json", os.path.join(tmpdir, "rules.json"))
+        rules_path = files("azure_functions_doctor.assets").joinpath("rules.json")
+        shutil.copy(str(rules_path), os.path.join(tmpdir, "rules.json"))
 
-        # Create minimal valid files
         with open(os.path.join(tmpdir, "host.json"), "w") as f:
             json.dump({"version": "2.0"}, f)
         with open(os.path.join(tmpdir, "requirements.txt"), "w") as f:
@@ -20,11 +20,9 @@ def test_run_diagnostics_minimal() -> None:
 
         results = run_diagnostics(tmpdir)
 
-        # Basic structural assertions
         assert isinstance(results, list)
         assert all("title" in section and "items" in section for section in results)
 
-        # Ensure 'host.json' check is included in some section
         host_check_found = any(
             any("host.json" in item.get("label", "") for item in section["items"]) for section in results
         )
