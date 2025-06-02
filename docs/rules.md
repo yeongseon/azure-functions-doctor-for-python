@@ -1,4 +1,4 @@
-## 📘 `rules.json` Documentation
+# 📘 `rules.json` Documentation
 
 The `rules.json` file defines diagnostic checks declaratively for **Azure Functions Doctor**. Each rule specifies what to validate, how to validate it, and what to show when the check passes or fails — without modifying the core Python code.
 
@@ -8,13 +8,13 @@ This makes the tool extensible and customizable.
 
 ## 📁 Location
 
-The file is located at the **project root**:
+The file is located under the **assets/** directory:
 
 ```
-azure-functions-doctor/
-├── rules.json  👈
-├── src/
-│   └── azure_functions_doctor/
+src/
+└── azure_functions_doctor/
+    └── assets/
+        └── rules.json  👈
 ```
 
 ---
@@ -100,7 +100,7 @@ Check whether a file contains a specific string or key path.
 
 ### 4. `custom`
 
-You may register custom handlers in code using the `@handler.register("your_type")` decorator.
+You may register custom handlers in code using the `@handler.register("your_type")` decorator. Add a `"type": "custom"` field and let your handler interpret additional keys under `condition`.
 
 ---
 
@@ -134,7 +134,7 @@ You can create your own section names if desired.
 
 To add a new rule:
 
-1. Open `rules.json`
+1. Open `src/azure_functions_doctor/assets/rules.json`
 2. Append your rule object to the array
 3. Save and rerun `azfunc-doctor`
 
@@ -173,7 +173,7 @@ To see grouped results and hints.
 
 ---
 
-## 📟 Example rules.json (simplified)
+## 📟 Example `rules.json` (simplified)
 
 ```json
 [
@@ -201,5 +201,5 @@ To see grouped results and hints.
 
 ## 📬 Contribute New Rules
 
-Want to improve the default rules? Feel free to open a PR or discussion on
-👉 [GitHub Repository](https://github.com/yeongseon/azure-functions-doctor)
+Want to improve the default rules? Feel free to open a PR or discussion on  
+👉 [GitHub Repository](https://github.com/yeongseon/azure-functions-doctor-for-python)

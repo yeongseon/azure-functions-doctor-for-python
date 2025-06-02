@@ -1,56 +1,116 @@
-# 🛠 Release Process
+# 🛠️ Release Process
 
-This document describes how to release a new version of **Azure Functions Doctor** to PyPI and update the changelog.
+This document outlines the steps to release a new version of **Azure Functions Doctor** to PyPI and update the changelog, using the existing Makefile and Hatch-based workflows.
 
 ---
 
-## 🧾 Step 1: Update the Version
+## 🧾 Step 1: Bump Version and Generate Changelog
 
-Use Hatch to bump the version and generate changelog:
+Use the Makefile targets to bump the version and update the changelog:
 
 ```bash
-make release-patch   # or: release-minor, release-major
+# Patch release (e.g., v0.1.0 → v0.1.1)
+make release-patch
+
+# Minor release (e.g., v0.1.1 → v0.2.0)
+make release-minor
+
+# Major release (e.g., v0.2.0 → v1.0.0)
+make release-major
 ```
 
-This will:
+Each command will:
+- Update the version in `pyproject.toml` and `src/azure_functions_doctor/__init__.py`
+- Generate or update `CHANGELOG.md` based on Git commit history (`git-cliff`)
+- Commit the updated changelog and version bump
+- Create a Git tag (e.g., `v0.2.0`)
+- Push commits and tags to the `main` branch
 
-- Update the version in `pyproject.toml`
-- Generate `CHANGELOG.md` via `git-cliff`
-- Commit changelog
-- Tag the commit (e.g. `v0.2.0`)
-- Push the tag to GitHub
+> **Tip**: Ensure your local branch is up-to-date with `main` before running these commands.
 
 ---
 
-## 📦 Step 2: Publish to PyPI
+## 📦 Step 2: Build and Test the Package
 
-Build and upload the package:
+Before publishing, build and verify locally:
 
 ```bash
+# Create source and wheel distributions
 make build
+
+# (Optional) Install from the local distribution to test
+pip install dist/azure_functions_doctor-<version>-py3-none-any.whl
+```
+
+Verify installation:
+
+```bash
+azfunc-doctor --version
+```
+
+---
+
+## 🚀 Step 3: Publish to PyPI
+
+Once the build artifacts are validated, upload the package to PyPI:
+
+```bash
 make publish
 ```
 
-This will upload the package to [PyPI](https://pypi.org/project/azure-functions-doctor/).
+This runs:
+- `hatch release` under the hood (builds, signs if configured, and uploads)
+- Uses credentials from `~/.pypirc` or environment variables (`PYPI_USERNAME`/`PYPI_PASSWORD`)
+- Verifies successful upload by checking PyPI listing
 
-> 🔒 Make sure your `~/.pypirc` is correctly configured with PyPI credentials.
-
----
-
-## ✅ Summary
-
-| Task                  | Command                          |
-|-----------------------|----------------------------------|
-| Version bump + changelog | `make release-patch`         |
-| Build package         | `make build`                     |
-| Publish to PyPI       | `make publish`                   |
+> **Security**: Ensure that your PyPI API token or credentials are stored securely and not committed to source control.
 
 ---
 
-## 🔁 Test on TestPyPI (Optional)
+## 🔁 Step 4: Test on TestPyPI (Optional)
 
-```bash
-hatch build
-twine upload --repository testpypi dist/*
-pip install --index-url https://test.pypi.org/simple/ azure-functions-doctor
-```
+If you want to verify the upload workflow without affecting production releases:
+
+1. Build the package:
+
+   ```bash
+   make build
+   ```
+
+2. Upload to TestPyPI:
+
+   ```bash
+   twine upload --repository testpypi dist/*
+   ```
+
+3. Install from TestPyPI:
+
+   ```bash
+   pip install --index-url https://test.pypi.org/simple/ azure-functions-doctor
+   ```
+
+4. Verify version:
+
+   ```bash
+   azfunc-doctor --version
+   ```
+
+---
+
+## ✅ Summary of Release Commands
+
+| Task                          | Command                          |
+|-------------------------------|----------------------------------|
+| Version bump + changelog      | `make release-patch`             |
+| Build distributions           | `make build`                     |
+| Publish to PyPI               | `make publish`                   |
+| Test on TestPyPI (optional)   | `twine upload --repository testpypi dist/*` |
+
+---
+
+## 🔗 Related Documentation
+
+- [CHANGELOG.md](CHANGELOG.md)
+- [Development Guide](development.md)
+- [Makefile Targets](development.md#%EB%AC%B8%EC%84%9C)
+- [PyPI Publishing with Hatch](https://hatch.pypa.io/latest/publishing/)
