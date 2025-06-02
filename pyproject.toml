@@ -10,6 +10,7 @@ build-backend = "hatchling.build"
 # ----------------------------------------
 [tool.hatch.build]
 sources = ["src"]
+include = ["src/azure_functions_doctor/assets/rules.json"]
 
 [tool.hatch.build.targets.wheel]
 # The package name will be resolved under "src/"

@@ -13,7 +13,7 @@
       "operator": ">=",
       "value": "3.9"
     },
-    "hint": "Install Python 3.9 or higher.",
+    "hint": "Use Python 3.9 or higher as required by Azure Functions Python v2.",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#supported-python-versions",
     "fix_command": "pyenv install 3.9.18",
     "check_order": 1
@@ -62,26 +62,27 @@
     "condition": {
       "target": "requirements.txt"
     },
-    "hint": "Your Azure Function project should have a requirements.txt file.",
+    "hint": "Add a requirements.txt file to specify your dependencies.",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#managing-dependencies",
     "fix_command": "pip freeze > requirements.txt",
     "check_order": 4
   },
   {
-    "id": "check_azure_functions_package",
+    "id": "check_azure_functions_library",
     "category": "dependencies",
     "section": "python_env",
-    "label": "azure-functions package",
-    "description": "Checks if 'azure-functions' package is installed.",
+    "label": "azure-functions-python-library package",
+    "description": "Checks if 'azure-functions-python-library' is installed (required for v2 programming model).",
     "type": "package_installed",
     "required": true,
     "severity": "error",
     "condition": {
-      "target": "azure_functions"
+      "pypi": "azure-functions-python-library",
+      "import": "azure.functions"
     },
-    "hint": "Install with 'pip install azure-functions'.",
-    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#install-the-required-libraries",
-    "fix_command": "pip install azure-functions",
+    "hint": "Install it with: pip install azure-functions-python-library",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=asgi&pivots=python-mode-decorators#azure-functions-python-library",
+    "fix_command": "pip install azure-functions-python-library",
     "check_order": 5
   },
   {
@@ -96,7 +97,7 @@
     "condition": {
       "target": "host.json"
     },
-    "hint": "Every Azure Functions project must include a host.json file.",
+    "hint": "host.json is required for configuring Azure Functions host runtime.",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-host-json",
     "check_order": 6
   },
@@ -105,31 +106,28 @@
     "category": "structure",
     "section": "project_structure",
     "label": "local.settings.json",
-    "description": "Checks if local.settings.json exists for local development.",
+    "description": "Checks if local.settings.json exists (useful for local development).",
     "type": "file_exists",
+    "target": "local.settings.json",
     "required": false,
     "severity": "info",
-    "condition": {
-      "target": "local.settings.json"
-    },
-    "hint": "Include local.settings.json to store local configuration securely.",
-    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-local#local-settings-file",
+    "hint": "Create local.settings.json for local development if needed.",
     "check_order": 7
   },
   {
-    "id": "check_main_py_exists",
+    "id": "check_decorator_usage",
     "category": "structure",
     "section": "project_structure",
-    "label": "main.py",
-    "description": "Checks if main.py exists for Programming Model v2 entry point.",
-    "type": "file_exists",
-    "required": false,
-    "severity": "warning",
+    "label": "Function decorators",
+    "description": "Checks if any files use Azure Functions v2 decorators (e.g., @app.route).",
+    "type": "source_code_contains",
+    "required": true,
+    "severity": "error",
     "condition": {
-      "target": "main.py"
+      "keyword": "@app."
     },
-    "hint": "Ensure your entrypoint (e.g., main.py) is defined for v2 model.",
-    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=asgi&pivots=python-mode-decorators#example-structure-for-the-python-v2-model",
+    "hint": "Ensure you are using the v2 programming model with @app decorators like @app.route, @app.schedule, etc.",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=asgi&pivots=python-mode-decorators",
     "check_order": 8
   }
 ]
