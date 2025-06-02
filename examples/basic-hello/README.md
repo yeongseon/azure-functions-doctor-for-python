@@ -62,7 +62,7 @@ $ azfunc-doctor diagnose
 ✖ Python Env
   • Python version: Python version is 3.12.3, expected >=3.9
   • Virtual environment: VIRTUAL_ENV is set
-  • Python executable: /root/.local/share/hatch/env/virtual/azure-function-doctor/.../bin/python exists
+  • Python executable: /root/.local/share/hatch/env/virtual/azure-functions-doctor/.../bin/python exists
   • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
   • azure-functions package: Package 'azure_functions' is not installed
 

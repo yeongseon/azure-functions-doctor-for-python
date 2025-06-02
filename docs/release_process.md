@@ -31,7 +31,7 @@ make build
 make publish
 ```
 
-This will upload the package to [PyPI](https://pypi.org/project/azure-function-doctor/).
+This will upload the package to [PyPI](https://pypi.org/project/azure-functions-doctor/).
 
 > 🔒 Make sure your `~/.pypirc` is correctly configured with PyPI credentials.
 
@@ -52,5 +52,5 @@ This will upload the package to [PyPI](https://pypi.org/project/azure-function-d
 ```bash
 hatch build
 twine upload --repository testpypi dist/*
-pip install --index-url https://test.pypi.org/simple/ azure-function-doctor
+pip install --index-url https://test.pypi.org/simple/ azure-functions-doctor
 ```

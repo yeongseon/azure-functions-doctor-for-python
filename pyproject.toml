@@ -18,7 +18,7 @@ packages = ["src/azure_functions_doctor"]
 # 🧾 Project Metadata
 # ----------------------------------------
 [project]
-name = "azure-function-doctor"
+name = "azure-functions-doctor"
 version = "0.1.0"
 description = "A diagnostic tool for Python Azure Functions"
 readme = "README.md"
