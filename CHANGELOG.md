@@ -2,7 +2,24 @@
 
 ## Build
 
+- Bump version to 0.1.7 ([726b7b6…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/726b7b6d6f515327b4058ae10a602dcb90067f1a))
+
+- Remove unnecessary wheel target config for src layout ([b1b8e60…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/b1b8e60a37b4d11a8806bddc2f8a4ad598c3393b))
+
+
+## Test
+
+- Fix ModuleNotFoundError by adding src to pytest PYTHONPATH ([9e2b071…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/9e2b07136523a3ffeabfddec1263521918dd344b))
+
+
+## Build
+
 - Bump version to 0.1.6 ([4261829…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/4261829476f5868ecabd103cea5cff926fec7a48))
+
+
+## Docs
+
+- Update changelog ([047381f…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/047381f9717d6989ed81f3c08dc06c29ea83dee1))
 
 
 ## Refactor
