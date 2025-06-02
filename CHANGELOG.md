@@ -2,9 +2,66 @@
 
 ## Build
 
+- Bump version to 0.1.5 ([18b397e…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/18b397efb41e1ea0f198a8be5295c4f11843dc42))
+
+
+## Chore
+
+- Add __init__.py to assets for package recognition ([7a1c654…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/7a1c6547f0d873a309ed9f6097cd157fc3a350c4))
+
+
+## Ci
+
+- Rename CI workflow to test.yml ([89cd70d…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/89cd70df618fceacbab2af6740164d1c842f002d))
+
+- Add Codecov upload step and coverage badge ([663e0db…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/663e0db6bb7eb514bc8ed0de94d5c522cda06502))
+
+
+## Docs
+
+- Update diagnostics list for Python Programming Model v2 ([be5f16a…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/be5f16a14b82869287753ef05e6702c4e7913b0a))
+
+- Update CI badge to match renamed test.yml workflow ([a8d8ec3…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/a8d8ec356aedc4d0cf3b8671c264b167b799972b))
+
+
+## Feat
+
+- Add 'source_code_contains' rule type and improve rule handlers ([1ed6f7b…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/1ed6f7be63a5638c8b2fca1ca97a4598d0058059))
+
+
+## Fix
+
+- Add packaging dependency for Windows CLI compatibility ([30e0161…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/30e0161ab33e5bf33211fdf0cf22f40be2989f72))
+
+
+## Refactor
+
+- Load rules.json from package resources using importlib.resources ([8af58a3…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/8af58a3caeead16090cdd93934fe65d8027fb4f9))
+
+- Move rules.json to package assets and update pyproject.toml include path ([030fcee…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/030fcee105a32d875f3eccfaa941400229e4a623))
+
+- Move rules.json to project root and update loader path ([35d7684…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/35d76849728f45aaef0d2b2d643f12a641696eda))
+
+
+## Test
+
+- Add unit tests for generic_handler including new rule types ([c9cdede…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/c9cdede1f25868dd5928f80f0380614307d25a17))
+
+- Update tests to load rules.json from embedded package resources ([695eb65…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/695eb65c51a6184cd519860587c39b98f3a011b3))
+
+- Fix diagnostics tests by copying rules.json into temp directories ([7f61ea9…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/7f61ea91a393ed127000af7f0c746ed08f46b9b6))
+
+
+## Build
+
 - Bump version to 0.1.4 ([dfc1a2a…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/dfc1a2aeec65297d5a91fa42a7a1eded1a196ad2))
 
 - Fix packaging path and add missing dependency ([40ae5e2…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/40ae5e2d04a0362dffec03d5ac3992ad8565ee22))
+
+
+## Docs
+
+- Update changelog ([a176577…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/a1765777b493cc5cba2a7ddb548762659588f0dc))
 
 
 ## Build
