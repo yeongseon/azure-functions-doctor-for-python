@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
 - *(makefile)* Add cross-platform uv detection with pip fallback
 - *(makefile)* Prevent NUL file creation on Windows when checking for uv
 - *(cli)* Explicitly register diagnose command and fix CLI entrypoint
-
+- 
 ### 💼 Other
 
 - Add hatch-based release and publish automation
@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - *(makefile)* Add tox target for multi-version testing
 - *(hatch)* Fix packaging path and add metadata for PyPI
 - Add changelog generation and release process to Makefile and docs site
+- Add GitHub Actions release workflow
 
 ### 🚜 Refactor
 
@@ -36,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - Modularize check logic and add handler registry
 - Restructure check logic and improve test coverage
 - *(core)* Restructure rule logic and output handling
+- Fix project name to ‘azure-functions-doctor’ across all files
 
 ### 📚 Documentation
 
@@ -63,6 +65,7 @@ All notable changes to this project will be documented in this file.
 - Add release process guide and git-cliff config
 - *(example)* Update README for basic-hello with Python model v2 instructions
 - Add changelog for v0.1.0
+- Update PyPI classifiers to include Python 3.11 and 3.12
 
 ### 🎨 Styling
 
