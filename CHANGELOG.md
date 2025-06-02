@@ -2,6 +2,16 @@
 
 ## Build
 
+- Bump version to 0.1.6 ([4261829…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/4261829476f5868ecabd103cea5cff926fec7a48))
+
+
+## Refactor
+
+- Replace 'import' with 'target' in package_installed condition ([1ab3d0a…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/1ab3d0aa88019688f7c515248899828535818e7e))
+
+
+## Build
+
 - Bump version to 0.1.5 ([18b397e…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/18b397efb41e1ea0f198a8be5295c4f11843dc42))
 
 
@@ -18,6 +28,8 @@
 
 
 ## Docs
+
+- Update changelog ([f5485f8…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/f5485f8a54eb91bca222a081ff8bb6837e9b5f0f))
 
 - Update diagnostics list for Python Programming Model v2 ([be5f16a…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/be5f16a14b82869287753ef05e6702c4e7913b0a))
 
