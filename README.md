@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <!-- CI workflow status badge -->
-  <a href="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/ci.yml">
+    <!-- Test workflow status badge -->
+  <a href="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/test.yml">
     <img
-      src="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/ci.yml/badge.svg"
-      alt="CI Workflow Status"
+      src="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/test.yml/badge.svg"
+      alt="Test Workflow Status"
     />
   </a>
   <!-- Release workflow status badge -->
