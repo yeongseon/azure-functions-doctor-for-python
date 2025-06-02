@@ -106,6 +106,13 @@ ifndef VERSION
 	$(error VERSION is not set. Usage: make release VERSION=1.0.1)
 endif
 	@hatch version $(VERSION)
+	@$(MAKE) release-core VERSION=$(VERSION)
+
+.PHONY: release-core
+release-core:
+ifndef VERSION
+	$(error VERSION is not set. Usage: make release-core VERSION=1.0.1)
+endif
 	@$(MAKE) changelog
 	@$(MAKE) commit-changelog
 	@$(MAKE) tag-release VERSION=$(VERSION)
@@ -114,19 +121,19 @@ endif
 release-patch:
 	@hatch version patch
 	@VERSION=$$(hatch version | tail -n1); \
-	 $(MAKE) release VERSION=$$VERSION
+	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: release-minor
 release-minor:
 	@hatch version minor
 	@VERSION=$$(hatch version | tail -n1); \
-	 $(MAKE) release VERSION=$$VERSION
+	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: release-major
 release-major:
 	@hatch version major
 	@VERSION=$$(hatch version | tail -n1); \
-	 $(MAKE) release VERSION=$$VERSION
+	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: publish
 publish:
