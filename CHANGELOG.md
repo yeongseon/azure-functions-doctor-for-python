@@ -62,6 +62,7 @@ All notable changes to this project will be documented in this file.
 - Add GitHub workflow, PyPI, coverage, license, and download badges to README
 - Add release process guide and git-cliff config
 - *(example)* Update README for basic-hello with Python model v2 instructions
+- Add changelog for v0.1.0
 
 ### 🎨 Styling
 
