@@ -49,13 +49,14 @@
       alt="Python Versions"
     />
   </a>
-  <!-- Download count badge (Pepy) -->
+  <!-- Download count badge (Pepy)
   <a href="https://pepy.tech/project/azure-functions-doctor">
     <img
       src="https://pepy.tech/badge/azure-functions-doctor"
       alt="Downloads"
     />
   </a>
+  -->
 </p>
 
 ---

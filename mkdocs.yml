@@ -13,6 +13,7 @@ nav:
   - Home: index.md
   - CLI Usage: usage.md
   - Diagnostics: diagnostics.md
+  - Rules: rules.md
   - Development: development.md
   - API Reference: api.md
   - Release Process: release.md

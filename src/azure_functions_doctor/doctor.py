@@ -29,7 +29,7 @@ class Doctor:
 
     def __init__(self, path: str = ".") -> None:
         self.project_path: Path = Path(path).resolve()
-        self.rules_path: Path = Path(__file__).parent / "rules.json"
+        self.rules_path: Path = self.project_path / "rules.json"
 
     def load_rules(self) -> list[Rule]:
         with self.rules_path.open(encoding="utf-8") as f:
