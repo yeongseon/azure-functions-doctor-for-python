@@ -12,13 +12,13 @@
         <meta name="author" content="Yeongseon Choe">
       
       
-        <link rel="canonical" href="https://yeongseon.github.io/azure-functions-doctor-for-python/usage/">
+        <link rel="canonical" href="https://yeongseon.github.io/azure-functions-doctor-for-python/rules/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../diagnostics/">
       
       
-        <link rel="next" href="../diagnostics/">
+        <link rel="next" href="../development/">
       
       
       <link rel="icon" href="../logo_assets/logo_favicon_16px.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>CLI Usage - Azure Functions Doctor for Python</title>
+        <title>Rules - Azure Functions Doctor for Python</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cli-usage-azure-functions-doctor" class="md-skip">
+        <a href="#rulesjson-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CLI Usage
+              Rules
             
           </span>
         </div>
@@ -243,32 +243,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    CLI Usage
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
         
   
   
@@ -279,62 +257,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      🔧 Basic Usage
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-it-checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      🩺 What It Checks
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      💡 Example Output
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#help" class="md-nav__link">
-    <span class="md-ellipsis">
-      🆘 Help
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -365,10 +287,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../rules/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Rules
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -379,6 +321,171 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rulesjson-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      📘 rules.json Documentation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#location" class="md-nav__link">
+    <span class="md-ellipsis">
+      📁 Location
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structure-of-a-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      ⌐ Structure of a Rule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⌐ Structure of a Rule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔑 Fields Explained
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-rule-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔍 Supported Rule Types
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔍 Supported Rule Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-compare_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. compare_version
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-file_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. file_exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-file_contains" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. file_contains
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-custom" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. custom
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grouping-by-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      📁 Grouping by section
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extending-the-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧹 Extending the Rules
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-your-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      🥪 Testing Your Changes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-rulesjson-simplified" class="md-nav__link">
+    <span class="md-ellipsis">
+      📟 Example rules.json (simplified)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contribute-new-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      📬 Contribute New Rules
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -466,8 +573,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -476,36 +581,147 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
+  <a href="#rulesjson-documentation" class="md-nav__link">
     <span class="md-ellipsis">
-      🔧 Basic Usage
+      📘 rules.json Documentation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-it-checks" class="md-nav__link">
+  <a href="#location" class="md-nav__link">
     <span class="md-ellipsis">
-      🩺 What It Checks
+      📁 Location
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-output" class="md-nav__link">
+  <a href="#structure-of-a-rule" class="md-nav__link">
     <span class="md-ellipsis">
-      💡 Example Output
+      ⌐ Structure of a Rule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⌐ Structure of a Rule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔑 Fields Explained
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-rule-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔍 Supported Rule Types
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔍 Supported Rule Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-compare_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. compare_version
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-file_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. file_exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-file_contains" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. file_contains
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-custom" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. custom
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grouping-by-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      📁 Grouping by section
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#help" class="md-nav__link">
+  <a href="#extending-the-rules" class="md-nav__link">
     <span class="md-ellipsis">
-      🆘 Help
+      🧹 Extending the Rules
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-your-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      🥪 Testing Your Changes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-rulesjson-simplified" class="md-nav__link">
+    <span class="md-ellipsis">
+      📟 Example rules.json (simplified)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contribute-new-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      📬 Contribute New Rules
     </span>
   </a>
   
@@ -530,52 +746,196 @@
   
 
 
-<h1 id="cli-usage-azure-functions-doctor">🖥️ CLI Usage: Azure Functions Doctor</h1>
-<p><strong>Azure Functions Doctor</strong> provides a command-line interface (CLI) to validate and troubleshoot your Python Azure Functions project setup.</p>
+  <h1>Rules</h1>
+
+<h2 id="rulesjson-documentation">📘 <code>rules.json</code> Documentation</h2>
+<p>The <code>rules.json</code> file defines diagnostic checks declaratively for <strong>Azure Functions Doctor</strong>. Each rule specifies what to validate, how to validate it, and what to show when the check passes or fails — without modifying the core Python code.</p>
+<p>This makes the tool extensible and customizable.</p>
 <hr />
-<h2 id="basic-usage">🔧 Basic Usage</h2>
-<p>Run the CLI from your terminal using:</p>
-<pre><code class="language-bash">azfunc-doctor diagnose
-</code></pre>
-<p>You can also specify options:</p>
-<pre><code class="language-bash">azfunc-doctor diagnose --format json --verbose
+<h2 id="location">📁 Location</h2>
+<p>The file is located at the <strong>project root</strong>:</p>
+<pre><code>azure-functions-doctor/
+├── rules.json  👈
+├── src/
+│   └── azure_functions_doctor/
 </code></pre>
 <hr />
-<h2 id="what-it-checks">🩺 What It Checks</h2>
+<h2 id="structure-of-a-rule">⌐ Structure of a Rule</h2>
+<p>Each rule is a JSON object with the following fields:</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;check_python_version&quot;,
+  &quot;section&quot;: &quot;python_env&quot;,
+  &quot;label&quot;: &quot;Python version&quot;,
+  &quot;type&quot;: &quot;compare_version&quot;,
+  &quot;target&quot;: &quot;python&quot;,
+  &quot;operator&quot;: &quot;&gt;=&quot;,
+  &quot;value&quot;: &quot;3.9&quot;,
+  &quot;hint&quot;: &quot;Install Python 3.9 or higher.&quot;
+}
+</code></pre>
+<h3 id="fields-explained">🔑 Fields Explained</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td>Unique identifier for the rule</td>
+</tr>
+<tr>
+<td><code>section</code></td>
+<td>string</td>
+<td>Logical group (e.g. <code>python_env</code>, <code>config_files</code>)</td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td>string</td>
+<td>Human-readable label for the check</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>string</td>
+<td>Rule type (see below)</td>
+</tr>
+<tr>
+<td><code>target</code></td>
+<td>string</td>
+<td>Subject to evaluate (e.g. Python version, file path)</td>
+</tr>
+<tr>
+<td><code>operator</code></td>
+<td>string</td>
+<td>Comparison operator (e.g. <code>==</code>, <code>!=</code>, <code>&gt;=</code>)</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td>any</td>
+<td>Expected value to compare</td>
+</tr>
+<tr>
+<td><code>hint</code></td>
+<td>string</td>
+<td>Suggestion if the rule fails</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="supported-rule-types">🔍 Supported Rule Types</h2>
+<h3 id="1-compare_version">1. <code>compare_version</code></h3>
+<p>Compare semantic versions.</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;compare_version&quot;,
+  &quot;target&quot;: &quot;python&quot;,
+  &quot;operator&quot;: &quot;&gt;=&quot;,
+  &quot;value&quot;: &quot;3.9&quot;
+}
+</code></pre>
 <ul>
-<li>✅ Python version is ≥ 3.9</li>
-<li>✅ Virtual environment is activated (VIRTUAL_ENV)</li>
-<li>✅ Python executable path is resolvable</li>
-<li>✅ <code>requirements.txt</code> file exists</li>
-<li>✅ <code>azure-functions</code> package is installed</li>
-<li>✅ Project files like <code>host.json</code>, <code>local.settings.json</code>, and <code>main.py</code> exist</li>
+<li>Valid <code>target</code>: <code>"python"</code>, <code>"azure-functions-core-tools"</code></li>
 </ul>
 <hr />
-<h2 id="example-output">💡 Example Output</h2>
-<pre><code class="language-bash">🩺 Azure Functions Doctor for Python v0.1.0
-📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
-
-✖ Python Env
-  • Python version: Python version is 3.12.3, expected &gt;=3.9
-  • Virtual environment: VIRTUAL_ENV is set
-  • Python executable: /root/.local/share/hatch/env/virtual/azure-functions-doctor/qaLwoID5/azure-functions-doctor/bin/python exists
-  • requirements.txt: /root/Github/azure-functions-doctor/examples/basic-hello/requirements.txt exists
-  • azure-functions package: Package 'azure_functions' is not installed
-
-✖ Project Structure
-  • host.json: /root/Github/azure-functions-doctor/examples/basic-hello/host.json exists
-  • local.settings.json: /root/Github/azure-functions-doctor/examples/basic-hello/local.settings.json is missing
-  • main.py: /root/Github/azure-functions-doctor/examples/basic-hello/main.py is missing
-
-Summary
-✔ 0 Passed    ✖ 2 Failed
+<h3 id="2-file_exists">2. <code>file_exists</code></h3>
+<p>Check whether a file exists.</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;file_exists&quot;,
+  &quot;target&quot;: &quot;host.json&quot;
+}
 </code></pre>
 <hr />
-<h2 id="help">🆘 Help</h2>
-<p>To view available options and subcommands:</p>
-<pre><code class="language-bash">azfunc-doctor --help
-azfunc-doctor diagnose --help
+<h3 id="3-file_contains">3. <code>file_contains</code></h3>
+<p>Check whether a file contains a specific string or key path.</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;file_contains&quot;,
+  &quot;target&quot;: &quot;host.json&quot;,
+  &quot;key_path&quot;: [&quot;version&quot;],
+  &quot;value&quot;: &quot;2.0&quot;
+}
 </code></pre>
+<hr />
+<h3 id="4-custom">4. <code>custom</code></h3>
+<p>You may register custom handlers in code using the <code>@handler.register("your_type")</code> decorator.</p>
+<hr />
+<h2 id="grouping-by-section">📁 Grouping by <code>section</code></h2>
+<p>Sections allow grouping related checks together for better readability in the CLI output:</p>
+<p>Example:</p>
+<pre><code class="language-json">{
+  &quot;section&quot;: &quot;python_env&quot;,
+  &quot;label&quot;: &quot;Python Version&quot;,
+  ...
+}
+</code></pre>
+<p>Predefined sections might include:</p>
+<ul>
+<li><code>python_env</code></li>
+<li><code>core_tools</code></li>
+<li><code>config_files</code></li>
+<li><code>dependencies</code></li>
+<li><code>network</code></li>
+</ul>
+<p>You can create your own section names if desired.</p>
+<hr />
+<h2 id="extending-the-rules">🧹 Extending the Rules</h2>
+<p>To add a new rule:</p>
+<ol>
+<li>Open <code>rules.json</code></li>
+<li>Append your rule object to the array</li>
+<li>Save and rerun <code>azfunc-doctor</code></li>
+</ol>
+<p>Example:</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;check_requirements_txt_exists&quot;,
+  &quot;section&quot;: &quot;dependencies&quot;,
+  &quot;label&quot;: &quot;requirements.txt exists&quot;,
+  &quot;type&quot;: &quot;file_exists&quot;,
+  &quot;target&quot;: &quot;requirements.txt&quot;,
+  &quot;hint&quot;: &quot;Create a requirements.txt file to declare Python dependencies.&quot;
+}
+</code></pre>
+<hr />
+<h2 id="tips">🛠️ Tips</h2>
+<ul>
+<li>Use <code>hint</code> to provide helpful, actionable suggestions.</li>
+<li>Use consistent <code>section</code> names for better CLI grouping.</li>
+<li>If you're writing custom rule types, register them in <code>handlers.py</code>.</li>
+</ul>
+<hr />
+<h2 id="testing-your-changes">🥪 Testing Your Changes</h2>
+<p>After editing <code>rules.json</code>, you can run:</p>
+<pre><code class="language-bash">azfunc-doctor diagnose --verbose
+</code></pre>
+<p>To see grouped results and hints.</p>
+<hr />
+<h2 id="example-rulesjson-simplified">📟 Example rules.json (simplified)</h2>
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: &quot;check_python_version&quot;,
+    &quot;section&quot;: &quot;python_env&quot;,
+    &quot;label&quot;: &quot;Python version&quot;,
+    &quot;type&quot;: &quot;compare_version&quot;,
+    &quot;target&quot;: &quot;python&quot;,
+    &quot;operator&quot;: &quot;&gt;=&quot;,
+    &quot;value&quot;: &quot;3.9&quot;,
+    &quot;hint&quot;: &quot;Install Python 3.9 or higher.&quot;
+  },
+  {
+    &quot;id&quot;: &quot;check_host_json_exists&quot;,
+    &quot;section&quot;: &quot;config_files&quot;,
+    &quot;label&quot;: &quot;host.json exists&quot;,
+    &quot;type&quot;: &quot;file_exists&quot;,
+    &quot;target&quot;: &quot;host.json&quot;
+  }
+]
+</code></pre>
+<hr />
+<h2 id="contribute-new-rules">📬 Contribute New Rules</h2>
+<p>Want to improve the default rules? Feel free to open a PR or discussion on
+👉 <a href="https://github.com/yeongseon/azure-functions-doctor">GitHub Repository</a></p>
 
 
 
