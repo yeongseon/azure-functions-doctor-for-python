@@ -1,5 +1,25 @@
 # 📦 Changelog
 
+## Build
+
+- Bump version to 0.1.3 ([340053c…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/340053cea4359e2156a3269d04ecae5345b2c041))
+
+
+## Chore
+
+- Add automatic commit after version bump in release targets ([69ba5da…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/69ba5da761dcd850ad96f9eb792b37a3b762e9b4))
+
+
+## Fix
+
+- Correct wheel target package path for src layout ([86239d9…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/86239d9c10037f2ec4aa635a108f42e5764c6888))
+
+
+## Build
+
+- Bump version to 0.1.2 ([4b15462…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/4b1546283c0351c2fd5ad967452b39120564e7c9))
+
+
 ## Chore
 
 - Declare version as dynamic in pyproject.toml for PEP 621 compliance ([41cc80d…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/41cc80d3005fcd24280533a66f7eda8b046b6ced))
@@ -15,6 +35,8 @@
 
 
 ## Docs
+
+- Update changelog ([9dd6ebd…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/9dd6ebda32c8be419179331643cf8e17350380ef))
 
 - Update README badges for CI and release workflows ([628f8a7…](https://github.com/yeongseon/azure-functions-doctor-for-python/commit/628f8a7e21317f3ba744dde10da99a9ef5b47852))
 
