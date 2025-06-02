@@ -24,14 +24,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Hatch
-        run: pip install hatch
+        run: pip install hatch make
 
       - name: Create Hatch environment & run all checks
         run: |
           make install
           make check
 
-      - name: Generate Coverage Report (optional)
+      - name: Generate Coverage Report
         run: make cov
 
       - name: Upload Coverage HTML
@@ -40,3 +40,14 @@ jobs:
         with:
           name: coverage-html-${{ matrix.python-version }}
           path: htmlcov/
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.9'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          verbose: true
+          fail_ci_if_error: true
+        env:
+          CODECOV_RETRIES: 3

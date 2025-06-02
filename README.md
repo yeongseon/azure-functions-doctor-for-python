@@ -35,11 +35,11 @@
       alt="License"
     />
   </a>
-  <!-- Coverage status badge (Coveralls) -->
-  <a href="https://coveralls.io/github/yeongseon/azure-functions-doctor-for-python?branch=main">
+  <!-- Coverage status badge (Codecov) -->
+  <a href="https://codecov.io/gh/yeongseon/azure-functions-doctor-for-python">
     <img
-      src="https://coveralls.io/repos/github/yeongseon/azure-functions-doctor-for-python/badge.svg?branch=main"
-      alt="Coverage Status"
+      src="https://codecov.io/gh/yeongseon/azure-functions-doctor-for-python/branch/main/graph/badge.svg"
+      alt="Codecov Coverage"
     />
   </a>
   <!-- Supported Python versions badge -->
@@ -73,7 +73,7 @@ This tool saves time by automating common Azure Functions environment diagnostic
 
 * Diagnose Python version, venv, azure-functions package
 * Validate host.json, local.settings.json, and function structure
-* Fully customizable via `rules.json` (see [docs](https://yeongseon.github.io/azure-functions-doctor/rules/))
+* Fully customizable via `rules.json` (see [docs](https://yeongseon.github.io/azure-functions-doctor-for-python/rules/))
 
 ---
 
@@ -83,7 +83,7 @@ This tool saves time by automating common Azure Functions environment diagnostic
 This tool helps identify configuration issues, missing dependencies, or version mismatches commonly found in Python-based Azure Functions.
 
 The behavior and rules for each check are defined declaratively in the `rules.json` file located in the project root. This file allows users and developers to customize or extend validation logic without modifying Python code directly.
-📘 Learn more: [rules.json documentation](https://yeongseon.github.io/azure-functions-doctor/rules/)
+📘 Learn more: [rules.json documentation](https://yeongseon.github.io/azure-functions-doctor-for-python/rules/)
 
 ---
 

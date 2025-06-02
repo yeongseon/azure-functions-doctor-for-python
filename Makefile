@@ -71,7 +71,9 @@ test:
 .PHONY: cov
 cov:
 	@hatch run cov
+	@coverage xml
 	@echo "📂 Open htmlcov/index.html in your browser to view the coverage report"
+	@echo "📝 coverage.xml generated for Codecov upload"
 
 # ------------------------------
 # 📦 Build & Release
