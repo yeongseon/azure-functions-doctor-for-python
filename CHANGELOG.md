@@ -2,10 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.1.1] - 2025-06-02
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Switch to dynamic versioning and fix Makefile targets
+
+## [0.1.1] - 2025-06-02
 
 ### 📚 Documentation
 
+- Update changelog
 - Update changelog
 
 ### ⚙️ Miscellaneous Tasks
