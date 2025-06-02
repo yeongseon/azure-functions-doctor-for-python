@@ -121,18 +121,24 @@ endif
 release-patch:
 	@hatch version patch
 	@VERSION=$$(hatch version | tail -n1); \
+	 git add src/azure_functions_doctor/__init__.py && \
+	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: release-minor
 release-minor:
 	@hatch version minor
 	@VERSION=$$(hatch version | tail -n1); \
+	 git add src/azure_functions_doctor/__init__.py && \
+	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: release-major
 release-major:
 	@hatch version major
 	@VERSION=$$(hatch version | tail -n1); \
+	 git add src/azure_functions_doctor/__init__.py && \
+	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: publish
