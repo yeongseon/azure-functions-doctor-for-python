@@ -14,12 +14,14 @@ sources = ["src"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/azure_functions_doctor"]
 
+[tool.hatch.version]
+path = "src/azure_functions_doctor/__init__.py"
+
 # ----------------------------------------
 # 🧾 Project Metadata
 # ----------------------------------------
 [project]
 name = "azure-functions-doctor"
-version = "0.1.0"
 description = "A diagnostic tool for Python Azure Functions"
 readme = "README.md"
 requires-python = ">=3.9"

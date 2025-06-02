@@ -105,24 +105,27 @@ release:
 ifndef VERSION
 	$(error VERSION is not set. Usage: make release VERSION=0.1.0)
 endif
-	@make changelog
-	@make commit-changelog
-	@make tag-release VERSION=$(VERSION)
+	@$(MAKE) changelog
+	@$(MAKE) commit-changelog
+	@$(MAKE) tag-release VERSION=$(VERSION)
 
 .PHONY: release-patch
 release-patch:
 	@hatch version patch
-	@make release VERSION=$(shell hatch version)
+	@VERSION=$$(hatch version | tail -n1); \
+	 $(MAKE) release VERSION=$$VERSION
 
 .PHONY: release-minor
 release-minor:
 	@hatch version minor
-	@make release VERSION=$(shell hatch version)
+	@VERSION=$$(hatch version | tail -n1); \
+	 $(MAKE) release VERSION=$$VERSION
 
 .PHONY: release-major
 release-major:
 	@hatch version major
-	@make release VERSION=$(shell hatch version)
+	@VERSION=$$(hatch version | tail -n1); \
+	 $(MAKE) release VERSION=$$VERSION
 
 .PHONY: publish
 publish:
