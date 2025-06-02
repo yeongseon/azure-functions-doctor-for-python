@@ -1,25 +1,60 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor-for-python/main/logo_assets/logo_full.png" alt="Azure Functions Doctor Logo" width="320" />
+  <img
+    src="https://raw.githubusercontent.com/yeongseon/azure-functions-doctor-for-python/main/logo_assets/logo_full.png"
+    alt="Azure Functions Doctor Logo"
+    width="320"
+  />
 </p>
 
 <p align="center">
-  <a href="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/deploy.yml">
-    <img src="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/deploy.yml/badge.svg" alt="GitHub Workflow Status" />
+  <!-- CI workflow status badge -->
+  <a href="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/ci.yml">
+    <img
+      src="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/ci.yml/badge.svg"
+      alt="CI Workflow Status"
+    />
   </a>
+  <!-- Release workflow status badge -->
+  <a href="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/release.yml">
+    <img
+      src="https://github.com/yeongseon/azure-functions-doctor-for-python/actions/workflows/release.yml/badge.svg"
+      alt="Release Workflow Status"
+    />
+  </a>
+  <!-- PyPI version badge -->
   <a href="https://pypi.org/project/azure-functions-doctor/">
-    <img src="https://img.shields.io/pypi/v/azure-functions-doctor.svg" alt="PyPI Version" />
+    <img
+      src="https://img.shields.io/pypi/v/azure-functions-doctor.svg"
+      alt="PyPI Version"
+    />
   </a>
+  <!-- License badge -->
   <a href="LICENSE">
-    <img src="https://img.shields.io/github/license/yeongseon/azure-functions-doctor-for-python" alt="License" />
+    <img
+      src="https://img.shields.io/github/license/yeongseon/azure-functions-doctor-for-python.svg"
+      alt="License"
+    />
   </a>
+  <!-- Coverage status badge (Coveralls) -->
   <a href="https://coveralls.io/github/yeongseon/azure-functions-doctor-for-python?branch=main">
-    <img src="https://coveralls.io/repos/github/yeongseon/azure-functions-doctor-for-python/badge.svg?branch=main" alt="Coverage Status" />
+    <img
+      src="https://coveralls.io/repos/github/yeongseon/azure-functions-doctor-for-python/badge.svg?branch=main"
+      alt="Coverage Status"
+    />
   </a>
+  <!-- Supported Python versions badge -->
   <a href="https://pypi.org/project/azure-functions-doctor/">
-    <img src="https://img.shields.io/pypi/pyversions/azure-functions-doctor" alt="Python Versions" />
+    <img
+      src="https://img.shields.io/pypi/pyversions/azure-functions-doctor.svg"
+      alt="Python Versions"
+    />
   </a>
+  <!-- Download count badge (Pepy) -->
   <a href="https://pepy.tech/project/azure-functions-doctor">
-    <img src="https://pepy.tech/badge/azure-functions-doctor" alt="Downloads" />
+    <img
+      src="https://pepy.tech/badge/azure-functions-doctor"
+      alt="Downloads"
+    />
   </a>
 </p>
 
