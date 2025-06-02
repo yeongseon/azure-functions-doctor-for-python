@@ -78,7 +78,7 @@
     "severity": "error",
     "condition": {
       "pypi": "azure-functions-python-library",
-      "import": "azure.functions"
+      "target": "azure.functions"
     },
     "hint": "Install it with: pip install azure-functions-python-library",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=asgi&pivots=python-mode-decorators#azure-functions-python-library",

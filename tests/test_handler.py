@@ -1,6 +1,7 @@
 import sys
 import tempfile
 from pathlib import Path
+from typing import cast
 
 from pytest import MonkeyPatch
 
@@ -95,7 +96,7 @@ def test_package_installed_pass() -> None:
     """Test that the package installed check passes for an existing package."""
     rule: Rule = {
         "type": "package_installed",
-        "condition": {"import": "os"},
+        "condition": {"target": "os"},
     }
     result = generic_handler(rule, Path("."))
     assert result["status"] == "pass"
@@ -104,7 +105,7 @@ def test_package_installed_pass() -> None:
 def test_package_installed_fail() -> None:
     rule: Rule = {
         "type": "package_installed",
-        "condition": {"import": "nonexistent_package_zzz"},
+        "condition": {"target": "nonexistent_package_zzz"},
     }
     result = generic_handler(rule, Path("."))
     assert result["status"] == "fail"
@@ -138,10 +139,19 @@ def test_source_code_contains_fail() -> None:
 
 def test_unknown_check_type() -> None:
     """Test that an unknown check type returns a fail status."""
-    rule: Rule = {
-        "type": "unknown_type",
-        "condition": {"target": "x"},
-    }
+    rule = cast(
+        Rule,
+        {
+            "type": "unknown_type",
+            "id": "invalid_type",
+            "label": "Invalid check",
+            "section": "misc",
+            "category": "misc",
+            "condition": {"target": "anything"},
+        },
+    )
+
     result = generic_handler(rule, Path("."))
+
     assert result["status"] == "fail"
     assert "Unknown check type" in result["detail"]

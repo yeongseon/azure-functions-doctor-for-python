@@ -122,11 +122,10 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
 
     # Check if a Python package is importable
     if check_type == "package_installed":
-        import_path = condition.get("import") or target
-        if not import_path:
-            return {"status": "fail", "detail": "Missing import path"}
+        if not target:
+            return {"status": "fail", "detail": "Missing package name"}
 
-        import_path_str: str = str(import_path)
+        import_path_str: str = str(target)
 
         try:
             __import__(import_path_str)
