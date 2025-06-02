@@ -1,4 +1,4 @@
-name: CI
+name: Test
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Hatch
+      - name: Install Hatch and Make
         run: pip install hatch make
 
       - name: Create Hatch environment & run all checks
