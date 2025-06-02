@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#diagnostic-checks" class="md-skip">
+        <a href="#diagnostic-checks-updated-for-azure-functions-python-programming-model-v2" class="md-skip">
           Skip to content
         </a>
       
@@ -274,8 +274,19 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Diagnostics
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -288,6 +299,47 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostic-checks-updated-for-azure-functions-python-programming-model-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Key Changes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -398,8 +450,38 @@
   
   
   
-    
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostic-checks-updated-for-azure-functions-python-programming-model-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Key Changes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -418,8 +500,10 @@
   
 
 
-<h1 id="diagnostic-checks">Diagnostic Checks</h1>
-<p>This document lists potential diagnostic features for Azure Functions Doctor, based on <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=get-started%2Casgi%2Capplication-level&amp;pivots=python-mode-decorators">Azure Functions Python Reference</a> and <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-best-practices?tabs=python">Azure Functions Best Practices</a>. </p>
+  <h1>Diagnostics</h1>
+
+<h2 id="diagnostic-checks-updated-for-azure-functions-python-programming-model-v2">🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)</h2>
+<p>This document lists diagnostic checks for <strong>Azure Functions Doctor</strong>, based on <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=get-started%2Casgi%2Capplication-level&amp;pivots=python-mode-decorators">Azure Functions Python Reference</a> and <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-best-practices?tabs=python">Best Practices</a>.</p>
 <table>
 <thead>
 <tr>
@@ -440,134 +524,148 @@
 </tr>
 <tr>
 <td>2</td>
-<td>Virtual environment (.venv) exists</td>
-<td>Ensure isolation of dependencies</td>
+<td>Virtual environment (.venv) active</td>
+<td>Ensure Python environment is isolated via virtualenv</td>
 <td>✅ Easy</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>3</td>
 <td>Azure Functions Core Tools installed</td>
-<td>Validate that <code>func</code> CLI is available</td>
+<td>Validate that <code>func</code> CLI is installed and accessible</td>
 <td>✅ Easy</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>4</td>
-<td>host.json exists and is valid</td>
-<td>Ensure configuration file is present</td>
+<td><code>host.json</code> exists</td>
+<td>Required runtime configuration file must be present</td>
 <td>✅ Easy</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>5</td>
-<td>function.json exists per function</td>
-<td>Ensure each function folder has its own function.json</td>
+<td><code>requirements.txt</code> exists</td>
+<td>Check for dependency management file</td>
 <td>✅ Easy</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>6</td>
-<td>Directory structure validation</td>
-<td>Check if directory matches Azure Functions layout</td>
+<td><code>azure-functions</code> package installed</td>
+<td>Ensure required Azure Functions SDK is installed</td>
 <td>✅ Easy</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>7</td>
-<td>requirements.txt or pyproject.toml present</td>
-<td>Check for dependency file</td>
+<td><code>azure-functions-python-library</code> installed</td>
+<td>Required for Programming Model v2 decorator syntax</td>
 <td>✅ Easy</td>
-<td>🔧 Planned</td>
+<td>✅ Implemented</td>
 </tr>
 <tr>
 <td>8</td>
-<td>local.settings.json exists</td>
-<td>Verify local dev settings file exists</td>
+<td><code>local.settings.json</code> exists (optional)</td>
+<td>Useful for storing app settings locally</td>
 <td>✅ Easy</td>
 <td>🔧 Planned</td>
 </tr>
 <tr>
 <td>9</td>
-<td>EntryPoint function exists</td>
-<td>Ensure the entryPoint in function.json matches a real Python function</td>
+<td>Detect use of decorators</td>
+<td>Confirm use of v2-style decorators like <code>@function_name</code></td>
 <td>✅ Easy</td>
-<td>🔧 Planned</td>
+<td>✅ Implemented</td>
 </tr>
 <tr>
 <td>10</td>
-<td>Function name and folder match</td>
-<td>Ensure function directory and entryPoint are aligned</td>
-<td>✅ Easy</td>
-<td>🔧 Planned</td>
-</tr>
-<tr>
-<td>11</td>
-<td>Durable Functions config in host.json</td>
-<td>Detect durableTask section for durable functions</td>
+<td>Function mode detection (v1 vs v2)</td>
+<td>Detect whether app uses function.json or decorators</td>
 <td>✅ Medium</td>
 <td>🔧 Planned</td>
 </tr>
 <tr>
+<td>11</td>
+<td>Directory structure validation</td>
+<td>Warn if folder structure is non-standard or missing expected files</td>
+<td>✅ Easy</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
 <td>12</td>
-<td>HTTP trigger config validation</td>
-<td>Validate authLevel, route, and methods</td>
+<td>Durable Functions config in <code>host.json</code></td>
+<td>Check for presence of <code>durableTask</code> section</td>
 <td>✅ Medium</td>
 <td>🔧 Planned</td>
 </tr>
 <tr>
 <td>13</td>
-<td>Timer trigger CRON expression validation</td>
-<td>Check CRON format in bindings</td>
+<td>HTTP trigger validation</td>
+<td>Ensure <code>authLevel</code>, <code>methods</code>, <code>route</code> in binding are valid</td>
 <td>✅ Medium</td>
 <td>🔧 Planned</td>
 </tr>
 <tr>
 <td>14</td>
-<td>App Insights configuration</td>
-<td>Validate instrumentation key or connection string</td>
+<td>Timer trigger CRON validation</td>
+<td>Validate correct CRON format</td>
 <td>✅ Medium</td>
 <td>🔧 Planned</td>
 </tr>
 <tr>
 <td>15</td>
-<td>Function mode detection (decorator or json)</td>
-<td>Detect whether function app uses decorators or function.json model</td>
+<td>App Insights configuration</td>
+<td>Validate presence of instrumentation key or connection string</td>
 <td>✅ Medium</td>
 <td>🔧 Planned</td>
 </tr>
 <tr>
 <td>16</td>
+<td>EntryPoint in <code>function.json</code> (v1 only)</td>
+<td>Check if entryPoint matches a real function (v1 only)</td>
+<td>✅ Easy</td>
+<td>❌ Not needed</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Function name and folder match (v1 only)</td>
+<td>Ensure folder/function naming aligns (v1 only)</td>
+<td>✅ Easy</td>
+<td>❌ Not needed</td>
+</tr>
+<tr>
+<td>18</td>
 <td>ASGI/WSGI compatibility</td>
-<td>Check if the app exposes ASGI/WSGI interfaces</td>
+<td>Check if app exposes ASGI/WSGI callable</td>
 <td>✅ Medium</td>
 <td>🔧 Planned</td>
 </tr>
 <tr>
-<td>17</td>
+<td>19</td>
 <td>Detect unused or invalid files</td>
-<td>Warn about <code>.pyc</code>, <code>__pycache__</code>, or other irrelevant files</td>
+<td>Warn about <code>.pyc</code>, <code>__pycache__</code>, or legacy files</td>
 <td>✅ Low</td>
-<td>🧭 Possible</td>
+<td>🔝 Possible</td>
 </tr>
 <tr>
-<td>18</td>
-<td>Detect long-running code patterns</td>
-<td>Flag suspicious code like <code>time.sleep</code> or infinite loops</td>
+<td>20</td>
+<td>Detect long-running blocking patterns</td>
+<td>Detect <code>sleep()</code>, infinite loops, or sync IO blocking</td>
 <td>❌ Hard</td>
 <td>❌ Not feasible</td>
 </tr>
 <tr>
-<td>19</td>
+<td>21</td>
 <td>Excessive logging</td>
-<td>Identify overuse of <code>print()</code> or <code>logging.debug()</code></td>
+<td>Detect overuse of <code>print()</code> or <code>logging.debug()</code></td>
 <td>❌ Runtime</td>
 <td>❌ Not feasible</td>
 </tr>
 <tr>
-<td>20</td>
-<td>Monolith vs modular layout</td>
-<td>Warn if everything is in one file or single large function</td>
+<td>22</td>
+<td>Monolithic layout warning</td>
+<td>Detect if everything is in one large file</td>
 <td>❌ Context</td>
 <td>❌ Not feasible</td>
 </tr>
@@ -581,6 +679,15 @@
 🔧 Planned = scheduled for future implementation<br />
 🧭 Possible = technically feasible but lower priority</p>
 </blockquote>
+<hr />
+<h3 id="key-changes">✅ Key Changes</h3>
+<ul>
+<li>Removed <code>main.py</code> check (was v1 specific)</li>
+<li>Added decorator detection (v2 model confirmation)</li>
+<li>Excluded v1-only checks like <code>entryPoint</code>, <code>function.json</code> folder matching</li>
+<li>Included v2-only checks like <code>azure-functions-python-library</code></li>
+<li>Clarified feasibility and implementation status across all checks</li>
+</ul>
 
 
 

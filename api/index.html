@@ -433,21 +433,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Doctor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#azure_functions_doctor.doctor.Doctor.run_all_checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_all_checks
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -683,21 +668,6 @@
       Doctor
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Doctor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#azure_functions_doctor.doctor.Doctor.run_all_checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_all_checks
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1186,11 +1156,9 @@ Loads checks from rules.json and executes them against a target project path.</p
 
                   <details class="quote">
                     <summary>Source code in <code>src/azure_functions_doctor/doctor.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
-<span class="normal">31</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
 <span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">rules_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;rules.json&quot;</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -1205,116 +1173,6 @@ Loads checks from rules.json and executes them against a target project path.</p
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="azure_functions_doctor.doctor.Doctor.run_all_checks" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">run_all_checks</span><span class="p">()</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Run all rules grouped by their section.
-Each section will include pass/fail status and individual check items.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/azure_functions_doctor/doctor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_all_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SectionResult</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Run all rules grouped by their section.</span>
-<span class="sd">    Each section will include pass/fail status and individual check items.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_rules</span><span class="p">()</span>
-    <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Rule</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">:</span>
-        <span class="n">grouped</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="s2">&quot;section&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
-
-    <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SectionResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">checks</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">section_result</span><span class="p">:</span> <span class="n">SectionResult</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">section</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span>
-            <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span>
-            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">[],</span>
-        <span class="p">}</span>
-
-        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">generic_handler</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">)</span>
-
-            <span class="n">item</span><span class="p">:</span> <span class="n">CheckResult</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]),</span>
-                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;detail&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">],</span>
-            <span class="p">}</span>
-
-            <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
-                <span class="n">section_result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fail&quot;</span>
-
-            <span class="k">if</span> <span class="s2">&quot;hint&quot;</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">:</span>
-                <span class="n">item</span><span class="p">[</span><span class="s2">&quot;hint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;hint&quot;</span><span class="p">]</span>
-
-            <span class="k">if</span> <span class="s2">&quot;hint_url&quot;</span> <span class="ow">in</span> <span class="n">rule</span> <span class="ow">and</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;hint_url&quot;</span><span class="p">]:</span>
-                <span class="n">item</span><span class="p">[</span><span class="s2">&quot;hint_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;hint_url&quot;</span><span class="p">]</span>
-
-            <span class="n">section_result</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-
-        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_result</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">results</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 
 
@@ -1393,23 +1251,7 @@ Each section will include pass/fail status and individual check items.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The rule dictionary.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>path</code>
-            </td>
-            <td>
-                  <code><span title="pathlib.Path">Path</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Path to the Azure Functions project.</p>
+                <p>The diagnostic rule to execute.</p>
               </div>
             </td>
             <td>
@@ -1435,7 +1277,7 @@ Each section will include pass/fail status and individual check items.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A result dict with status ('pass' or 'fail') and detail message.</p>
+                <p>A dictionary with the status and detail of the check.</p>
               </div>
             </td>
           </tr>
@@ -1445,14 +1287,7 @@ Each section will include pass/fail status and individual check items.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/handlers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 33</span>
-<span class="normal"> 34</span>
-<span class="normal"> 35</span>
-<span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
-<span class="normal"> 39</span>
-<span class="normal"> 40</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 40</span>
 <span class="normal"> 41</span>
 <span class="normal"> 42</span>
 <span class="normal"> 43</span>
@@ -1528,16 +1363,69 @@ Each section will include pass/fail status and individual check items.</p>
 <span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
-<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generic_handler</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generic_handler</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Execute a diagnostic rule based on its type and condition.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        rule: The rule dictionary.</span>
-<span class="sd">        path: Path to the Azure Functions project.</span>
+<span class="sd">        rule: The diagnostic rule to execute.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A result dict with status (&#39;pass&#39; or &#39;fail&#39;) and detail message.</span>
+<span class="sd">        A dictionary with the status and detail of the check.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">check_type</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
     <span class="n">condition</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;condition&quot;</span><span class="p">,</span> <span class="p">{})</span>
@@ -1546,6 +1434,7 @@ Each section will include pass/fail status and individual check items.</p>
     <span class="n">operator</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;operator&quot;</span><span class="p">)</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
 
+    <span class="c1"># Compare current Python version with expected version</span>
     <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;compare_version&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">target</span> <span class="ow">and</span> <span class="n">operator</span> <span class="ow">and</span> <span class="n">value</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing condition fields for compare_version&quot;</span><span class="p">}</span>
@@ -1554,7 +1443,6 @@ Each section will include pass/fail status and individual check items.</p>
             <span class="n">current_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">micro</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">current</span> <span class="o">=</span> <span class="n">parse_version</span><span class="p">(</span><span class="n">current_version</span><span class="p">)</span>
             <span class="n">expected</span> <span class="o">=</span> <span class="n">parse_version</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-
             <span class="n">passed</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&gt;=</span> <span class="n">expected</span><span class="p">,</span>
                 <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&lt;=</span> <span class="n">expected</span><span class="p">,</span>
@@ -1562,7 +1450,6 @@ Each section will include pass/fail status and individual check items.</p>
                 <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&gt;</span> <span class="n">expected</span><span class="p">,</span>
                 <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="n">current</span> <span class="o">&lt;</span> <span class="n">expected</span><span class="p">,</span>
             <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-
             <span class="k">return</span> <span class="p">{</span>
                 <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">passed</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Python version is </span><span class="si">{</span><span class="n">current_version</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="n">operator</span><span class="si">}{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -1570,48 +1457,97 @@ Each section will include pass/fail status and individual check items.</p>
 
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Unknown target for version comparison: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
 
-    <span class="k">elif</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;env_var_exists&quot;</span><span class="p">:</span>
+    <span class="c1"># Check if an environment variable is set</span>
+    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;env_var_exists&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing environment variable name&quot;</span><span class="p">}</span>
+
         <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">exists</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
             <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="s1">&#39;set&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;not set&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">elif</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;path_exists&quot;</span><span class="p">:</span>
+    <span class="c1"># Check if a path exists (including sys.executable)</span>
+    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;path_exists&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing target path&quot;</span><span class="p">}</span>
+
         <span class="n">resolved_path</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span> <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;sys.executable&quot;</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
         <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">resolved_path</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">exists</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resolved_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;exists&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;is missing&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
 
-    <span class="k">elif</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;file_exists&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">exists</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resolved_path</span><span class="si">}</span><span class="s2"> exists&quot;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resolved_path</span><span class="si">}</span><span class="s2"> is missing (optional)&quot;</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resolved_path</span><span class="si">}</span><span class="s2"> is missing&quot;</span><span class="p">}</span>
+
+    <span class="c1"># Check if a specific file exists</span>
+    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;file_exists&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing file path&quot;</span><span class="p">}</span>
+
         <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
         <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">exists</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;exists&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;is missing&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
 
-    <span class="k">elif</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;package_installed&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing package name&quot;</span><span class="p">}</span>
-        <span class="n">found</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">exists</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> exists&quot;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> not found (optional for local development)&quot;</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">}</span>
+
+    <span class="c1"># Check if a Python package is importable</span>
+    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;package_installed&quot;</span><span class="p">:</span>
+        <span class="n">import_path</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;import&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">target</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">import_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing import path&quot;</span><span class="p">}</span>
+
+        <span class="n">import_path_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">import_path</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">__import__</span><span class="p">(</span><span class="n">import_path_str</span><span class="p">)</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">found</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Package &#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&#39; is </span><span class="si">{</span><span class="s1">&#39;installed&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;not installed&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Module &#39;</span><span class="si">{</span><span class="n">import_path_str</span><span class="si">}</span><span class="s2">&#39; is </span><span class="si">{</span><span class="s1">&#39;installed&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="sa">f</span><span class="s1">&#39;not installed</span><span class="si">{</span><span class="n">error_msg</span><span class="si">}</span><span class="s1">&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Unsupported check type: </span><span class="si">{</span><span class="n">check_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
+    <span class="c1"># Check if a keyword exists in any .py source files</span>
+    <span class="k">if</span> <span class="n">check_type</span> <span class="o">==</span> <span class="s2">&quot;source_code_contains&quot;</span><span class="p">:</span>
+        <span class="n">keyword</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keyword&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing or invalid &#39;keyword&#39; in condition&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">py_file</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">py_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span> <span class="k">if</span> <span class="n">found</span> <span class="k">else</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Keyword &#39;</span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&#39; </span><span class="si">{</span><span class="s1">&#39;found&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;not found&#39;</span><span class="si">}</span><span class="s2"> in source code&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="c1"># Unknown check type fallback</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Unknown check type: </span><span class="si">{</span><span class="n">check_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
