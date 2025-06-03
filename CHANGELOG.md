@@ -1,5 +1,17 @@
 # 📦 Changelog
 
+- bump version to 0.1.9 (5c6af020db3e59dd6ce32e6285aefd6381f8e8c3)
+
+- rename CLI command from azfunc-doctor to func-doctor in docs and scripts (ecbd0320830548de7c74dfb48ab9dccb636c0974)
+
+- update README and documentation for improved usage and structure (cae2b7191443d747d4ca3ec44a513b15b155e7cb)
+
+- replace screenshot with lowercase filename for azfunc-doctor example (1bbf2e1db358d47508a6d3a69ba40f3063507ce8)
+
+- improve README usage section with clearer structure and sample image (2af7acbe4c389aaf79890dbdcf3422beb41f1192)
+
+- simplify changelog template to fix template errors (8bf9f9905508a44d4ad8e384ca670ce34e0036f3)
+
 - update changelog (a973c03fb168c8b2df2231260dba9a030f6310e1)
 
 - bump version to 0.1.8 (a339eb5cf40530e8b64a50ec5e8cb88db1453ed2)

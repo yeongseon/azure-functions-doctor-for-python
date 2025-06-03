@@ -1,9 +1,24 @@
+import logging
 import os
 import sys
 from pathlib import Path
 from typing import Literal, TypedDict, Union
 
 from packaging.version import parse as parse_version
+
+logger = logging.getLogger(__name__)
+
+
+def _create_result(status: str, detail: str) -> dict[str, str]:
+    """Create a standardized result dictionary."""
+    return {"status": status, "detail": detail}
+
+
+def _handle_exception(operation: str, exc: Exception) -> dict[str, str]:
+    """Handle exceptions consistently across all handlers."""
+    error_msg = f"Error during {operation}: {exc}"
+    logger.error(error_msg, exc_info=True)
+    return _create_result("error", error_msg)
 
 
 class Condition(TypedDict, total=False):
@@ -57,7 +72,7 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
     # Compare current Python version with expected version
     if check_type == "compare_version":
         if not (target and operator and value):
-            return {"status": "fail", "detail": "Missing condition fields for compare_version"}
+            return _create_result("fail", "Missing condition fields for compare_version")
 
         if target == "python":
             current_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
@@ -70,84 +85,76 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
                 ">": current > expected,
                 "<": current < expected,
             }.get(operator, False)
-            return {
-                "status": "pass" if passed else "fail",
-                "detail": f"Python version is {current_version}, expected {operator}{value}",
-            }
+            return _create_result(
+                "pass" if passed else "fail",
+                f"Python version is {current_version}, expected {operator}{value}",
+            )
 
-        return {"status": "fail", "detail": f"Unknown target for version comparison: {target}"}
+        return _create_result("fail", f"Unknown target for version comparison: {target}")
 
     # Check if an environment variable is set
     if check_type == "env_var_exists":
         if not target:
-            return {"status": "fail", "detail": "Missing environment variable name"}
+            return _create_result("fail", "Missing environment variable name")
 
         exists = os.getenv(target) is not None
-        return {
-            "status": "pass" if exists else "fail",
-            "detail": f"{target} is {'set' if exists else 'not set'}",
-        }
+        return _create_result(
+            "pass" if exists else "fail",
+            f"{target} is {'set' if exists else 'not set'}",
+        )
 
     # Check if a path exists (including sys.executable)
     if check_type == "path_exists":
         if not target:
-            return {"status": "fail", "detail": "Missing target path"}
+            return _create_result("fail", "Missing target path")
 
         resolved_path = sys.executable if target == "sys.executable" else os.path.join(path, target)
         exists = os.path.exists(resolved_path)
 
         if exists:
-            return {"status": "pass", "detail": f"{resolved_path} exists"}
+            return _create_result("pass", f"{resolved_path} exists")
 
         if not rule.get("required", True):
-            return {"status": "pass", "detail": f"{resolved_path} is missing (optional)"}
+            return _create_result("pass", f"{resolved_path} is missing (optional)")
 
-        return {"status": "fail", "detail": f"{resolved_path} is missing"}
+        return _create_result("fail", f"{resolved_path} is missing")
 
     # Check if a specific file exists
     if check_type == "file_exists":
         if not target:
-            return {"status": "fail", "detail": "Missing file path"}
+            return _create_result("fail", "Missing file path")
 
         file_path = os.path.join(path, target)
         exists = os.path.isfile(file_path)
 
         if exists:
-            return {"status": "pass", "detail": f"{file_path} exists"}
+            return _create_result("pass", f"{file_path} exists")
 
         if not rule.get("required", True):
-            return {"status": "pass", "detail": f"{file_path} not found (optional for local development)"}
+            return _create_result("pass", f"{file_path} not found (optional for local development)")
 
-        return {"status": "fail", "detail": f"{file_path} not found"}
+        return _create_result("fail", f"{file_path} not found")
 
     # Check if a Python package is importable
     if check_type == "package_installed":
         if not target:
-            return {"status": "fail", "detail": "Missing package name"}
+            return _create_result("fail", "Missing package name")
 
         import_path_str: str = str(target)
 
         try:
             __import__(import_path_str)
-            found = True
-            error_msg = ""
+            return _create_result("pass", f"Module '{import_path_str}' is installed")
         except ImportError as exc:
-            found = False
-            error_msg = f": {exc}"
-
-        return {
-            "status": "pass" if found else "fail",
-            "detail": f"Module '{import_path_str}' is {'installed' if found else f'not installed{error_msg}'}",
-        }
+            return _create_result("fail", f"Module '{import_path_str}' is not installed: {exc}")
+        except Exception as exc:
+            return _handle_exception(f"importing module '{import_path_str}'", exc)
 
     # Check if a keyword exists in any .py source files
     if check_type == "source_code_contains":
         keyword = condition.get("keyword")
         if not isinstance(keyword, str):
-            return {
-                "status": "fail",
-                "detail": "Missing or invalid 'keyword' in condition",
-            }
+            return _create_result("fail", "Missing or invalid 'keyword' in condition")
 
         found = False
 
@@ -157,13 +164,14 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
                 if keyword in content:
                     found = True
                     break
-            except Exception:
+            except Exception as exc:
+                logger.warning(f"Failed to read file {py_file}: {exc}")
                 continue
 
-        return {
-            "status": "pass" if found else "fail",
-            "detail": f"Keyword '{keyword}' {'found' if found else 'not found'} in source code",
-        }
+        return _create_result(
+            "pass" if found else "fail",
+            f"Keyword '{keyword}' {'found' if found else 'not found'} in source code",
+        )
 
     # Unknown check type fallback
-    return {"status": "fail", "detail": f"Unknown check type: {check_type}"}
+    return _create_result("fail", f"Unknown check type: {check_type}")

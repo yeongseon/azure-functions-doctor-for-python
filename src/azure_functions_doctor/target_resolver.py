@@ -1,5 +1,8 @@
+import logging
 import subprocess
 import sys
+
+logger = logging.getLogger(__name__)
 
 
 def resolve_target_value(target: str) -> str:
@@ -21,6 +24,7 @@ def resolve_target_value(target: str) -> str:
         try:
             output = subprocess.check_output(["func", "--version"], text=True)
             return output.strip()
-        except Exception:
+        except Exception as exc:
+            logger.warning(f"Failed to get func core tools version: {exc}")
             return "0.0.0"  # Return a fallback version if resolution fails
     raise ValueError(f"Unknown target: {target}")
