@@ -1,77 +1,100 @@
 # ------------------------------
+# 🧰 Environment Bootstrap
+# ------------------------------
+
+VENV_DIR := .venv
+PYTHON := $(VENV_DIR)/bin/python
+PIP := $(VENV_DIR)/bin/pip
+HATCH := $(VENV_DIR)/bin/hatch
+
+.PHONY: bootstrap
+bootstrap:
+	@if [ ! -d "$(VENV_DIR)" ]; then \
+		echo "🐍 Creating virtual environment..."; \
+		python3 -m venv $(VENV_DIR); \
+	fi
+	@echo "📦 Ensuring Hatch is installed in virtual environment..."
+	@$(PIP) install --upgrade pip > /dev/null
+	@$(PIP) install hatch > /dev/null
+	@echo "✅ Hatch installed at $(HATCH)"
+
+.PHONY: ensure-hatch
+ensure-hatch: bootstrap
+
+# ------------------------------
 # 🧰 Hatch Environment Management
 # ------------------------------
 
 .PHONY: install
-install:
-	@hatch env create
+install: ensure-hatch
+	@$(HATCH) env create
 	@make precommit-install
 
 .PHONY: shell
-shell:
-	@hatch shell
+shell: ensure-hatch
+	@$(HATCH) shell
 
 .PHONY: reset
 reset: clean-all install
 	@echo "🔁 Project reset complete."
 
 .PHONY: hatch-clean
-hatch-clean:
-	@hatch env remove || echo "⚠️ No hatch environment to remove"
+hatch-clean: ensure-hatch
+	@$(HATCH) env remove || echo "⚠️ No hatch environment to remove"
 
 # ------------------------------
 # 🧹 Code Quality
 # ------------------------------
 
 .PHONY: format
-format:
-	@hatch run format
+format: ensure-hatch
+	@$(HATCH) run format
 
 .PHONY: style
-style:
-	@hatch run style
+style: ensure-hatch
+	@$(HATCH) run style
 
 .PHONY: typecheck
-typecheck:
-	@hatch run typecheck
+typecheck: ensure-hatch
+	@$(HATCH) run typecheck
 
 .PHONY: lint
-lint:
-	@hatch run lint
+lint: ensure-hatch
+	@$(HATCH) run lint
 
 .PHONY: check
-check:
+check: ensure-hatch
 	@make lint
 	@make typecheck
 	@echo "✅ Lint & type check passed!"
 
 .PHONY: check-all
-check-all:
+check-all: ensure-hatch
 	@make check
 	@make test
 	@echo "✅ All checks passed including tests!"
 
 .PHONY: precommit
-precommit:
-	@hatch run precommit
+precommit: ensure-hatch
+	@$(HATCH) run precommit
 
 .PHONY: precommit-install
-precommit-install:
-	@hatch run precommit-install
+precommit-install: ensure-hatch
+	@$(HATCH) run precommit-install
 
 # ------------------------------
 # 🧪 Testing & Coverage
 # ------------------------------
 
 .PHONY: test
-test:
+test: ensure-hatch
 	@echo "🔬 Running tests..."
-	@hatch run test
+	@$(HATCH) run test
 
 .PHONY: cov
-cov:
-	@hatch run cov
-	@hatch run coverage xml
+cov: ensure-hatch
+	@$(HATCH) run cov
+	@$(HATCH) run coverage xml
 	@echo "📂 Open htmlcov/index.html in your browser to view the coverage report"
 	@echo "📝 coverage.xml generated for Codecov upload"
 
@@ -80,8 +103,8 @@ cov:
 # ------------------------------
 
 .PHONY: build
-build:
-	@hatch build
+build: ensure-hatch
+	@$(HATCH) build
 
 .PHONY: changelog
 changelog:
@@ -103,11 +126,11 @@ endif
 	@echo "🚀 Tagged release v$(VERSION)"
 
 .PHONY: release
-release:
+release: ensure-hatch
 ifndef VERSION
 	$(error VERSION is not set. Usage: make release VERSION=1.0.1)
 endif
-	@hatch version $(VERSION)
+	@$(HATCH) version $(VERSION)
 	@$(MAKE) release-core VERSION=$(VERSION)
 
 .PHONY: release-core
@@ -120,44 +143,44 @@ endif
 	@$(MAKE) tag-release VERSION=$(VERSION)
 
 .PHONY: release-patch
-release-patch:
-	@hatch version patch
-	@VERSION=$$(hatch version | tail -n1); \
+release-patch: ensure-hatch
+	@$(HATCH) version patch
+	@VERSION=$$($(HATCH) version | tail -n1); \
 	 git add src/azure_functions_doctor/__init__.py && \
 	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: release-minor
-release-minor:
-	@hatch version minor
-	@VERSION=$$(hatch version | tail -n1); \
+release-minor: ensure-hatch
+	@$(HATCH) version minor
+	@VERSION=$$($(HATCH) version | tail -n1); \
 	 git add src/azure_functions_doctor/__init__.py && \
 	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: release-major
-release-major:
-	@hatch version major
-	@VERSION=$$(hatch version | tail -n1); \
+release-major: ensure-hatch
+	@$(HATCH) version major
+	@VERSION=$$($(HATCH) version | tail -n1); \
 	 git add src/azure_functions_doctor/__init__.py && \
 	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: publish
-publish:
-	@hatch publish
+publish: ensure-hatch
+	@$(HATCH) publish
 
 # ------------------------------
 # 📚 Documentation
 # ------------------------------
 
 .PHONY: docs
-docs:
-	@hatch run mkdocs build
+docs: ensure-hatch
+	@$(HATCH) run mkdocs build
 
 .PHONY: docs-serve
-docs-serve:
-	@hatch run mkdocs serve
+docs-serve: ensure-hatch
+	@$(HATCH) run mkdocs serve
 
 # ------------------------------
 # 🩺 Diagnostic
@@ -166,7 +189,7 @@ docs-serve:
 .PHONY: doctor
 doctor:
 	@echo "🔍 Python version:" && python --version
-	@echo "🔍 Installed packages:" && hatch env run pip list || echo "⚠️ No hatch env found"
+	@echo "🔍 Installed packages:" && $(HATCH) env run pip list || echo "⚠️ No hatch env found"
 	@echo "🔍 Azure Function Core Tools version:" && func --version || echo "⚠️ func not found. Install with: npm i -g azure-functions-core-tools@4"
 	@echo "🔍 Pre-commit hook installed:"
 	@if [ -f .git/hooks/pre-commit ]; then echo ✅ Yes; else echo ❌ No; fi
