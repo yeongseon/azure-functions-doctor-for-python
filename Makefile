@@ -166,8 +166,12 @@ release-major: ensure-hatch
 	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
-.PHONY: publish
-publish: ensure-hatch
+.PHONY: publish-test
+publish-test: ensure-hatch
+	@$(HATCH) publish --repo test
+
+.PHONY: publish-pypi
+publish-pypi: ensure-hatch
 	@$(HATCH) publish
 
 # ------------------------------
