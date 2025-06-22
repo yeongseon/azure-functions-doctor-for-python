@@ -174,6 +174,11 @@ publish-test: ensure-hatch
 publish-pypi: ensure-hatch
 	@$(HATCH) publish
 
+.PHONY: version
+version: ensure-hatch
+	@echo "📦 Current version:"
+	@$(HATCH) version
+
 # ------------------------------
 # 📚 Documentation
 # ------------------------------
