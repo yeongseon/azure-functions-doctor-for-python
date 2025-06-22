@@ -1,5 +1,21 @@
 # 📦 Changelog
 
+- bump version to 0.1.11 (7fdb1e6c480d4e20497e497a152c2d1b55c85b05)
+
+- add version check target (29bcbed13943e78c5fcc817be11af8a2dd2ceec4)
+
+- update release process guide to reflect hatch-based workflow (d0a814cd6222723180a3d10d6f7051041bfb2917)
+
+- configure default and test PyPI repositories for hatch publish (931563cf2e6d5b463863fed12f7ffe0da79443b9)
+
+- add publish-pypi and publish-test targets for PyPI release (f769088317f3e23dafaf4b0f3b3aa90ab98db31a)
+
+- bump version to 0.1.10 (e7b53af13a317f886e95c88d3c5cce26a5e36ba0)
+
+- use Hatch inside virtualenv with automatic bootstrap (e2bec3f660a7366a3255888bde1a519756bfa523)
+
+- update changelog (95e1596371c72e478a87a1d06846b14fa8877bb9)
+
 - bump version to 0.1.9 (5c6af020db3e59dd6ce32e6285aefd6381f8e8c3)
 
 - rename CLI command from azfunc-doctor to func-doctor in docs and scripts (ecbd0320830548de7c74dfb48ab9dccb636c0974)
