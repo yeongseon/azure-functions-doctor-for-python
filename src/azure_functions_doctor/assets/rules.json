@@ -108,7 +108,9 @@
     "label": "local.settings.json",
     "description": "Checks if local.settings.json exists (useful for local development).",
     "type": "file_exists",
-    "target": "local.settings.json",
+    "condition": {
+      "target": "local.settings.json"
+    },
     "required": false,
     "severity": "info",
     "hint": "Create local.settings.json for local development if needed.",

@@ -3,11 +3,12 @@
 import sys
 import tempfile
 from pathlib import Path
+from typing import cast
 
 from azure_functions_doctor.handlers import HandlerRegistry, Rule
 
 
-def test_handler_registry_initialization():
+def test_handler_registry_initialization() -> None:
     """Test that handler registry initializes with all expected handlers."""
     registry = HandlerRegistry()
 
@@ -24,14 +25,18 @@ def test_handler_registry_initialization():
         assert handler_type in registry._handlers
 
 
-def test_handler_registry_unknown_type():
+def test_handler_registry_unknown_type() -> None:
     """Test registry handling of unknown check types."""
     registry = HandlerRegistry()
 
-    rule: Rule = {
-        "id": "test_unknown",
-        "type": "unknown_type_xyz",  # type: ignore
-    }
+    # Create rule with intentionally invalid type for testing error handling
+    rule = cast(
+        Rule,
+        {
+            "id": "test_unknown",
+            "type": "unknown_type_xyz",
+        },
+    )
 
     result = registry.handle(rule, Path("."))
 
@@ -39,7 +44,7 @@ def test_handler_registry_unknown_type():
     assert "Unknown check type" in result["detail"]
 
 
-def test_handler_registry_compare_version():
+def test_handler_registry_compare_version() -> None:
     """Test version comparison through registry."""
     registry = HandlerRegistry()
 
@@ -59,7 +64,7 @@ def test_handler_registry_compare_version():
     assert "Python version is" in result["detail"]
 
 
-def test_handler_registry_env_var_exists():
+def test_handler_registry_env_var_exists() -> None:
     """Test environment variable check through registry."""
     registry = HandlerRegistry()
 
@@ -77,7 +82,7 @@ def test_handler_registry_env_var_exists():
     assert "PATH is set" in result["detail"]
 
 
-def test_handler_registry_path_exists():
+def test_handler_registry_path_exists() -> None:
     """Test path existence check through registry."""
     registry = HandlerRegistry()
 
@@ -95,7 +100,7 @@ def test_handler_registry_path_exists():
     assert "exists" in result["detail"]
 
 
-def test_handler_registry_file_exists():
+def test_handler_registry_file_exists() -> None:
     """Test file existence check through registry."""
     registry = HandlerRegistry()
 
@@ -121,7 +126,7 @@ def test_handler_registry_file_exists():
         tmp_path.unlink()
 
 
-def test_handler_registry_package_installed():
+def test_handler_registry_package_installed() -> None:
     """Test package installation check through registry."""
     registry = HandlerRegistry()
 
@@ -140,7 +145,7 @@ def test_handler_registry_package_installed():
     assert "is installed" in result["detail"]
 
 
-def test_handler_registry_source_code_contains():
+def test_handler_registry_source_code_contains() -> None:
     """Test source code search through registry."""
     registry = HandlerRegistry()
 
@@ -165,7 +170,7 @@ def test_handler_registry_source_code_contains():
         assert "found" in result["detail"]
 
 
-def test_handler_registry_exception_handling():
+def test_handler_registry_exception_handling() -> None:
     """Test registry exception handling."""
     registry = HandlerRegistry()
 
@@ -183,7 +188,7 @@ def test_handler_registry_exception_handling():
     assert "Missing condition fields" in result["detail"]
 
 
-def test_handler_registry_optional_rules():
+def test_handler_registry_optional_rules() -> None:
     """Test registry handling of optional rules."""
     registry = HandlerRegistry()
 

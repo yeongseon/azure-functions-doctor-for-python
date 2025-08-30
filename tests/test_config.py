@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from azure_functions_doctor.config import Config, get_config, override_config
 
 if TYPE_CHECKING:
-    pass
+    import pytest
 
 
 def test_config_defaults() -> None:
@@ -22,7 +22,7 @@ def test_config_defaults() -> None:
     assert config.get("parallel_execution") is False
 
 
-def test_config_environment_variables(monkeypatch):
+def test_config_environment_variables(monkeypatch: "pytest.MonkeyPatch") -> None:
     """Test loading configuration from environment variables."""
     monkeypatch.setenv("FUNC_DOCTOR_LOG_LEVEL", "DEBUG")
     monkeypatch.setenv("FUNC_DOCTOR_MAX_FILE_SIZE_MB", "20")
@@ -35,7 +35,7 @@ def test_config_environment_variables(monkeypatch):
     assert config.get("enable_colors") is False
 
 
-def test_config_boolean_environment_values(monkeypatch):
+def test_config_boolean_environment_values(monkeypatch: "pytest.MonkeyPatch") -> None:
     """Test boolean environment variable parsing."""
     test_cases = [
         ("true", True),
@@ -54,7 +54,7 @@ def test_config_boolean_environment_values(monkeypatch):
         assert config.get("enable_colors") is expected
 
 
-def test_config_invalid_environment_values(monkeypatch):
+def test_config_invalid_environment_values(monkeypatch: "pytest.MonkeyPatch") -> None:
     """Test handling of invalid environment variable values."""
     monkeypatch.setenv("FUNC_DOCTOR_MAX_FILE_SIZE_MB", "invalid")
 
@@ -64,7 +64,7 @@ def test_config_invalid_environment_values(monkeypatch):
     assert config.get("max_file_size_mb") == 10
 
 
-def test_config_set_and_get():
+def test_config_set_and_get() -> None:
     """Test setting and getting configuration values."""
     config = Config()
 
@@ -74,7 +74,7 @@ def test_config_set_and_get():
     assert config.get("nonexistent_key", "default") == "default"
 
 
-def test_config_convenience_methods():
+def test_config_convenience_methods() -> None:
     """Test convenience methods for common configuration values."""
     config = Config()
 
@@ -88,7 +88,7 @@ def test_config_convenience_methods():
     assert isinstance(config.is_parallel_execution_enabled(), bool)
 
 
-def test_config_custom_rules_path(monkeypatch):
+def test_config_custom_rules_path(monkeypatch: "pytest.MonkeyPatch") -> None:
     """Test custom rules path resolution."""
     config = Config()
 
@@ -112,7 +112,7 @@ def test_config_custom_rules_path(monkeypatch):
         os.unlink(custom_path)
 
 
-def test_config_custom_rules_path_nonexistent(monkeypatch):
+def test_config_custom_rules_path_nonexistent(monkeypatch: "pytest.MonkeyPatch") -> None:
     """Test custom rules path with nonexistent file."""
     monkeypatch.setenv("FUNC_DOCTOR_CUSTOM_RULES", "/nonexistent/path.json")
 
@@ -122,7 +122,7 @@ def test_config_custom_rules_path_nonexistent(monkeypatch):
     assert config.get_custom_rules_path() is None
 
 
-def test_config_to_dict():
+def test_config_to_dict() -> None:
     """Test configuration serialization to dictionary."""
     config = Config()
     config.set("test_key", "test_value")
@@ -134,7 +134,7 @@ def test_config_to_dict():
     assert config_dict["test_key"] == "test_value"
 
 
-def test_get_config_singleton():
+def test_get_config_singleton() -> None:
     """Test that get_config returns the same instance."""
     config1 = get_config()
     config2 = get_config()
@@ -142,7 +142,7 @@ def test_get_config_singleton():
     assert config1 is config2
 
 
-def test_override_config():
+def test_override_config() -> None:
     """Test configuration override functionality."""
     original_log_level = get_config().get("log_level")
 
