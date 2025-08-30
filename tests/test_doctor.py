@@ -31,6 +31,8 @@ def test_doctor_checks_pass() -> None:
         assert "Python version" in item_map
         assert item_map.get("host.json") == "pass"
         assert item_map.get("requirements.txt") == "pass"
+    # local.settings.json is optional; should be present in the results and pass when missing
+    assert item_map.get("local.settings.json") == "pass"
 
 
 def test_missing_files() -> None:
@@ -46,3 +48,5 @@ def test_missing_files() -> None:
 
         assert item_map.get("host.json") == "fail"
         assert item_map.get("requirements.txt") == "fail"
+    # local.settings.json is optional; missing should not cause a fail
+    assert item_map.get("local.settings.json") == "pass"

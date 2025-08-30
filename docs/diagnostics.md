@@ -11,7 +11,7 @@ This document lists diagnostic checks for **Azure Functions Doctor**, based on [
 | 5  | `requirements.txt` exists                  | Check for dependency management file                               | ✅ Easy      | ✅ Implemented  |
 | 6  | `azure-functions` package installed        | Ensure required Azure Functions SDK is installed                   | ✅ Easy      | ✅ Implemented  |
 | 7  | `azure-functions-python-library` installed | Required for Programming Model v2 decorator syntax                 | ✅ Easy      | ✅ Implemented  |
-| 8  | `local.settings.json` exists (optional)    | Useful for storing app settings locally                            | Easy      | Planned     |
+| 8  | `local.settings.json` exists (optional)    | Useful for storing app settings locally                            | ✅ Easy      | ✅ Implemented  |
 | 9  | Detect use of decorators                   | Confirm use of v2-style decorators like `@function_name`           | ✅ Easy      | ✅ Implemented  |
 | 10 | Function mode detection (v1 vs v2)         | Detect whether app uses function.json or decorators                | Medium    | Planned     |
 | 11 | Directory structure validation             | Warn if folder structure is non-standard or missing expected files | ✅ Easy      | ✅ Implemented  |
