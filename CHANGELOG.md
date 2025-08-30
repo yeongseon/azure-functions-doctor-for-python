@@ -1,5 +1,17 @@
 # 📦 Changelog
 
+- bump version to 0.3.0 (cb009efdfbae834ee293973df6346c8251e34e90)
+
+- fix documentation build issues (df9046675e4cb25d4f0d1f9e754a034d63c42aa1)
+
+- resolve diagnostic failures and pre-commit issues (cc2a27eedd63c0dbf6d0c35ab2ca93a98b7bf26b)
+
+- implement major code structure improvements (18c3d60ef104003ebc93788a25db5e7fcc34b0cd)
+
+- align local version with PyPI release (0.2.0) (68a011cfc517751eda20de5b19d9a1f378296187)
+
+- update changelog (afdf7359dafaf8ff444552b08152a5d9cd25271b)
+
 - bump version to 0.1.11 (39be13cfef2f5725f46766d897c4b822504b20fc)
 
 - remove overly ambitious roadmap document (3a9d4d15b45709d6a68e77d22939f3288a8bfae8)
