@@ -29,13 +29,13 @@
 
 ---
 
-# 🚑 Azure Functions Doctor for Python
+# Azure Functions Doctor for Python
 
 A fast and extensible diagnostic CLI for Python-based Azure Functions projects.
 
 ---
 
-## 🤔 Why Azure Functions Doctor?
+## Why Azure Functions Doctor?
 
 - Getting random 500 errors and suspect misconfiguration?
 - Need to verify your dev environment before CI/CD deployment?
@@ -45,7 +45,7 @@ A fast and extensible diagnostic CLI for Python-based Azure Functions projects.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - Diagnose Python version, venv, `azure-functions` package
 - Validate `host.json`, `local.settings.json`, function structure
@@ -64,7 +64,7 @@ A fast and extensible diagnostic CLI for Python-based Azure Functions projects.
 
 ---
 
-## 📦 Installation
+## Installation
 
 From PyPI:
 
@@ -127,7 +127,7 @@ We welcome issues and PRs!
 
 Please see [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidelines.
 
-If you find this useful, please ⭐️ the repo!
+If you find this useful, please star the repo!
 
 ---
 

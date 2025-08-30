@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/yeongseon/azure-functions-doctor-for-python/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: Documentation
+    url: https://github.com/yeongseon/azure-functions-doctor-for-python/blob/main/README.md
+    about: Check the documentation for usage guides and examples

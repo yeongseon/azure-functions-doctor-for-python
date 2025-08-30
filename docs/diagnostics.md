@@ -11,17 +11,17 @@ This document lists diagnostic checks for **Azure Functions Doctor**, based on [
 | 5  | `requirements.txt` exists                  | Check for dependency management file                               | ✅ Easy      | ✅ Implemented  |
 | 6  | `azure-functions` package installed        | Ensure required Azure Functions SDK is installed                   | ✅ Easy      | ✅ Implemented  |
 | 7  | `azure-functions-python-library` installed | Required for Programming Model v2 decorator syntax                 | ✅ Easy      | ✅ Implemented  |
-| 8  | `local.settings.json` exists (optional)    | Useful for storing app settings locally                            | ✅ Easy      | 🔧 Planned     |
+| 8  | `local.settings.json` exists (optional)    | Useful for storing app settings locally                            | Easy      | Planned     |
 | 9  | Detect use of decorators                   | Confirm use of v2-style decorators like `@function_name`           | ✅ Easy      | ✅ Implemented  |
-| 10 | Function mode detection (v1 vs v2)         | Detect whether app uses function.json or decorators                | ✅ Medium    | 🔧 Planned     |
+| 10 | Function mode detection (v1 vs v2)         | Detect whether app uses function.json or decorators                | Medium    | Planned     |
 | 11 | Directory structure validation             | Warn if folder structure is non-standard or missing expected files | ✅ Easy      | ✅ Implemented  |
-| 12 | Durable Functions config in `host.json`    | Check for presence of `durableTask` section                        | ✅ Medium    | 🔧 Planned     |
-| 13 | HTTP trigger validation                    | Ensure `authLevel`, `methods`, `route` in binding are valid        | ✅ Medium    | 🔧 Planned     |
-| 14 | Timer trigger CRON validation              | Validate correct CRON format                                       | ✅ Medium    | 🔧 Planned     |
-| 15 | App Insights configuration                 | Validate presence of instrumentation key or connection string      | ✅ Medium    | 🔧 Planned     |
+| 12 | Durable Functions config in `host.json`    | Check for presence of `durableTask` section                        | Medium    | Planned     |
+| 13 | HTTP trigger validation                    | Ensure `authLevel`, `methods`, `route` in binding are valid        | Medium    | Planned     |
+| 14 | Timer trigger CRON validation              | Validate correct CRON format                                       | Medium    | Planned     |
+| 15 | App Insights configuration                 | Validate presence of instrumentation key or connection string      | Medium    | Planned     |
 | 16 | EntryPoint in `function.json` (v1 only)    | Check if entryPoint matches a real function (v1 only)              | ✅ Easy      | ❌ Not needed   |
 | 17 | Function name and folder match (v1 only)   | Ensure folder/function naming aligns (v1 only)                     | ✅ Easy      | ❌ Not needed   |
-| 18 | ASGI/WSGI compatibility                    | Check if app exposes ASGI/WSGI callable                            | ✅ Medium    | 🔧 Planned     |
+| 18 | ASGI/WSGI compatibility                    | Check if app exposes ASGI/WSGI callable                            | Medium    | Planned     |
 | 19 | Detect unused or invalid files             | Warn about `.pyc`, `__pycache__`, or legacy files                  | ✅ Low       | 🔝 Possible    |
 | 20 | Detect long-running blocking patterns      | Detect `sleep()`, infinite loops, or sync IO blocking              | ❌ Hard      | ❌ Not feasible |
 | 21 | Excessive logging                          | Detect overuse of `print()` or `logging.debug()`                   | ❌ Runtime   | ❌ Not feasible |
@@ -31,7 +31,7 @@ This document lists diagnostic checks for **Azure Functions Doctor**, based on [
 > ✅ Easy = statically checkable  
 > ✅ Medium = requires additional parsing/context  
 > ❌ = not feasible by static analysis  
-> 🔧 Planned = scheduled for future implementation  
+> Planned = scheduled for future implementation  
 > 🧭 Possible = technically feasible but lower priority
 
 ---

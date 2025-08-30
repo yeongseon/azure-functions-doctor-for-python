@@ -51,7 +51,7 @@ Each rule is a JSON object with the following fields:
 
 ---
 
-## 🔍 Supported Rule Types
+## Supported Rule Types
 
 ### 1. `compare_version`
 
@@ -153,7 +153,7 @@ Example:
 
 ---
 
-## 🛠️ Tips
+## Tips
 
 * Use `hint` to provide helpful, actionable suggestions.
 * Use consistent `section` names for better CLI grouping.

@@ -4,7 +4,7 @@ The Azure Functions Doctor CLI helps validate your local Python-based Azure Func
 
 ---
 
-## 🚀 Basic Usage
+## Basic Usage
 
 ```bash
 func-doctor diagnose
@@ -14,7 +14,7 @@ Run diagnostics in the current or specified folder.
 
 ---
 
-## ⚙️ Options
+## Options
 
 | Option | Description |
 |--------|-------------|
@@ -41,7 +41,7 @@ func-doctor diagnose --path ./my-func-app --format json --verbose
 
 ---
 
-## 🧪 Example Output
+## Example Output
 
 ```
 🩺 Azure Functions Doctor for Python v0.1.0

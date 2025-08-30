@@ -1,0 +1,110 @@
+name: General Issue
+description: Report a general issue, question, or discussion topic
+title: "[Issue]: "
+labels: ["triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for opening an issue! This template is for general issues that don't fit into bug reports or feature requests.
+        
+        **Note**: For questions or discussions, consider using [GitHub Discussions](https://github.com/yeongseon/azure-functions-doctor-for-python/discussions) instead.
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What type of issue is this?
+      options:
+        - Documentation issue
+        - Installation problem
+        - Configuration question
+        - Usage question
+        - Performance concern
+        - Compatibility issue
+        - Security concern
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a detailed description of your issue.
+      placeholder: Describe your issue here...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Please provide context about your environment and situation.
+      placeholder: |
+        - What are you trying to achieve?
+        - What have you tried so far?
+        - Any relevant background information?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (if applicable)
+      description: Provide environment details if relevant to your issue
+      placeholder: |
+        - OS: [e.g. Windows 11, macOS 14.0, Ubuntu 22.04]
+        - Python version: [e.g. 3.9.18]
+        - azure-functions-doctor version: [e.g. 0.1.10]
+        - Any other relevant tools or versions
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps-taken
+    attributes:
+      label: Steps Already Taken
+      description: What have you already tried to resolve this issue?
+      placeholder: |
+        1. I tried...
+        2. I also attempted...
+        3. I checked...
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: Expected Outcome
+      description: What would you like to see happen or what outcome are you looking for?
+      placeholder: I would like to...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any additional information, links, or context that might be helpful.
+      placeholder: |
+        - Links to relevant documentation
+        - Screenshots or code snippets
+        - Any other relevant information
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues and discussions for similar topics
+          required: true
+        - label: I have provided sufficient information for others to understand my issue
+          required: true
+        - label: I understand this may be better suited for GitHub Discussions if it's a general question
+          required: false

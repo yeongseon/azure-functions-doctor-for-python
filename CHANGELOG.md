@@ -1,4 +1,4 @@
-# 📦 Changelog
+# Changelog
 
 - bump version to 0.1.9 (5c6af020db3e59dd6ce32e6285aefd6381f8e8c3)
 
