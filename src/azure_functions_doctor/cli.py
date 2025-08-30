@@ -1,3 +1,5 @@
+import json
+import time
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -7,16 +9,24 @@ from rich.text import Text
 
 from azure_functions_doctor import __version__
 from azure_functions_doctor.doctor import Doctor
+from azure_functions_doctor.logging_config import (
+    get_logger,
+    log_diagnostic_complete,
+    log_diagnostic_start,
+    setup_logging,
+)
 from azure_functions_doctor.utils import format_detail, format_result, format_status_icon
 
 cli = typer.Typer()
 console = Console()
+logger = get_logger(__name__)
 
 
 @cli.command()
 def diagnose(
     path: str = ".",
     verbose: bool = False,
+    debug: Annotated[bool, typer.Option(help="Enable debug logging")] = False,
     format: Annotated[str, typer.Option(help="Output format: 'table' or 'json'")] = "table",
     output: Annotated[Optional[Path], typer.Option(help="Optional path to save JSON result")] = None,
 ) -> None:
@@ -26,17 +36,45 @@ def diagnose(
     Args:
         path: Path to the Azure Functions app. Defaults to current directory.
         verbose: Show detailed hints for failed checks.
+        debug: Enable debug logging to stderr.
         format: Output format: 'table' or 'json'.
         output: Optional file path to save JSON result.
     """
+    # Configure logging based on CLI flags
+    if debug:
+        setup_logging(level="DEBUG", format_style="structured")
+    elif verbose:
+        setup_logging(level="INFO", format_style="simple")
+    else:
+        # Use environment variable or default to WARNING
+        setup_logging(level=None, format_style="simple")
+
+    start_time = time.time()
     doctor = Doctor(path)
+    resolved_path = Path(path).resolve()
+
+    # Log diagnostic start
+    rules = doctor.load_rules()
+    log_diagnostic_start(str(resolved_path), len(rules))
+
     results = doctor.run_all_checks()
+
+    # Calculate execution metrics
+    end_time = time.time()
+    duration_ms = (end_time - start_time) * 1000
+
+    # Count results for logging
+    total_checks = sum(len(section["items"]) for section in results)
+    passed_items = sum(1 for section in results for item in section["items"] if item["status"] == "pass")
+    failed_items = sum(1 for section in results for item in section["items"] if item["status"] == "fail")
+    errors = sum(1 for section in results for item in section["items"] if item["status"] == "error")
+
+    # Log diagnostic completion
+    log_diagnostic_complete(total_checks, passed_items, failed_items, errors, duration_ms)
 
     passed = failed = 0
 
     if format == "json":
-        import json
-
         json_output = results
 
         if output:
@@ -49,7 +87,10 @@ def diagnose(
 
     # Print header only for table format
     console.print(f"[bold blue]🩺 Azure Functions Doctor for Python v{__version__}[/bold blue]")
-    console.print(f"[bold]📁 Path:[/bold] {Path(path).resolve()}\n")
+    console.print(f"[bold]📁 Path:[/bold] {resolved_path}\n")
+
+    if debug:
+        console.print("[dim]Debug logging enabled - check stderr for detailed logs[/dim]\n")
 
     # Default: table format
     for section in results:
@@ -89,6 +130,21 @@ def diagnose(
         (f"{format_status_icon('fail')} ", "red bold"),
         (f"{failed} Failed", "bold"),
     )
+
+    if errors > 0:
+        summary = Text.assemble(
+            summary,
+            ("    ⚠ ", "yellow bold"),
+            (f"{errors} Errors", "bold"),
+        )
+
+    if debug:
+        summary = Text.assemble(
+            summary,
+            ("    🕒 ", "dim"),
+            (f"{duration_ms:.1f}ms", "dim"),
+        )
+
     console.print(summary)
 
 

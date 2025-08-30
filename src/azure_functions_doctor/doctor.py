@@ -1,10 +1,14 @@
 import importlib.resources
 import json
+import time
 from collections import defaultdict
 from pathlib import Path
 from typing import TypedDict
 
 from azure_functions_doctor.handlers import Rule, generic_handler
+from azure_functions_doctor.logging_config import get_logger, log_rule_execution
+
+logger = get_logger(__name__)
 
 
 class CheckResult(TypedDict, total=False):
@@ -55,7 +59,13 @@ class Doctor:
             }
 
             for rule in checks:
+                # Time rule execution for logging
+                rule_start = time.time()
                 result = generic_handler(rule, self.project_path)
+                rule_duration_ms = (time.time() - rule_start) * 1000
+
+                # Log rule execution
+                log_rule_execution(rule["id"], rule["type"], result["status"], rule_duration_ms)
 
                 # If the result is empty, skip this rule
                 value_msg = result["detail"]

@@ -1,8 +1,9 @@
-import logging
 import subprocess
 import sys
 
-logger = logging.getLogger(__name__)
+from azure_functions_doctor.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def resolve_target_value(target: str) -> str:

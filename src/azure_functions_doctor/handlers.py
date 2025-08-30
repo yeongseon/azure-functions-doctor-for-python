@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 from pathlib import Path
@@ -6,7 +5,9 @@ from typing import Literal, TypedDict, Union
 
 from packaging.version import parse as parse_version
 
-logger = logging.getLogger(__name__)
+from azure_functions_doctor.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def _create_result(status: str, detail: str) -> dict[str, str]:
