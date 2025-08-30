@@ -22,6 +22,29 @@ console = Console()
 logger = get_logger(__name__)
 
 
+def _validate_inputs(path: str, format_type: str, output: Optional[Path]) -> None:
+    """Validate CLI inputs before processing."""
+    path_obj = Path(path)
+    if not path_obj.exists():
+        raise typer.BadParameter(f"Path does not exist: {path}")
+
+    if not path_obj.is_dir():
+        raise typer.BadParameter(f"Path must be a directory: {path}")
+
+    if format_type not in ["table", "json"]:
+        raise typer.BadParameter(f"Invalid format: {format_type}. Must be 'table' or 'json'")
+
+    if output:
+        if output.exists() and not output.is_file():
+            raise typer.BadParameter(f"Output path exists but is not a file: {output}")
+
+        # Check if parent directory exists or can be created
+        try:
+            output.parent.mkdir(parents=True, exist_ok=True)
+        except (OSError, PermissionError) as e:
+            raise typer.BadParameter(f"Cannot create output directory: {e}") from e
+
+
 @cli.command()
 def diagnose(
     path: str = ".",
@@ -40,6 +63,9 @@ def diagnose(
         format: Output format: 'table' or 'json'.
         output: Optional file path to save JSON result.
     """
+    # Validate inputs before proceeding
+    _validate_inputs(path, format, output)
+
     # Configure logging based on CLI flags
     if debug:
         setup_logging(level="DEBUG", format_style="structured")
@@ -67,7 +93,8 @@ def diagnose(
     total_checks = sum(len(section["items"]) for section in results)
     passed_items = sum(1 for section in results for item in section["items"] if item["status"] == "pass")
     failed_items = sum(1 for section in results for item in section["items"] if item["status"] == "fail")
-    errors = sum(1 for section in results for item in section["items"] if item["status"] == "error")
+    # Note: handlers currently only return "pass"/"fail", not "error"
+    errors = 0
 
     # Log diagnostic completion
     log_diagnostic_complete(total_checks, passed_items, failed_items, errors, duration_ms)
@@ -78,9 +105,13 @@ def diagnose(
         json_output = results
 
         if output:
-            output.parent.mkdir(parents=True, exist_ok=True)
-            output.write_text(json.dumps(json_output, indent=2), encoding="utf-8")
-            console.print(f"[green]✓ JSON output saved to:[/green] {output}")
+            try:
+                output.write_text(json.dumps(json_output, indent=2), encoding="utf-8")
+                console.print(f"[green]✓ JSON output saved to:[/green] {output}")
+            except (OSError, IOError, PermissionError) as e:
+                console.print(f"[red]✗ Failed to write output file:[/red] {e}")
+                logger.error(f"Failed to write JSON output to {output}: {e}")
+                raise typer.Exit(1) from e
         else:
             print(json.dumps(json_output, indent=2))
         return

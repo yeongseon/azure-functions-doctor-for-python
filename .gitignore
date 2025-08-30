@@ -135,6 +135,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+check_pypi_env/
 
 # Spyder project settings
 .spyderproject

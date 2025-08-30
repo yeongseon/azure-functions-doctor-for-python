@@ -53,25 +53,41 @@ class Rule(TypedDict, total=False):
     check_order: int
 
 
-def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
-    """
-    Execute a diagnostic rule based on its type and condition.
+class HandlerRegistry:
+    """Registry for diagnostic check handlers with individual handler methods."""
 
-    Args:
-        rule: The diagnostic rule to execute.
+    def __init__(self) -> None:
+        self._handlers = {
+            "compare_version": self._handle_compare_version,
+            "env_var_exists": self._handle_env_var_exists,
+            "path_exists": self._handle_path_exists,
+            "file_exists": self._handle_file_exists,
+            "package_installed": self._handle_package_installed,
+            "source_code_contains": self._handle_source_code_contains,
+        }
 
-    Returns:
-        A dictionary with the status and detail of the check.
-    """
-    check_type = rule.get("type")
-    condition = rule.get("condition", {})
+    def handle(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Route rule execution to appropriate handler."""
+        check_type = rule.get("type")
+        if check_type is None:
+            return _create_result("fail", "Missing check type in rule")
+        handler = self._handlers.get(check_type)
 
-    target = condition.get("target")
-    operator = condition.get("operator")
-    value = condition.get("value")
+        if not handler:
+            return _create_result("fail", f"Unknown check type: {check_type}")
 
-    # Compare current Python version with expected version
-    if check_type == "compare_version":
+        try:
+            return handler(rule, path)
+        except Exception as exc:
+            return _handle_exception(f"executing {check_type} check", exc)
+
+    def _handle_compare_version(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Handle version comparison checks."""
+        condition = rule.get("condition", {})
+        target = condition.get("target")
+        operator = condition.get("operator")
+        value = condition.get("value")
+
         if not (target and operator and value):
             return _create_result("fail", "Missing condition fields for compare_version")
 
@@ -93,8 +109,11 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
 
         return _create_result("fail", f"Unknown target for version comparison: {target}")
 
-    # Check if an environment variable is set
-    if check_type == "env_var_exists":
+    def _handle_env_var_exists(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Handle environment variable existence checks."""
+        condition = rule.get("condition", {})
+        target = condition.get("target")
+
         if not target:
             return _create_result("fail", "Missing environment variable name")
 
@@ -104,8 +123,11 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
             f"{target} is {'set' if exists else 'not set'}",
         )
 
-    # Check if a path exists (including sys.executable)
-    if check_type == "path_exists":
+    def _handle_path_exists(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Handle path existence checks."""
+        condition = rule.get("condition", {})
+        target = condition.get("target")
+
         if not target:
             return _create_result("fail", "Missing target path")
 
@@ -120,8 +142,11 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
 
         return _create_result("fail", f"{resolved_path} is missing")
 
-    # Check if a specific file exists
-    if check_type == "file_exists":
+    def _handle_file_exists(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Handle file existence checks."""
+        condition = rule.get("condition", {})
+        target = condition.get("target")
+
         if not target:
             return _create_result("fail", "Missing file path")
 
@@ -136,8 +161,11 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
 
         return _create_result("fail", f"{file_path} not found")
 
-    # Check if a Python package is importable
-    if check_type == "package_installed":
+    def _handle_package_installed(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Handle Python package installation checks."""
+        condition = rule.get("condition", {})
+        target = condition.get("target")
+
         if not target:
             return _create_result("fail", "Missing package name")
 
@@ -151,9 +179,11 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
         except Exception as exc:
             return _handle_exception(f"importing module '{import_path_str}'", exc)
 
-    # Check if a keyword exists in any .py source files
-    if check_type == "source_code_contains":
+    def _handle_source_code_contains(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Handle source code keyword search checks."""
+        condition = rule.get("condition", {})
         keyword = condition.get("keyword")
+
         if not isinstance(keyword, str):
             return _create_result("fail", "Missing or invalid 'keyword' in condition")
 
@@ -174,5 +204,22 @@ def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
             f"Keyword '{keyword}' {'found' if found else 'not found'} in source code",
         )
 
-    # Unknown check type fallback
-    return _create_result("fail", f"Unknown check type: {check_type}")
+
+# Global registry instance
+_registry = HandlerRegistry()
+
+
+def generic_handler(rule: Rule, path: Path) -> dict[str, str]:
+    """
+    Execute a diagnostic rule based on its type and condition.
+
+    This function maintains backward compatibility while delegating to the registry.
+
+    Args:
+        rule: The diagnostic rule to execute.
+        path: Path to the Azure Functions project.
+
+    Returns:
+        A dictionary with the status and detail of the check.
+    """
+    return _registry.handle(rule, path)
