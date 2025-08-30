@@ -22,7 +22,7 @@
     
     
       
-        <title>🛠️ Release Process - Azure Functions Doctor for Python</title>
+        <title>Release Process - Azure Functions Doctor for Python</title>
       
     
     
@@ -101,7 +101,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              🛠️ Release Process
+              Release Process
             
           </span>
         </div>
@@ -405,7 +405,7 @@
         <li class="md-nav__item">
   <a href="#step-2-build-and-test-the-package" class="md-nav__link">
     <span class="md-ellipsis">
-      📦 Step 2: Build and Test the Package
+      Step 2: Build and Test the Package
     </span>
   </a>
   
@@ -414,7 +414,7 @@
         <li class="md-nav__item">
   <a href="#step-3-publish-to-pypi" class="md-nav__link">
     <span class="md-ellipsis">
-      🚀 Step 3: Publish to PyPI
+      Step 3: Publish to PyPI
     </span>
   </a>
   
@@ -466,7 +466,7 @@
   
 
 
-<h1 id="release-process">🛠️ Release Process</h1>
+<h1 id="release-process">Release Process</h1>
 <p>This document outlines the steps to release a new version of <strong>Azure Functions Doctor</strong> to PyPI and update the changelog using the existing Makefile and Hatch-based workflows.</p>
 <hr />
 <h2 id="step-1-bump-version-and-generate-changelog">🧾 Step 1: Bump Version and Generate Changelog</h2>
@@ -481,10 +481,10 @@ make release-major     # Major release (e.g., v0.2.0 → v1.0.0)
 - Commit the version bump and changelog
 - Create a Git tag (e.g., <code>v0.2.0</code>) and push to <code>main</code></p>
 <blockquote>
-<p>🔄 Make sure your <code>main</code> branch is up-to-date before running these commands.</p>
+<p>Make sure your <code>main</code> branch is up-to-date before running these commands.</p>
 </blockquote>
 <hr />
-<h2 id="step-2-build-and-test-the-package">📦 Step 2: Build and Test the Package</h2>
+<h2 id="step-2-build-and-test-the-package">Step 2: Build and Test the Package</h2>
 <pre><code class="language-bash">make build
 </code></pre>
 <p>To test the local build:</p>
@@ -492,7 +492,7 @@ make release-major     # Major release (e.g., v0.2.0 → v1.0.0)
 func-doctor --version
 </code></pre>
 <hr />
-<h2 id="step-3-publish-to-pypi">🚀 Step 3: Publish to PyPI</h2>
+<h2 id="step-3-publish-to-pypi">Step 3: Publish to PyPI</h2>
 <pre><code class="language-bash">make publish-pypi
 </code></pre>
 <ul>
