@@ -1,4 +1,34 @@
-# Changelog
+# 📦 Changelog
+
+- bump version to 0.1.11 (39be13cfef2f5725f46766d897c4b822504b20fc)
+
+- remove overly ambitious roadmap document (3a9d4d15b45709d6a68e77d22939f3288a8bfae8)
+
+- add comprehensive roadmap for static analysis and CI/CD platform (66db758d6d426b0bd76fdcb7d76c2fac60b165b0)
+
+- add architecture diagram and remove emojis from README (654c34195bd21ed502218bd12624843ce1fb89db)
+
+- enhance open source documentation and add contribution templates (2a7a811e19d1394982b88643145196a7c13883f9)
+
+- implement centralized logging infrastructure (8b508c585e54b825fde4456fd53bc995c2e41652)
+
+- Merge branch 'main' of https://github.com/yeongseon/azure-functions-doctor-for-python (40194d23ffe4160319e0d8c428b366e1760c5274)
+
+- Merge branch 'main' of https://github.com/yeongseon/azure-functions-doctor-for-python (3459db77278e4d0a1a1a337b9e13e9fe804ad4aa)
+
+- update release process guide to reflect hatch-based workflow (d0a814cd6222723180a3d10d6f7051041bfb2917)
+
+- configure default and test PyPI repositories for hatch publish (931563cf2e6d5b463863fed12f7ffe0da79443b9)
+
+- add publish-pypi and publish-test targets for PyPI release (f769088317f3e23dafaf4b0f3b3aa90ab98db31a)
+
+- bump version to 0.1.10 (e7b53af13a317f886e95c88d3c5cce26a5e36ba0)
+
+- use Hatch inside virtualenv with automatic bootstrap (e2bec3f660a7366a3255888bde1a519756bfa523)
+
+- update changelog (95e1596371c72e478a87a1d06846b14fa8877bb9)
+
+- update changelog (01d9c94bc3adba61f4921df9aee69ef063623e4c)
 
 - bump version to 0.1.9 (5c6af020db3e59dd6ce32e6285aefd6381f8e8c3)
 
