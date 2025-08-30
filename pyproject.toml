@@ -19,6 +19,18 @@ sources = ["src"]
 path = "src/azure_functions_doctor/__init__.py"
 
 # ----------------------------------------
+# 🚀 Hatch Publish Configuration
+# ----------------------------------------
+[tool.hatch.publish.index]
+default = "pypi"
+
+[tool.hatch.publish.index.repos.pypi]
+url = "https://upload.pypi.org/legacy/"
+
+[tool.hatch.publish.index.repos.test]
+url = "https://test.pypi.org/legacy/"
+
+# ----------------------------------------
 # 📄 Project Metadata
 # ----------------------------------------
 [project]
