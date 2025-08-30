@@ -12,9 +12,9 @@
 
 ::: azure_functions_doctor.handlers
 
-## Check Logic
+## Configuration
 
-::: azure_functions_doctor.check
+::: azure_functions_doctor.config
 
 ## Target Resolver
 

@@ -16,7 +16,7 @@ nav:
   - Rules: rules.md
   - Development: development.md
   - API Reference: api.md
-  - Release Process: release.md
+  - Release Process: release_process.md
 
 plugins:
   - search
