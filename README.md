@@ -55,7 +55,57 @@ A fast and extensible diagnostic CLI for Python-based Azure Functions projects.
 
 ---
 
-## 🪠 Requirements
+## Architecture
+
+Azure Functions Doctor uses a modular, rule-based architecture for extensibility and maintainability:
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   CLI Interface │    │  Core Diagnostic │    │   Rule System   │
+│    (cli.py)     │───▶│    Engine        │───▶│  (rules.json)   │
+│                 │    │   (doctor.py)    │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                        │                       │
+         │                        ▼                       ▼
+         │               ┌──────────────────┐    ┌─────────────────┐
+         │               │     Handler      │    │  Target/Version │
+         │               │    Dispatcher    │    │    Resolver     │
+         │               │  (handlers.py)   │    │ (target_resolver │
+         │               └──────────────────┘    │      .py)       │
+         │                        │              └─────────────────┘
+         │                        ▼
+         │               ┌──────────────────┐
+         │               │   Individual     │
+         │               │    Handlers      │
+         │               │ • file_exists    │
+         │               │ • compare_version│
+         │               │ • check_package  │
+         │               │ • validate_json  │
+         │               └──────────────────┘
+         │                        │
+         ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐
+│ Output Formatter│    │     Results      │
+│   JSON / CLI    │◀───│   Aggregator     │
+│                 │    │                  │
+└─────────────────┘    └──────────────────┘
+```
+
+### Key Components
+
+- **CLI Interface**: Entry point handling commands, flags, and output formatting
+- **Diagnostic Engine**: Core orchestration logic loading rules and coordinating execution  
+- **Rule System**: Declarative JSON-based rule definitions for extensibility
+- **Handler Dispatcher**: Routes rule types to appropriate handler functions
+- **Individual Handlers**: Specific diagnostic implementations (file checks, version validation, etc.)
+- **Results Aggregator**: Collects and structures all diagnostic outcomes
+- **Output Formatter**: Renders results as colorized CLI output or machine-readable JSON
+
+This design allows easy extension by adding new rules to `rules.json` and implementing corresponding handlers, without modifying core engine logic.
+
+---
+
+## Requirements
 
 - Python 3.9+
 - Git
@@ -84,7 +134,7 @@ pip install -e .
 
 ---
 
-## 🩺 Usage
+## Usage
 
 ### Run the Doctor
 
@@ -100,11 +150,11 @@ func-doctor diagnose
 func-doctor --help
 ```
 
-📌 Sample: [examples/basic-hello/diagnose-output.md](examples/basic-hello/diagnose-output.md)
+Sample: [examples/basic-hello/diagnose-output.md](examples/basic-hello/diagnose-output.md)
 
 ---
 
-## 📋 Example
+## Example
 
 See [`examples/basic-hello`](examples/basic-hello) for:
 
@@ -113,7 +163,7 @@ See [`examples/basic-hello`](examples/basic-hello) for:
 
 ---
 
-## 📘 Documentation
+## Documentation
 
 - Getting Started: [docs/index.md](https://yeongseon.github.io/azure-functions-doctor-for-python/)
 - Custom Rules: [docs/rules.md](https://yeongseon.github.io/azure-functions-doctor-for-python/rules/)
@@ -121,7 +171,7 @@ See [`examples/basic-hello`](examples/basic-hello) for:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome issues and PRs!
 
@@ -131,6 +181,6 @@ If you find this useful, please star the repo!
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
