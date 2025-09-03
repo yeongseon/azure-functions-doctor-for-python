@@ -6,6 +6,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import TypedDict
 
+from rich.console import Console
+
 from azure_functions_doctor.handlers import Rule, generic_handler
 from azure_functions_doctor.logging_config import get_logger, log_rule_execution
 
@@ -42,13 +44,23 @@ class Doctor:
         # Check for v1 function.json files
         function_json_files = list(self.project_path.rglob("function.json"))
         if function_json_files:
-            print("❌ Incompatible project detected!")
-            print("This tool currently supports Azure Functions Python Programming Model v2 only.")
-            print("Your project appears to use v1 (function.json based).")
-            print("\nTo use this tool:")
-            print("1. Migrate your project to v2 using decorators (@app.route, @app.schedule, etc.)")
-            print("2. Or use a different diagnostic tool that supports v1")
-            print("\nLearn more: https://learn.microsoft.com/azure/azure-functions/functions-python-develop-v2")
+            console = Console()
+            console.print("❌ [red]Incompatible project detected![/red]")
+            console.print(
+                "[yellow]This tool currently supports Azure Functions Python Programming Model v2 only.[/yellow]"
+            )
+            console.print("[yellow]Your project appears to use v1 (function.json based).[/yellow]")
+            console.print()
+            console.print("[bold]To use this tool:[/bold]")
+            console.print(
+                "1. Migrate your project to v2 using decorators "
+                "([cyan]@app.route[/cyan], [cyan]@app.schedule[/cyan], etc.)"
+            )
+            console.print("2. Or use a different diagnostic tool that supports v1")
+            console.print()
+            console.print(
+                "[blue]Learn more:[/blue] https://learn.microsoft.com/azure/azure-functions/functions-python-develop-v2"
+            )
             sys.exit(1)
 
     def load_rules(self) -> list[Rule]:
