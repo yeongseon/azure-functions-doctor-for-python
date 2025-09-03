@@ -1,5 +1,21 @@
 # 📦 Changelog
 
+- bump version to 0.5.0 (248da2a31fa91b09270d72627a2d20569526360d)
+
+- improve error handling and robustness (1c90078671dbee99ce13d3c0a1920447bcfc141f)
+
+- bump version to 0.4.1 (a9fc413faef0efb421ce93cafcc267bb349ada39)
+
+- unify output using Rich Console (ebaf2071df99d2f61eb34a8940ff5e386176a134)
+
+- bump version to 0.4.0 (a21ca7cb94a14e29eb2d3f5d5abb3aaeb35d2bc0)
+
+- add v1/v2 compatibility check at initialization (af3621b35dcef7513839f8e0b8f07b329cf82a9a)
+
+- mark local.settings.json implemented; test: assert optional local.settings.json passes (ab2c16d5dfdab13720a66bf539c61998a0bc8dc6)
+
+- update changelog (1fef4982e53a40df6ac191e8d11aea3607d1d015)
+
 - bump version to 0.3.0 (cb009efdfbae834ee293973df6346c8251e34e90)
 
 - fix documentation build issues (df9046675e4cb25d4f0d1f9e754a034d63c42aa1)
