@@ -1,4 +1,5 @@
 import json
+import os
 import time
 from pathlib import Path
 from typing import Annotated, Optional
@@ -24,25 +25,44 @@ logger = get_logger(__name__)
 
 def _validate_inputs(path: str, format_type: str, output: Optional[Path]) -> None:
     """Validate CLI inputs before processing."""
-    path_obj = Path(path)
+    try:
+        path_obj = Path(path).resolve()
+    except (OSError, ValueError) as e:
+        raise typer.BadParameter(f"Invalid path: {e}") from e
+
     if not path_obj.exists():
         raise typer.BadParameter(f"Path does not exist: {path}")
 
     if not path_obj.is_dir():
         raise typer.BadParameter(f"Path must be a directory: {path}")
 
+    # Check read permissions
+    if not os.access(path_obj, os.R_OK):
+        raise typer.BadParameter(f"No read permission for path: {path}")
+
+    # Validate format type
     if format_type not in ["table", "json"]:
         raise typer.BadParameter(f"Invalid format: {format_type}. Must be 'table' or 'json'")
 
+    # Validate output path
     if output:
-        if output.exists() and not output.is_file():
+        try:
+            output_path = Path(output).resolve()
+        except (OSError, ValueError) as e:
+            raise typer.BadParameter(f"Invalid output path: {e}") from e
+
+        if output_path.exists() and not output_path.is_file():
             raise typer.BadParameter(f"Output path exists but is not a file: {output}")
 
         # Check if parent directory exists or can be created
         try:
-            output.parent.mkdir(parents=True, exist_ok=True)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
         except (OSError, PermissionError) as e:
             raise typer.BadParameter(f"Cannot create output directory: {e}") from e
+
+        # Check write permissions
+        if not os.access(output_path.parent, os.W_OK):
+            raise typer.BadParameter(f"No write permission for output directory: {output_path.parent}")
 
 
 @cli.command()

@@ -23,9 +23,21 @@ def resolve_target_value(target: str) -> str:
         return sys.version.split()[0]
     if target == "func_core_tools":
         try:
-            output = subprocess.check_output(["func", "--version"], text=True)
+            output = subprocess.check_output(["func", "--version"], text=True, timeout=10)
             return output.strip()
+        except FileNotFoundError:
+            logger.debug("Azure Functions Core Tools not found in PATH")
+            return "not_installed"
+        except subprocess.TimeoutExpired:
+            logger.warning("Timeout getting func version")
+            return "timeout"
+        except TimeoutError:
+            logger.warning("Timeout getting func version")
+            return "timeout"
+        except subprocess.CalledProcessError as e:
+            logger.warning(f"func command failed with code {e.returncode}")
+            return f"error_{e.returncode}"
         except Exception as exc:
-            logger.warning(f"Failed to get func core tools version: {exc}")
-            return "0.0.0"  # Return a fallback version if resolution fails
+            logger.error(f"Unexpected error getting func version: {exc}")
+            return "unknown_error"
     raise ValueError(f"Unknown target: {target}")

@@ -22,6 +22,38 @@ def _handle_exception(operation: str, exc: Exception) -> dict[str, str]:
     return _create_result("error", error_msg)
 
 
+def _handle_specific_exceptions(operation: str, exc: Exception) -> dict[str, str]:
+    """Handle specific exception types with user-friendly messages."""
+    if isinstance(exc, UnicodeDecodeError):
+        return _create_result(
+            "error", f"File encoding error in {operation}: {exc}. Please check file encoding (UTF-8 recommended)."
+        )
+    elif isinstance(exc, (ValueError, TypeError)):
+        return _create_result(
+            "fail", f"Configuration error in {operation}: {exc}. Please check your rule configuration."
+        )
+    elif isinstance(exc, (OSError, PermissionError)):
+        return _create_result(
+            "error", f"File system error in {operation}: {exc}. Please check file permissions and paths."
+        )
+    elif isinstance(exc, ImportError):
+        return _create_result("fail", f"Missing dependency in {operation}: {exc}. Please install required packages.")
+    elif isinstance(exc, MemoryError):
+        return _create_result(
+            "error", f"Memory error in {operation}: File too large to process. Consider using smaller files."
+        )
+    elif isinstance(exc, KeyboardInterrupt):
+        # Re-raise keyboard interrupt to allow proper cleanup
+        raise exc
+    elif isinstance(exc, SystemExit):
+        # Re-raise system exit to allow proper cleanup
+        raise exc
+    else:
+        # For unknown exceptions, provide generic error message
+        logger.error(f"Unexpected error in {operation}: {exc}", exc_info=True)
+        return _create_result("error", f"Unexpected error in {operation}. Please check the logs for more details.")
+
+
 class Condition(TypedDict, total=False):
     target: str
     operator: str
@@ -79,7 +111,7 @@ class HandlerRegistry:
         try:
             return handler(rule, path)
         except Exception as exc:
-            return _handle_exception(f"executing {check_type} check", exc)
+            return _handle_specific_exceptions(f"executing {check_type} check", exc)
 
     def _handle_compare_version(self, rule: Rule, path: Path) -> dict[str, str]:
         """Handle version comparison checks."""
@@ -195,8 +227,24 @@ class HandlerRegistry:
                 if keyword in content:
                     found = True
                     break
+            except PermissionError:
+                logger.warning(f"Permission denied reading {py_file}")
+                continue
+            except UnicodeDecodeError:
+                logger.warning(f"Encoding error in {py_file}, trying with errors='ignore'")
+                try:
+                    content = py_file.read_text(encoding="utf-8", errors="ignore")
+                    if keyword in content:
+                        found = True
+                        break
+                except Exception:
+                    logger.warning(f"Failed to read {py_file} even with error handling")
+                    continue
+            except MemoryError:
+                logger.error(f"File too large to process: {py_file}")
+                continue
             except Exception as exc:
-                logger.warning(f"Failed to read file {py_file}: {exc}")
+                logger.error(f"Unexpected error reading {py_file}: {exc}")
                 continue
 
         return _create_result(

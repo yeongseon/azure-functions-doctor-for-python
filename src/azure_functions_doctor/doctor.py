@@ -64,10 +64,20 @@ class Doctor:
             sys.exit(1)
 
     def load_rules(self) -> list[Rule]:
-        rules_path = importlib.resources.files("azure_functions_doctor.assets").joinpath("rules.json")
-        with rules_path.open(encoding="utf-8") as f:
-            rules: list[Rule] = json.load(f)
-        return sorted(rules, key=lambda r: r.get("check_order", 999))
+        try:
+            rules_path = importlib.resources.files("azure_functions_doctor.assets").joinpath("rules.json")
+            with rules_path.open(encoding="utf-8") as f:
+                rules: list[Rule] = json.load(f)
+            return sorted(rules, key=lambda r: r.get("check_order", 999))
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in rules file: {e}")
+            raise RuntimeError(f"Failed to parse rules.json: {e}") from e
+        except FileNotFoundError as e:
+            logger.error("rules.json not found in package")
+            raise RuntimeError("Rules file not found") from e
+        except Exception as e:
+            logger.error(f"Unexpected error loading rules: {e}")
+            raise RuntimeError(f"Failed to load rules: {e}") from e
 
     def run_all_checks(self) -> list[SectionResult]:
         rules = self.load_rules()
