@@ -1,5 +1,6 @@
 import importlib.resources
 import json
+import sys
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -34,6 +35,21 @@ class Doctor:
 
     def __init__(self, path: str = ".") -> None:
         self.project_path: Path = Path(path).resolve()
+        self._check_compatibility()
+
+    def _check_compatibility(self) -> None:
+        """Check if the project is compatible with this tool (currently v2 only)."""
+        # Check for v1 function.json files
+        function_json_files = list(self.project_path.rglob("function.json"))
+        if function_json_files:
+            print("❌ Incompatible project detected!")
+            print("This tool currently supports Azure Functions Python Programming Model v2 only.")
+            print("Your project appears to use v1 (function.json based).")
+            print("\nTo use this tool:")
+            print("1. Migrate your project to v2 using decorators (@app.route, @app.schedule, etc.)")
+            print("2. Or use a different diagnostic tool that supports v1")
+            print("\nLearn more: https://learn.microsoft.com/azure/azure-functions/functions-python-develop-v2")
+            sys.exit(1)
 
     def load_rules(self) -> list[Rule]:
         rules_path = importlib.resources.files("azure_functions_doctor.assets").joinpath("rules.json")

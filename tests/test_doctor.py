@@ -4,6 +4,8 @@ import shutil
 import tempfile
 from importlib.resources import files
 
+import pytest
+
 from azure_functions_doctor.doctor import Doctor
 
 
@@ -50,3 +52,31 @@ def test_missing_files() -> None:
         assert item_map.get("requirements.txt") == "fail"
     # local.settings.json is optional; missing should not cause a fail
     assert item_map.get("local.settings.json") == "pass"
+
+
+def test_v2_compatibility_check() -> None:
+    """Test that v2 projects (with decorators) work normally."""
+    with tempfile.TemporaryDirectory() as tmp:
+        # Create a v2 project with decorators
+        with open(os.path.join(tmp, "func.py"), "w") as f:
+            f.write("from azure.functions import App\n@app.route('/hello')\ndef main(req):\n    return 'ok'\n")
+
+        # Should not raise any exception
+        doctor = Doctor(tmp)
+        results = doctor.run_all_checks()
+
+        # Should have normal results (no function mode check)
+        assert len(results) > 0
+
+
+def test_v1_incompatibility_exit() -> None:
+    """Test that v1 projects (with function.json) cause the tool to exit."""
+    with tempfile.TemporaryDirectory() as tmp:
+        # Create a v1 project with function.json
+        os.makedirs(os.path.join(tmp, "MyFunction"), exist_ok=True)
+        with open(os.path.join(tmp, "MyFunction", "function.json"), "w") as f:
+            json.dump({"bindings": []}, f)
+
+        # Should raise SystemExit
+        with pytest.raises(SystemExit):
+            Doctor(tmp)
