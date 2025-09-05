@@ -94,7 +94,8 @@ def diagnose(
         setup_logging(level=None, format_style="simple")
 
     start_time = time.time()
-    doctor = Doctor(path)
+    # Allow v1 projects when invoked from CLI so we can show warning but continue
+    doctor = Doctor(path, allow_v1=True)
     resolved_path = Path(path).resolve()
 
     # Log diagnostic start
