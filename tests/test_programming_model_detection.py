@@ -19,7 +19,8 @@ class TestProgrammingModelDetection:
             function_json = temp_path / "function.json"
             function_json.write_text('{"scriptFile": "main.py", "entryPoint": "main"}')
 
-            doctor = Doctor(str(temp_path))
+            # allow_v1=True to allow nested function.json detection in tests
+            doctor = Doctor(str(temp_path), allow_v1=True)
             assert doctor.programming_model == "v1"
 
     def test_detect_v2_with_decorators(self) -> None:
@@ -78,7 +79,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
 """
             )
 
-            doctor = Doctor(str(temp_path))
+            doctor = Doctor(str(temp_path), allow_v1=True)
             assert doctor.programming_model == "v1"
 
     def test_has_v2_decorators_with_various_patterns(self) -> None:
@@ -170,7 +171,8 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             function_json = nested_dir / "function.json"
             function_json.write_text('{"scriptFile": "main.py", "entryPoint": "main"}')
 
-            doctor = Doctor(str(temp_path))
+            # allow nested v1 detection in tests
+            doctor = Doctor(str(temp_path), allow_v1=True)
             assert doctor.programming_model == "v1"
 
     def test_detect_v2_with_nested_decorators(self) -> None:

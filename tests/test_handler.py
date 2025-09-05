@@ -155,3 +155,59 @@ def test_unknown_check_type() -> None:
 
     assert result["status"] == "fail"
     assert "Unknown check type" in result["detail"]
+
+
+def test_conditional_exists_no_durable_usage_pass() -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # No durable usage in source -> check should be skipped/pass
+        rule: Rule = {
+            "type": "conditional_exists",
+            "condition": {"jsonpath": "$.extensions.durableTask"},
+        }
+        result = generic_handler(rule, Path(tmpdir))
+        assert result["status"] == "pass"
+
+
+def test_conditional_exists_durable_missing_host_fail() -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create a Python file that contains durable keyword
+        file_path = Path(tmpdir) / "function.py"
+        file_path.write_text("# uses durable\nfrom azure.durable_functions import DurableOrchestrationContext")
+
+        rule: Rule = {
+            "type": "conditional_exists",
+            "condition": {"jsonpath": "$.extensions.durableTask"},
+        }
+        result = generic_handler(rule, Path(tmpdir))
+        assert result["status"] == "fail"
+
+
+def test_conditional_exists_durable_present_pass() -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create a Python file that contains durable keyword
+        file_path = Path(tmpdir) / "function.py"
+        file_path.write_text("# uses durable\nfrom azure.durable_functions import DurableOrchestrationContext")
+        # Create host.json with the durableTask entry
+        host = Path(tmpdir) / "host.json"
+        host.write_text('{"extensions": {"durableTask": {}}}')
+
+        rule: Rule = {
+            "type": "conditional_exists",
+            "condition": {"jsonpath": "$.extensions.durableTask"},
+        }
+        result = generic_handler(rule, Path(tmpdir))
+        assert result["status"] == "pass"
+
+
+def test_callable_detection_pass_and_fail() -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # No ASGI/WSGI files => fail
+        rule: Rule = {"type": "callable_detection"}
+        result = generic_handler(rule, Path(tmpdir))
+        assert result["status"] == "fail"
+
+        # Add a FastAPI example => pass
+        file_path = Path(tmpdir) / "app.py"
+        file_path.write_text("from fastapi import FastAPI\napp = FastAPI()")
+        result2 = generic_handler(rule, Path(tmpdir))
+        assert result2["status"] == "pass"

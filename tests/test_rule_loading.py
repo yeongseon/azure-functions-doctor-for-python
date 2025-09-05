@@ -108,21 +108,12 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
 
             doctor = Doctor(str(temp_path))
 
-            # Mock the new rule files to not exist, forcing fallback to legacy
+            # Mock the new rule files to not exist; expect explicit v2.json error
             with patch("importlib.resources.files") as mock_files:
-                # Mock common.json not found
-                mock_common_path = mock_files.return_value.joinpath.return_value
-                mock_common_path.open.side_effect = FileNotFoundError()
+                mock_files.return_value.joinpath.return_value.open.side_effect = FileNotFoundError()
 
-                # Mock legacy rules.json exists
-                mock_legacy_path = mock_files.return_value.joinpath.return_path
-                mock_legacy_path.open.return_value.__enter__.return_value.read.return_value = json.dumps(
-                    [{"id": "test_rule", "check_order": 1}]
-                )
-
-                rules = doctor.load_rules()
-                assert len(rules) > 0
-                assert rules[0]["id"] == "test_rule"
+                with pytest.raises(RuntimeError, match="v2.json not found"):
+                    doctor.load_rules()
 
     def test_rule_loading_handles_json_errors(self) -> None:
         """Test that rule loading handles JSON parsing errors gracefully."""
@@ -145,12 +136,12 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
 
             doctor = Doctor(str(temp_path))
 
-            # Mock common.json to have invalid JSON
+            # Mock v2.json to have invalid JSON
             with patch("importlib.resources.files") as mock_files:
-                mock_common_path = mock_files.return_value.joinpath.return_value
-                mock_common_path.open.return_value.__enter__.return_value.read.return_value = "invalid json"
+                mock_v2_path = mock_files.return_value.joinpath.return_value
+                mock_v2_path.open.return_value.__enter__.return_value.read.return_value = "invalid json"
 
-                with pytest.raises(RuntimeError, match="Failed to parse common.json"):
+                with pytest.raises(RuntimeError, match="Failed to parse v2.json"):
                     doctor.load_rules()
 
     def test_rule_loading_handles_missing_v2_rules(self) -> None:
@@ -186,10 +177,9 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
                 mock_v2_path = mock_files.return_value.joinpath.return_value
                 mock_v2_path.open.side_effect = FileNotFoundError()
 
-                rules = doctor.load_rules()
-                # Should still load common rules
-                assert len(rules) > 0
-                assert rules[0]["id"] == "common_rule"
+                # With common.json handling removed, expect an explicit error
+                with pytest.raises(RuntimeError, match="v2.json not found"):
+                    doctor.load_rules()
 
     def test_rule_loading_handles_missing_v1_rules(self) -> None:
         """Test that rule loading handles missing v1.json gracefully."""
@@ -214,10 +204,9 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
                 mock_v1_path = mock_files.return_value.joinpath.return_value
                 mock_v1_path.open.side_effect = FileNotFoundError()
 
-                rules = doctor.load_rules()
-                # Should still load common rules
-                assert len(rules) > 0
-                assert rules[0]["id"] == "common_rule"
+                # With common.json handling removed, expect an explicit error
+                with pytest.raises(RuntimeError, match="v1.json not found"):
+                    doctor.load_rules()
 
     def test_rule_ordering(self) -> None:
         """Test that rules are properly ordered by check_order."""
@@ -270,5 +259,6 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             with patch("importlib.resources.files") as mock_files:
                 mock_files.return_value.joinpath.return_value.open.side_effect = FileNotFoundError()
 
-                with pytest.raises(RuntimeError, match="No rules files found"):
+                # Now loader only looks for v2.json (project is v2), so expect that error
+                with pytest.raises(RuntimeError, match="v2.json not found"):
                     doctor.load_rules()
