@@ -1,5 +1,9 @@
 # 📦 Changelog
 
+- fix: separate verbose option from logging level control (9b373a9)
+
+- bump version to 0.5.1 (fix verbose option behavior)
+
 - bump version to 0.5.0 (248da2a31fa91b09270d72627a2d20569526360d)
 
 - improve error handling and robustness (1c90078671dbee99ce13d3c0a1920447bcfc141f)
