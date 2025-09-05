@@ -117,19 +117,35 @@
     "check_order": 7
   },
   {
-    "id": "check_decorator_usage",
+    "id": "check_programming_model_v2",
     "category": "structure",
     "section": "project_structure",
-    "label": "Function decorators",
-    "description": "Checks if any files use Azure Functions v2 decorators (e.g., @app.route).",
+    "label": "Programming Model v2",
+    "description": "Detects if the project uses Azure Functions Python Programming Model v2 (decorator-based).",
     "type": "source_code_contains",
     "required": true,
-    "severity": "error",
+    "severity": "info",
     "condition": {
       "keyword": "@app."
     },
-    "hint": "Ensure you are using the v2 programming model with @app decorators like @app.route, @app.schedule, etc.",
+    "hint": "✅ Using Programming Model v2 with @app decorators. This is the recommended modern approach.",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=asgi&pivots=python-mode-decorators",
     "check_order": 8
+  },
+  {
+    "id": "check_programming_model_v1",
+    "category": "structure",
+    "section": "project_structure",
+    "label": "Programming Model v1",
+    "description": "Detects if the project uses Azure Functions Python Programming Model v1 (function.json-based).",
+    "type": "file_exists",
+    "required": false,
+    "severity": "warning",
+    "condition": {
+      "target": "function.json"
+    },
+    "hint": "⚠️ Using Programming Model v1 (function.json-based). Consider migrating to v2 for better developer experience.",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-python-develop-v2",
+    "check_order": 9
   }
 ]
