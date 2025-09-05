@@ -136,7 +136,15 @@ def diagnose(
 
     # Print header only for table format
     console.print(f"[bold blue]🩺 Azure Functions Doctor for Python v{__version__}[/bold blue]")
-    console.print(f"[bold]📁 Path:[/bold] {resolved_path}\n")
+    console.print(f"[bold]📁 Path:[/bold] {resolved_path}")
+
+    # Show programming model in header
+    if doctor.programming_model == "v1":
+        console.print("[bold]🐍 Python Programming Model:[/bold] [yellow]v1 (limited support)[/yellow]")
+    else:
+        console.print("[bold]🐍 Python Programming Model:[/bold] [green]v2[/green]")
+
+    console.print()
 
     if debug:
         console.print("[dim]Debug logging enabled - check stderr for detailed logs[/dim]\n")
