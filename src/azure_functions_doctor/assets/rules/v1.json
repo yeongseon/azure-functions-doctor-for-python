@@ -1,0 +1,119 @@
+[
+  {
+    "id": "check_python_version",
+    "category": "environment",
+    "section": "python_env",
+    "label": "Python version",
+    "description": "Checks if the current Python version is 3.6 or higher (v1 supports older versions).",
+    "type": "compare_version",
+    "required": true,
+    "severity": "error",
+    "condition": {
+      "target": "python",
+      "operator": ">=",
+      "value": "3.6"
+    },
+    "hint": "Use Python 3.6 or higher as required by Azure Functions Python v1.",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#supported-python-versions",
+    "fix_command": "pyenv install 3.6.15",
+    "check_order": 1
+  },
+  {
+    "id": "check_venv",
+    "category": "environment",
+    "section": "python_env",
+    "label": "Virtual environment",
+    "description": "Checks if a virtual environment is activated.",
+    "type": "env_var_exists",
+    "required": true,
+    "severity": "warning",
+    "condition": {
+      "target": "VIRTUAL_ENV"
+    },
+    "hint": "Activate a virtual environment using: 'source venv/bin/activate'.",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-best-practices?tabs=python#use-virtual-environments",
+    "check_order": 2
+  },
+  {
+    "id": "check_python_executable",
+    "category": "environment",
+    "section": "python_env",
+    "label": "Python executable",
+    "description": "Checks if Python executable path exists.",
+    "type": "path_exists",
+    "required": true,
+    "severity": "error",
+    "condition": {
+      "target": "sys.executable"
+    },
+    "hint": "Ensure Python is installed and sys.executable points to a valid path.",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#python-version-and-package-management",
+    "check_order": 3
+  },
+  {
+    "id": "check_requirements_txt",
+    "category": "dependencies",
+    "section": "python_env",
+    "label": "requirements.txt",
+    "description": "Checks if requirements.txt file exists at the root.",
+    "type": "file_exists",
+    "required": true,
+    "severity": "error",
+    "condition": {
+      "target": "requirements.txt"
+    },
+    "hint": "Add a requirements.txt file to specify your dependencies.",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#managing-dependencies",
+    "fix_command": "pip freeze > requirements.txt",
+    "check_order": 4
+  },
+  {
+    "id": "check_azure_functions_worker",
+    "category": "dependencies",
+    "section": "python_env",
+    "label": "azure-functions-worker package",
+    "description": "Checks if 'azure-functions-worker' is installed (required for v1 programming model).",
+    "type": "package_installed",
+    "required": true,
+    "severity": "error",
+    "condition": {
+      "pypi": "azure-functions-worker",
+      "target": "azure.functions_worker"
+    },
+    "hint": "Install it with: pip install azure-functions-worker",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#azure-functions-worker",
+    "fix_command": "pip install azure-functions-worker",
+    "check_order": 5
+  },
+  {
+    "id": "check_host_json",
+    "category": "structure",
+    "section": "project_structure",
+    "label": "host.json",
+    "description": "Checks if host.json file exists in the root directory.",
+    "type": "file_exists",
+    "required": true,
+    "severity": "error",
+    "condition": {
+      "target": "host.json"
+    },
+    "hint": "host.json is required for configuring Azure Functions host runtime.",
+    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-host-json",
+    "check_order": 6
+  },
+  {
+    "id": "check_local_settings",
+    "category": "structure",
+    "section": "project_structure",
+    "label": "local.settings.json",
+    "description": "Checks if local.settings.json exists (useful for local development).",
+    "type": "file_exists",
+    "condition": {
+      "target": "local.settings.json"
+    },
+    "required": false,
+    "severity": "info",
+    "hint": "Create local.settings.json for local development if needed.",
+    "check_order": 7
+  }
+]
