@@ -89,8 +89,6 @@ def diagnose(
     # Configure logging based on CLI flags
     if debug:
         setup_logging(level="DEBUG", format_style="structured")
-    elif verbose:
-        setup_logging(level="INFO", format_style="simple")
     else:
         # Use environment variable or default to WARNING
         setup_logging(level=None, format_style="simple")
