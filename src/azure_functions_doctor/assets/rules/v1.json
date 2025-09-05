@@ -19,6 +19,20 @@
     "check_order": 1
   },
   {
+    "id": "check_programming_model_v1",
+    "category": "project_structure",
+    "section": "programming_model",
+    "label": "Programming model v1",
+    "description": "Confirms the project appears to use the v1 function.json programming model.",
+    "type": "file_exists",
+    "required": true,
+    "severity": "info",
+    "condition": {
+      "target": "function.json"
+    },
+    "check_order": 0
+  },
+  {
     "id": "check_venv",
     "category": "environment",
     "section": "python_env",
