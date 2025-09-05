@@ -1,5 +1,19 @@
 # 📦 Changelog
 
+- bump version to 0.7.0 (f1a3ebb19a11194282a9e86222174fd89aedfff7)
+
+- merge new handler tests and update programming model/rule-loading tests (019d875570b245ff787e8b73e72097df32cdfb11)
+
+- simplify rule loader, add allow_v1 flag for CLI (c0d52982df13a70587afa67509bb4bf3e80bf4ae)
+
+- add conditional_exists and callable_detection handlers (428b59fbdca4e3151cd8410eb60ee957b1024d34)
+
+- add v1/v2 rule stubs and severities (fcbe157ac2c3246b9171a56b4ee5075ca89dfc89)
+
+- add Severity column to v2 programming model checks (ad021874bc78d42369346f81a2c9b4d7e9bdf0f6)
+
+- update changelog (ffc692f5465f58c8816e9ff28d2e7841d5a5196e)
+
 - bump version to 0.6.0 (f6bad63d9cfd913b6bb6461c9fc8ca8d53ae70eb)
 
 - update legacy rules.json for backward compatibility (a9ba697213ebe60570d701c53c91ce064ada4afb)
