@@ -1,4 +1,6 @@
+import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Literal, TypedDict, Union
@@ -70,6 +72,8 @@ class Rule(TypedDict, total=False):
         "file_exists",
         "package_installed",
         "source_code_contains",
+        "conditional_exists",
+        "callable_detection",
     ]
     label: str
     category: str
@@ -96,6 +100,8 @@ class HandlerRegistry:
             "file_exists": self._handle_file_exists,
             "package_installed": self._handle_package_installed,
             "source_code_contains": self._handle_source_code_contains,
+            "conditional_exists": self._handle_conditional_exists,
+            "callable_detection": self._handle_callable_detection,
         }
 
     def handle(self, rule: Rule, path: Path) -> dict[str, str]:
@@ -251,6 +257,88 @@ class HandlerRegistry:
             "pass" if found else "fail",
             f"Keyword '{keyword}' {'found' if found else 'not found'} in source code",
         )
+
+    def _handle_conditional_exists(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Handle conditional existence checks such as durableTask in host.json when durable usage exists."""
+        # Determine if project uses Durable Functions by scanning for common imports/keywords
+        durable_keywords = ["durable", "DurableOrchestrationContext", "durable_functions", "orchestrator"]
+        uses_durable = False
+
+        try:
+            for py_file in path.rglob("*.py"):
+                try:
+                    content = py_file.read_text(encoding="utf-8", errors="ignore")
+                except Exception:
+                    continue
+                lowered = content.lower()
+                if any(k in lowered for k in durable_keywords):
+                    uses_durable = True
+                    break
+        except Exception as exc:
+            return _handle_specific_exceptions("scanning for durable usage", exc)
+
+        # If no durable usage detected, skip/soft-pass the check
+        if not uses_durable:
+            return _create_result("pass", "No Durable Functions usage detected; check skipped")
+
+        # Load host.json and verify jsonpath-style key presence
+        condition = rule.get("condition", {})
+        jsonpath = condition.get("jsonpath")
+
+        if not jsonpath:
+            return _create_result("fail", "Missing jsonpath in condition for conditional_exists check")
+
+        # Ensure jsonpath is a str for type-checkers and safe operations
+        if not isinstance(jsonpath, str):
+            return _create_result("fail", "jsonpath must be a string for conditional_exists check")
+
+        host_path = path / "host.json"
+        if not host_path.exists():
+            return _create_result("fail", "host.json not found but Durable Functions detected")
+
+        try:
+            host_data = json.loads(host_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            return _handle_specific_exceptions("reading host.json", exc)
+
+        # Support simple jsonpath like $.extensions.durableTask or $.extensionBundle
+        pointer = jsonpath.lstrip("$.")
+        parts = pointer.split(".") if pointer else []
+        node = host_data
+        for p in parts:
+            if isinstance(node, dict) and p in node:
+                node = node[p]
+            else:
+                return _create_result("fail", f"Required host.json property '{jsonpath}' not found")
+
+        return _create_result("pass", f"host.json contains '{jsonpath}'")
+
+    def _handle_callable_detection(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Detect ASGI/WSGI callable exposure in source files (basic heuristics)."""
+        patterns = [
+            r"\bFastAPI\s*\(|\bStarlette\s*\(|\bFlask\s*\(|\bQuart\s*\(",
+            r"\bapp\s*=",
+            r"ASGIApp|WSGIApp|asgi_app|wsgi_app",
+        ]
+
+        found_items: list[str] = []
+        try:
+            for py_file in path.rglob("*.py"):
+                try:
+                    content = py_file.read_text(encoding="utf-8", errors="ignore")
+                except Exception:
+                    continue
+                for pat in patterns:
+                    if re.search(pat, content):
+                        found_items.append(f"{py_file.relative_to(path)}:{pat}")
+                        break
+        except Exception as exc:
+            return _handle_specific_exceptions("scanning for ASGI/WSGI callables", exc)
+
+        if found_items:
+            return _create_result("pass", f"Detected ASGI/WSGI-related patterns: {found_items[:3]}")
+
+        return _create_result("fail", "No ASGI/WSGI callable detected in project source")
 
 
 # Global registry instance
