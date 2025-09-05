@@ -1,21 +1,32 @@
-# 📘 `rules.json` Documentation
+# 📘 Rules Documentation
 
-The `rules.json` file defines diagnostic checks declaratively for **Azure Functions Doctor**. Each rule specifies what to validate, how to validate it, and what to show when the check passes or fails — without modifying the core Python code.
+Azure Functions Doctor uses a modular rules system to define diagnostic checks declaratively. The tool now supports both **Programming Model v1** and **v2** with separate rule sets for each model.
 
-This makes the tool extensible and customizable.
+Each rule specifies what to validate, how to validate it, and what to show when the check passes or fails — without modifying the core Python code. This makes the tool extensible and customizable.
 
 ---
 
 ## 📁 Location
 
-The file is located under the **assets/** directory:
+The rules are organized in separate files under the **assets/rules/** directory:
 
 ```
 src/
 └── azure_functions_doctor/
     └── assets/
-        └── rules.json  👈
+        ├── rules.json          👈 Legacy (fallback)
+        └── rules/
+            ├── v1.json         👈 v1 Programming Model rules
+            └── v2.json         👈 v2 Programming Model rules
 ```
+
+### Rule File Selection
+
+The tool automatically selects the appropriate rule file based on the detected programming model:
+
+- **v1 projects**: Uses `v1.json` (function.json-based projects)
+- **v2 projects**: Uses `v2.json` (decorator-based projects)  
+- **Fallback**: Uses legacy `rules.json` if new files are not found
 
 ---
 
@@ -134,9 +145,18 @@ You can create your own section names if desired.
 
 To add a new rule:
 
-1. Open `src/azure_functions_doctor/assets/rules.json`
+### For v2 Projects (Recommended)
+1. Open `src/azure_functions_doctor/assets/rules/v2.json`
 2. Append your rule object to the array
 3. Save and rerun `func-doctor`
+
+### For v1 Projects
+1. Open `src/azure_functions_doctor/assets/rules/v1.json`
+2. Append your rule object to the array
+3. Save and rerun `func-doctor`
+
+### For Universal Rules
+If you want a rule to apply to both v1 and v2 projects, you'll need to add it to both files with appropriate model-specific configurations.
 
 Example:
 

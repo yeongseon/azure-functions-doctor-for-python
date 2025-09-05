@@ -31,7 +31,7 @@
 
 # Azure Functions Doctor for Python
 
-A fast and extensible diagnostic CLI for Python-based Azure Functions projects.
+A fast and extensible diagnostic CLI for Python-based Azure Functions projects. Supports both **Programming Model v1** (function.json-based) and **Programming Model v2** (decorator-based) projects.
 
 ---
 
@@ -47,11 +47,13 @@ A fast and extensible diagnostic CLI for Python-based Azure Functions projects.
 
 ## Key Features
 
-- Diagnose Python version, venv, `azure-functions` package
-- Validate `host.json`, `local.settings.json`, function structure
-- Fully customizable via `rules.json`
-- Output: colorized CLI or machine-readable JSON
-- Built-in rule engine, easily extensible
+- **Multi-Model Support**: Works with both v1 (function.json) and v2 (decorator) projects
+- **Automatic Detection**: Automatically detects your project's programming model
+- **Model-Specific Checks**: Different requirements for v1 vs v2 (Python version, packages, etc.)
+- **Rich Diagnostics**: Python version, venv, required packages, project files
+- **Extensible Rules**: Customizable rules system for both programming models
+- **Rich Console Output**: Clear formatting with hints and suggestions
+- **CI/CD Ready**: JSON output for automated environments
 
 ---
 

@@ -1,8 +1,30 @@
 # 📦 Changelog
 
+- feat: add support for Programming Model v1 and v2 with automatic detection
+- feat: implement separate rule sets for v1 and v2 projects
+- feat: add programming model display in CLI header
+- feat: improve UI with cleaner programming model indication
 - fix: separate verbose option from logging level control (9b373a9)
 
-- bump version to 0.5.1 (fix verbose option behavior)
+- bump version to 0.5.1 (Programming Model v1/v2 support)
+
+## 🎉 New Features in v0.5.1
+
+### Programming Model Support
+- **v1 Support**: Now supports function.json-based projects (limited support)
+- **v2 Support**: Enhanced support for decorator-based projects
+- **Automatic Detection**: Automatically detects project type and applies appropriate rules
+- **Model-Specific Rules**: Separate rule sets with different requirements for each model
+
+### UI Improvements
+- **Header Display**: Programming model shown in CLI header (`🐍 Python programming model: v2`)
+- **Cleaner Output**: Removed redundant programming model checks from Project Structure
+- **v1 Warning**: v1 projects show "(limited support)" indication
+
+### Technical Improvements
+- **Rule Separation**: Independent rule files for v1 and v2 with proper check_order management
+- **Backward Compatibility**: Legacy rules.json still supported as fallback
+- **Enhanced Testing**: Comprehensive test coverage for both programming models
 
 - bump version to 0.5.0 (248da2a31fa91b09270d72627a2d20569526360d)
 

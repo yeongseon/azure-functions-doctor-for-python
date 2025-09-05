@@ -1,6 +1,6 @@
 # 🖥️ CLI Usage: `func-doctor`
 
-The Azure Functions Doctor CLI helps validate your local Python-based Azure Functions project for common issues using an extensible rules system.
+The Azure Functions Doctor CLI helps validate your local Python-based Azure Functions project for common issues using an extensible rules system. It supports both **Programming Model v1** (function.json-based) and **Programming Model v2** (decorator-based) projects.
 
 ---
 
@@ -33,31 +33,61 @@ func-doctor diagnose --path ./my-func-app --format json --verbose
 
 ## ✅ What It Checks
 
-| Category | Description |
-|----------|-------------|
-| Python Environment | Python version ≥ 3.9, virtualenv activated, executable exists |
-| Dependencies | `requirements.txt` present, `azure-functions` installed |
-| Project Files | `host.json`, `local.settings.json`, and `main.py` exist |
+### Programming Model Detection
+The tool automatically detects your project's programming model:
+
+- **v2 (Decorator-based)**: Uses `@app.route`, `@app.schedule` decorators
+- **v1 (function.json-based)**: Uses `function.json` files for configuration
+
+### Diagnostic Categories
+
+| Category | v2 Checks | v1 Checks |
+|----------|-----------|-----------|
+| Python Environment | Python ≥ 3.9, virtualenv, executable | Python ≥ 3.6, virtualenv, executable |
+| Dependencies | `azure-functions-python-library` | `azure-functions-worker` |
+| Project Files | `host.json`, `local.settings.json` | `host.json`, `local.settings.json`, `function.json` |
 
 ---
 
 ## Example Output
 
+### v2 Project (Decorator-based)
 ```
-🩺 Azure Functions Doctor for Python v0.1.0
-📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
+🩺 Azure Functions Doctor for Python v0.5.1
+📁 Path: /path/to/v2-project
+🐍 Python Programming Model: v2
 
 ✖ Python Env
   • Python version: Python version is 3.12.3, expected >=3.9
   • Virtual environment: VIRTUAL_ENV is set
   • Python executable: .../bin/python exists
   • requirements.txt: exists
-  • azure-functions package: Package 'azure_functions' is not installed
+  • azure-functions-python-library package: Package 'azure.functions' is not installed
+
+✔ Project Structure
+  • host.json: exists
+  • local.settings.json: is missing (optional for local development)
+
+Summary
+✔ 1 Passed    ✖ 1 Failed
+```
+
+### v1 Project (function.json-based)
+```
+🩺 Azure Functions Doctor for Python v0.5.1
+📁 Path: /path/to/v1-project
+🐍 Python Programming Model: v1 (limited support)
+
+✖ Python Env
+  • Python version: Python version is 3.12.3, expected >=3.6
+  • Virtual environment: VIRTUAL_ENV is set
+  • Python executable: .../bin/python exists
+  • requirements.txt: exists
+  • azure-functions-worker package: Package 'azure.functions_worker' is not installed
 
 ✖ Project Structure
-  • host.json: exists
-  • local.settings.json: is missing
-  • main.py: is missing
+  • host.json: is missing
+  • local.settings.json: is missing (optional for local development)
 
 Summary
 ✔ 0 Passed    ✖ 2 Failed
