@@ -341,15 +341,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#planned-future-checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      Planned Future Checks
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#not-feasible-checks" class="md-nav__link">
     <span class="md-ellipsis">
       Not Feasible Checks
@@ -521,15 +512,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#planned-future-checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      Planned Future Checks
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#not-feasible-checks" class="md-nav__link">
     <span class="md-ellipsis">
       Not Feasible Checks
@@ -577,7 +559,8 @@
 <h2 id="diagnostic-checks">🙺 Diagnostic Checks</h2>
 <p>This document lists diagnostic checks for <strong>Azure Functions Doctor</strong>, based on <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=get-started%2Casgi%2Capplication-level&amp;pivots=python-mode-decorators">Azure Functions Python Reference</a> and <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-best-practices?tabs=python">Best Practices</a>.</p>
 <p>The tool supports both <strong>Programming Model v1</strong> (function.json-based) and <strong>Programming Model v2</strong> (decorator-based) projects, automatically detecting the model and applying appropriate checks.</p>
-<hr />
+<p>Note: Each check includes a Severity that indicates likely deployment/runtime impact:</p>
+<p>(In the JSON rule assets <code>src/azure_functions_doctor/assets/rules/*.json</code> the same values are stored in the <code>severity</code> field: <code>"error"</code>, <code>"warning"</code>, <code>"info"</code>.)</p>
 <h2 id="v2-programming-model-checks-decorator-based">v2 Programming Model Checks (Decorator-based)</h2>
 <table>
 <thead>
@@ -586,50 +569,114 @@
 <th>Diagnostic Check</th>
 <th>Description</th>
 <th>Status</th>
+<th>Severity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
-<td>Python version ≥ 3.9</td>
-<td>Check if the runtime meets minimum requirements for v2</td>
+<td>Python version (supported)</td>
+<td>Verify runtime Python version is supported by Azure Functions (v2 recommends Python 3.9+ per MS docs)</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>2</td>
 <td>Virtual environment (.venv) active</td>
-<td>Ensure Python environment is isolated via virtualenv</td>
+<td>Ensure Python environment is isolated (use virtualenv/venv for local development)</td>
 <td>✅ Implemented</td>
+<td>warning</td>
 </tr>
 <tr>
 <td>3</td>
 <td>Python executable exists</td>
-<td>Validate Python executable path</td>
+<td>Validate Python executable path is present and usable</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>4</td>
 <td><code>requirements.txt</code> exists</td>
-<td>Check for dependency management file</td>
+<td>Check for dependency file; recommend pinning critical packages and checking for incompatible packages</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>5</td>
 <td><code>azure-functions-python-library</code> installed</td>
-<td>Required for Programming Model v2 decorator syntax</td>
+<td>Ensure <code>azure.functions</code> package present for decorator-based programming model</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>6</td>
 <td><code>host.json</code> exists</td>
-<td>Required runtime configuration file must be present</td>
+<td>Ensure <code>host.json</code> is present; validate basic schema and common fields (e.g., logging, extensionBundle)</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>7</td>
 <td><code>local.settings.json</code> exists (optional)</td>
-<td>Useful for storing app settings locally</td>
+<td>Optional local settings file for development (check presence and warn about missing common keys/SECRETS)</td>
 <td>✅ Implemented</td>
+<td>info</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Azure Functions Core Tools (<code>func</code>)</td>
+<td>Recommend checking <code>func</code> is installed for local testing and tooling (version compatibility)</td>
+<td>Planned</td>
+<td>warning</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Durable Functions config in <code>host.json</code></td>
+<td>Check for <code>durableTask</code> section and that required extension/config is present</td>
+<td>Planned</td>
+<td>error</td>
+</tr>
+<tr>
+<td>10</td>
+<td>HTTP trigger validation</td>
+<td>Validate HTTP trigger binding fields (<code>authLevel</code>, <code>methods</code>, <code>route</code>) and common misconfigurations</td>
+<td>Planned</td>
+<td>error</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Timer trigger CRON validation</td>
+<td>Validate <code>schedule</code> exists and CRON expression format is valid (consider second-field differences)</td>
+<td>Planned</td>
+<td>error</td>
+</tr>
+<tr>
+<td>12</td>
+<td>App Insights configuration</td>
+<td>Check for Application Insights settings: env vars (<code>APPLICATIONINSIGHTS_CONNECTION_STRING</code> or instrumentation key) or host.json connection</td>
+<td>Planned</td>
+<td>warning</td>
+</tr>
+<tr>
+<td>13</td>
+<td>extensionBundle / binding extensions</td>
+<td>Validate <code>extensionBundle</code> in <code>host.json</code> or presence of required binding extensions for triggers</td>
+<td>Planned</td>
+<td>error</td>
+</tr>
+<tr>
+<td>15</td>
+<td>ASGI/WSGI compatibility</td>
+<td>Detect whether app exposes ASGI/WSGI callable (for frameworks like FastAPI/Starlette)</td>
+<td>Planned</td>
+<td>warning</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Detect unused or invalid files</td>
+<td>Warn about common unwanted files in project root or deployment (<code>.pyc</code>, <code>__pycache__</code>, <code>.venv</code>, tests`)</td>
+<td>Planned</td>
+<td>info</td>
 </tr>
 </tbody>
 </table>
@@ -642,130 +689,121 @@
 <th>Diagnostic Check</th>
 <th>Description</th>
 <th>Status</th>
+<th>Severity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
-<td>Python version ≥ 3.6</td>
-<td>Check if the runtime meets minimum requirements for v1</td>
+<td>Python version (supported)</td>
+<td>Verify runtime Python version supported by v1 projects (legacy; document recommended versions, e.g., &gt;=3.6)</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>2</td>
 <td>Virtual environment (.venv) active</td>
-<td>Ensure Python environment is isolated via virtualenv</td>
+<td>Ensure Python environment is isolated (use virtualenv/venv for local development)</td>
 <td>✅ Implemented</td>
+<td>warning</td>
 </tr>
 <tr>
 <td>3</td>
 <td>Python executable exists</td>
-<td>Validate Python executable path</td>
+<td>Validate Python executable path is present and usable</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>4</td>
 <td><code>requirements.txt</code> exists</td>
-<td>Check for dependency management file</td>
+<td>Check for dependency file; recommend pinning and validate azure-functions version compatibility</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>5</td>
 <td><code>azure-functions-worker</code> installed</td>
-<td>Required for Programming Model v1 function.json syntax</td>
+<td>Ensure worker package for v1 function.json projects is present</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>6</td>
 <td><code>host.json</code> exists</td>
-<td>Required runtime configuration file must be present</td>
+<td>Ensure <code>host.json</code> is present; validate basic schema and common fields (e.g., extensionBundle)</td>
 <td>✅ Implemented</td>
+<td>error</td>
 </tr>
 <tr>
 <td>7</td>
 <td><code>local.settings.json</code> exists (optional)</td>
-<td>Useful for storing app settings locally</td>
+<td>Optional local settings file for development (check presence and warn about missing common keys/SECRETS)</td>
 <td>✅ Implemented</td>
+<td>info</td>
 </tr>
-</tbody>
-</table>
-<hr />
-<h2 id="planned-future-checks">Planned Future Checks</h2>
-<table>
-<thead>
 <tr>
-<th>#</th>
-<th>Diagnostic Check</th>
-<th>Description</th>
-<th>v1 Support</th>
-<th>v2 Support</th>
-<th>Priority</th>
+<td>8</td>
+<td>Azure Functions Core Tools (<code>func</code>)</td>
+<td>Recommend checking <code>func</code> is installed for local testing and tooling (version compatibility)</td>
+<td>Planned</td>
+<td>warning</td>
 </tr>
-</thead>
-<tbody>
 <tr>
 <td>9</td>
 <td>Durable Functions config in <code>host.json</code></td>
-<td>Check for presence of <code>durableTask</code> section</td>
-<td>✅</td>
-<td>✅</td>
-<td>Medium</td>
+<td>Check for <code>durableTask</code> section and that required extension/config is present</td>
+<td>Planned</td>
+<td>error</td>
 </tr>
 <tr>
 <td>10</td>
 <td>HTTP trigger validation</td>
-<td>Ensure <code>authLevel</code>, <code>methods</code>, <code>route</code> in binding are valid</td>
-<td>✅</td>
-<td>✅</td>
-<td>Medium</td>
+<td>Validate <code>httpTrigger</code> binding fields (<code>authLevel</code>, <code>methods</code>, <code>route</code>) and <code>binding</code> correctness</td>
+<td>Planned</td>
+<td>error</td>
 </tr>
 <tr>
 <td>11</td>
 <td>Timer trigger CRON validation</td>
-<td>Validate correct CRON format</td>
-<td>✅</td>
-<td>✅</td>
-<td>Medium</td>
+<td>Validate <code>schedule</code> exists in binding and CRON expression format is valid</td>
+<td>Planned</td>
+<td>error</td>
 </tr>
 <tr>
 <td>12</td>
 <td>App Insights configuration</td>
-<td>Validate presence of instrumentation key or connection string</td>
-<td>✅</td>
-<td>✅</td>
-<td>Medium</td>
+<td>Check for Application Insights settings: env vars or host.json/telemetry configuration</td>
+<td>Planned</td>
+<td>warning</td>
 </tr>
 <tr>
 <td>13</td>
 <td>EntryPoint in <code>function.json</code> (v1 only)</td>
-<td>Check if entryPoint matches a real function (v1 only)</td>
-<td>✅</td>
-<td>❌</td>
-<td>Low</td>
+<td>Verify <code>entryPoint</code> / <code>scriptFile</code> references a real module/function and is importable at runtime</td>
+<td>Planned</td>
+<td>error</td>
 </tr>
 <tr>
 <td>14</td>
 <td>Function name and folder match (v1 only)</td>
-<td>Ensure folder/function naming aligns (v1 only)</td>
-<td>✅</td>
-<td>❌</td>
-<td>Low</td>
+<td>Ensure function folder, <code>function.json</code> name and script location align</td>
+<td>Planned</td>
+<td>error</td>
 </tr>
 <tr>
 <td>15</td>
-<td>ASGI/WSGI compatibility</td>
-<td>Check if app exposes ASGI/WSGI callable</td>
-<td>✅</td>
-<td>✅</td>
-<td>Low</td>
+<td>extensionBundle / binding extensions</td>
+<td>Validate <code>extensionBundle</code> configuration or presence of required binding extensions (v1 binding support)</td>
+<td>Planned</td>
+<td>error</td>
 </tr>
 <tr>
 <td>16</td>
 <td>Detect unused or invalid files</td>
-<td>Warn about <code>.pyc</code>, <code>__pycache__</code>, or legacy files</td>
-<td>✅</td>
-<td>✅</td>
-<td>Low</td>
+<td>Warn about common unwanted files in project root or deployment (<code>.pyc</code>, <code>__pycache__</code>, <code>.venv</code>, tests`)</td>
+<td>Planned</td>
+<td>info</td>
 </tr>
 </tbody>
 </table>
