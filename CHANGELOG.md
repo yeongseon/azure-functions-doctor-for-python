@@ -1,30 +1,26 @@
 # 📦 Changelog
 
-- feat: add support for Programming Model v1 and v2 with automatic detection
-- feat: implement separate rule sets for v1 and v2 projects
-- feat: add programming model display in CLI header
-- feat: improve UI with cleaner programming model indication
-- fix: separate verbose option from logging level control (9b373a9)
+- bump version to 0.6.0 (f6bad63d9cfd913b6bb6461c9fc8ca8d53ae70eb)
 
-- bump version to 0.5.1 (Programming Model v1/v2 support)
+- update legacy rules.json for backward compatibility (a9ba697213ebe60570d701c53c91ce064ada4afb)
 
-## 🎉 New Features in v0.5.1
+- update documentation for v1/v2 programming model support (c7653652bb4045cd624cb6d6b521fa1500103900)
 
-### Programming Model Support
-- **v1 Support**: Now supports function.json-based projects (limited support)
-- **v2 Support**: Enhanced support for decorator-based projects
-- **Automatic Detection**: Automatically detects project type and applies appropriate rules
-- **Model-Specific Rules**: Separate rule sets with different requirements for each model
+- improve UI and add v1 project support with warning (fd04e11d825d34d7fa6a25816712f25ce7ad1328)
 
-### UI Improvements
-- **Header Display**: Programming model shown in CLI header (`🐍 Python programming model: v2`)
-- **Cleaner Output**: Removed redundant programming model checks from Project Structure
-- **v1 Warning**: v1 projects show "(limited support)" indication
+- implement separate rule sets for v1 and v2 programming models (2bb5952602e2d63e9676bb383958b1d6aec0c8e2)
 
-### Technical Improvements
-- **Rule Separation**: Independent rule files for v1 and v2 with proper check_order management
-- **Backward Compatibility**: Legacy rules.json still supported as fallback
-- **Enhanced Testing**: Comprehensive test coverage for both programming models
+- implement programming model detection for v1 and v2 (568f756521cb6657bcf6a12617a9872bd074bedd)
+
+- bump version to 0.5.1
+
+- Fix verbose option behavior
+- verbose now only controls hint display, not logging level
+- Update CHANGELOG.md with fix details (a6a8690e8f5ac10e9092d2783ecba200403f5caa)
+
+- separate verbose option from logging level control (9b373a91243fcf5668afec8491beea95b258fa7d)
+
+- update changelog (deeb342676ef59776d8812758b64632bc730e9ee)
 
 - bump version to 0.5.0 (248da2a31fa91b09270d72627a2d20569526360d)
 
