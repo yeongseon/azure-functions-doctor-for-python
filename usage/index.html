@@ -320,6 +320,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="✅ What It Checks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#programming-model-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Programming Model Detection
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diagnostic-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Diagnostic Categories
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -328,6 +352,30 @@
       Example Output
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Example Output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v2-project-decorator-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2 Project (Decorator-based)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v1-project-functionjson-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1 Project (function.json-based)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -509,6 +557,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="✅ What It Checks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#programming-model-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Programming Model Detection
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diagnostic-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Diagnostic Categories
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -517,6 +589,30 @@
       Example Output
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Example Output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v2-project-decorator-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2 Project (Decorator-based)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v1-project-functionjson-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1 Project (function.json-based)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -549,7 +645,7 @@
 
 
 <h1 id="cli-usage-func-doctor">🖥️ CLI Usage: <code>func-doctor</code></h1>
-<p>The Azure Functions Doctor CLI helps validate your local Python-based Azure Functions project for common issues using an extensible rules system.</p>
+<p>The Azure Functions Doctor CLI helps validate your local Python-based Azure Functions project for common issues using an extensible rules system. It supports both <strong>Programming Model v1</strong> (function.json-based) and <strong>Programming Model v2</strong> (decorator-based) projects.</p>
 <hr />
 <h2 id="basic-usage">Basic Usage</h2>
 <pre><code class="language-bash">func-doctor diagnose
@@ -588,44 +684,75 @@
 </code></pre>
 <hr />
 <h2 id="what-it-checks">✅ What It Checks</h2>
+<h3 id="programming-model-detection">Programming Model Detection</h3>
+<p>The tool automatically detects your project's programming model:</p>
+<ul>
+<li><strong>v2 (Decorator-based)</strong>: Uses <code>@app.route</code>, <code>@app.schedule</code> decorators</li>
+<li><strong>v1 (function.json-based)</strong>: Uses <code>function.json</code> files for configuration</li>
+</ul>
+<h3 id="diagnostic-categories">Diagnostic Categories</h3>
 <table>
 <thead>
 <tr>
 <th>Category</th>
-<th>Description</th>
+<th>v2 Checks</th>
+<th>v1 Checks</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Python Environment</td>
-<td>Python version ≥ 3.9, virtualenv activated, executable exists</td>
+<td>Python ≥ 3.9, virtualenv, executable</td>
+<td>Python ≥ 3.6, virtualenv, executable</td>
 </tr>
 <tr>
 <td>Dependencies</td>
-<td><code>requirements.txt</code> present, <code>azure-functions</code> installed</td>
+<td><code>azure-functions-python-library</code></td>
+<td><code>azure-functions-worker</code></td>
 </tr>
 <tr>
 <td>Project Files</td>
-<td><code>host.json</code>, <code>local.settings.json</code>, and <code>main.py</code> exist</td>
+<td><code>host.json</code>, <code>local.settings.json</code></td>
+<td><code>host.json</code>, <code>local.settings.json</code>, <code>function.json</code></td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="example-output">Example Output</h2>
-<pre><code>🩺 Azure Functions Doctor for Python v0.1.0
-📁 Path: /root/Github/azure-functions-doctor/examples/basic-hello
+<h3 id="v2-project-decorator-based">v2 Project (Decorator-based)</h3>
+<pre><code>🩺 Azure Functions Doctor for Python v0.5.1
+📁 Path: /path/to/v2-project
+🐍 Python Programming Model: v2
 
 ✖ Python Env
   • Python version: Python version is 3.12.3, expected &gt;=3.9
   • Virtual environment: VIRTUAL_ENV is set
   • Python executable: .../bin/python exists
   • requirements.txt: exists
-  • azure-functions package: Package 'azure_functions' is not installed
+  • azure-functions-python-library package: Package 'azure.functions' is not installed
+
+✔ Project Structure
+  • host.json: exists
+  • local.settings.json: is missing (optional for local development)
+
+Summary
+✔ 1 Passed    ✖ 1 Failed
+</code></pre>
+<h3 id="v1-project-functionjson-based">v1 Project (function.json-based)</h3>
+<pre><code>🩺 Azure Functions Doctor for Python v0.5.1
+📁 Path: /path/to/v1-project
+🐍 Python Programming Model: v1 (limited support)
+
+✖ Python Env
+  • Python version: Python version is 3.12.3, expected &gt;=3.6
+  • Virtual environment: VIRTUAL_ENV is set
+  • Python executable: .../bin/python exists
+  • requirements.txt: exists
+  • azure-functions-worker package: Package 'azure.functions_worker' is not installed
 
 ✖ Project Structure
-  • host.json: exists
-  • local.settings.json: is missing
-  • main.py: is missing
+  • host.json: is missing
+  • local.settings.json: is missing (optional for local development)
 
 Summary
 ✔ 0 Passed    ✖ 2 Failed

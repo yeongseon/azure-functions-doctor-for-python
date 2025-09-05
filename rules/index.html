@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#rulesjson-documentation" class="md-skip">
+        <a href="#rules-documentation" class="md-skip">
           Skip to content
         </a>
       
@@ -346,6 +346,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="📁 Location">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-file-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rule File Selection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -438,6 +453,39 @@
       🧹 Extending the Rules
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="🧹 Extending the Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-v2-projects-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      For v2 Projects (Recommended)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-v1-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      For v1 Projects
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-universal-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      For Universal Rules
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -584,6 +632,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="📁 Location">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-file-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rule File Selection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -677,6 +740,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="🧹 Extending the Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-v2-projects-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      For v2 Projects (Recommended)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-v1-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      For v1 Projects
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-universal-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      For Universal Rules
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -734,17 +830,27 @@
   
 
 
-<h1 id="rulesjson-documentation">📘 <code>rules.json</code> Documentation</h1>
-<p>The <code>rules.json</code> file defines diagnostic checks declaratively for <strong>Azure Functions Doctor</strong>. Each rule specifies what to validate, how to validate it, and what to show when the check passes or fails — without modifying the core Python code.</p>
-<p>This makes the tool extensible and customizable.</p>
+<h1 id="rules-documentation">📘 Rules Documentation</h1>
+<p>Azure Functions Doctor uses a modular rules system to define diagnostic checks declaratively. The tool now supports both <strong>Programming Model v1</strong> and <strong>v2</strong> with separate rule sets for each model.</p>
+<p>Each rule specifies what to validate, how to validate it, and what to show when the check passes or fails — without modifying the core Python code. This makes the tool extensible and customizable.</p>
 <hr />
 <h2 id="location">📁 Location</h2>
-<p>The file is located under the <strong>assets/</strong> directory:</p>
+<p>The rules are organized in separate files under the <strong>assets/rules/</strong> directory:</p>
 <pre><code>src/
 └── azure_functions_doctor/
     └── assets/
-        └── rules.json  👈
+        ├── rules.json          👈 Legacy (fallback)
+        └── rules/
+            ├── v1.json         👈 v1 Programming Model rules
+            └── v2.json         👈 v2 Programming Model rules
 </code></pre>
+<h3 id="rule-file-selection">Rule File Selection</h3>
+<p>The tool automatically selects the appropriate rule file based on the detected programming model:</p>
+<ul>
+<li><strong>v1 projects</strong>: Uses <code>v1.json</code> (function.json-based projects)</li>
+<li><strong>v2 projects</strong>: Uses <code>v2.json</code> (decorator-based projects)  </li>
+<li><strong>Fallback</strong>: Uses legacy <code>rules.json</code> if new files are not found</li>
+</ul>
 <hr />
 <h2 id="structure-of-a-rule">⌐ Structure of a Rule</h2>
 <p>Each rule is a JSON object with the following fields:</p>
@@ -868,11 +974,20 @@
 <hr />
 <h2 id="extending-the-rules">🧹 Extending the Rules</h2>
 <p>To add a new rule:</p>
+<h3 id="for-v2-projects-recommended">For v2 Projects (Recommended)</h3>
 <ol>
-<li>Open <code>src/azure_functions_doctor/assets/rules.json</code></li>
+<li>Open <code>src/azure_functions_doctor/assets/rules/v2.json</code></li>
 <li>Append your rule object to the array</li>
 <li>Save and rerun <code>func-doctor</code></li>
 </ol>
+<h3 id="for-v1-projects">For v1 Projects</h3>
+<ol>
+<li>Open <code>src/azure_functions_doctor/assets/rules/v1.json</code></li>
+<li>Append your rule object to the array</li>
+<li>Save and rerun <code>func-doctor</code></li>
+</ol>
+<h3 id="for-universal-rules">For Universal Rules</h3>
+<p>If you want a rule to apply to both v1 and v2 projects, you'll need to add it to both files with appropriate model-specific configurations.</p>
 <p>Example:</p>
 <pre><code class="language-json">{
   &quot;id&quot;: &quot;check_requirements_txt_exists&quot;,

@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#diagnostic-checks-updated-for-azure-functions-python-programming-model-v2" class="md-skip">
+        <a href="#diagnostic-checks" class="md-skip">
           Skip to content
         </a>
       
@@ -314,19 +314,55 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#diagnostic-checks-updated-for-azure-functions-python-programming-model-v2" class="md-nav__link">
+  <a href="#diagnostic-checks" class="md-nav__link">
     <span class="md-ellipsis">
-      🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)
+      🙺 Diagnostic Checks
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v2-programming-model-checks-decorator-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2 Programming Model Checks (Decorator-based)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v1-programming-model-checks-functionjson-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1 Programming Model Checks (function.json-based)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#planned-future-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Planned Future Checks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-feasible-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Not Feasible Checks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Not Feasible Checks">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#key-changes" class="md-nav__link">
+  <a href="#key-features" class="md-nav__link">
     <span class="md-ellipsis">
-      ✅ Key Changes
+      ✅ Key Features
     </span>
   </a>
   
@@ -458,19 +494,55 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#diagnostic-checks-updated-for-azure-functions-python-programming-model-v2" class="md-nav__link">
+  <a href="#diagnostic-checks" class="md-nav__link">
     <span class="md-ellipsis">
-      🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)
+      🙺 Diagnostic Checks
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v2-programming-model-checks-decorator-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      v2 Programming Model Checks (Decorator-based)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v1-programming-model-checks-functionjson-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      v1 Programming Model Checks (function.json-based)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#planned-future-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Planned Future Checks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-feasible-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Not Feasible Checks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Not Feasible Checks">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#key-changes" class="md-nav__link">
+  <a href="#key-features" class="md-nav__link">
     <span class="md-ellipsis">
-      ✅ Key Changes
+      ✅ Key Features
     </span>
   </a>
   
@@ -502,15 +574,17 @@
 
   <h1>Diagnostics</h1>
 
-<h2 id="diagnostic-checks-updated-for-azure-functions-python-programming-model-v2">🙺 Diagnostic Checks (Updated for Azure Functions Python Programming Model v2)</h2>
+<h2 id="diagnostic-checks">🙺 Diagnostic Checks</h2>
 <p>This document lists diagnostic checks for <strong>Azure Functions Doctor</strong>, based on <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=get-started%2Casgi%2Capplication-level&amp;pivots=python-mode-decorators">Azure Functions Python Reference</a> and <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-best-practices?tabs=python">Best Practices</a>.</p>
+<p>The tool supports both <strong>Programming Model v1</strong> (function.json-based) and <strong>Programming Model v2</strong> (decorator-based) projects, automatically detecting the model and applying appropriate checks.</p>
+<hr />
+<h2 id="v2-programming-model-checks-decorator-based">v2 Programming Model Checks (Decorator-based)</h2>
 <table>
 <thead>
 <tr>
 <th>#</th>
 <th>Diagnostic Check</th>
 <th>Description</th>
-<th>Feasibility</th>
 <th>Status</th>
 </tr>
 </thead>
@@ -518,175 +592,220 @@
 <tr>
 <td>1</td>
 <td>Python version ≥ 3.9</td>
-<td>Check if the runtime meets minimum requirements</td>
-<td>✅ Easy</td>
+<td>Check if the runtime meets minimum requirements for v2</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>2</td>
 <td>Virtual environment (.venv) active</td>
 <td>Ensure Python environment is isolated via virtualenv</td>
-<td>✅ Easy</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>3</td>
-<td>Azure Functions Core Tools installed</td>
-<td>Validate that <code>func</code> CLI is installed and accessible</td>
-<td>✅ Easy</td>
+<td>Python executable exists</td>
+<td>Validate Python executable path</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>4</td>
-<td><code>host.json</code> exists</td>
-<td>Required runtime configuration file must be present</td>
-<td>✅ Easy</td>
+<td><code>requirements.txt</code> exists</td>
+<td>Check for dependency management file</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>5</td>
-<td><code>requirements.txt</code> exists</td>
-<td>Check for dependency management file</td>
-<td>✅ Easy</td>
+<td><code>azure-functions-python-library</code> installed</td>
+<td>Required for Programming Model v2 decorator syntax</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>6</td>
-<td><code>azure-functions</code> package installed</td>
-<td>Ensure required Azure Functions SDK is installed</td>
-<td>✅ Easy</td>
+<td><code>host.json</code> exists</td>
+<td>Required runtime configuration file must be present</td>
 <td>✅ Implemented</td>
 </tr>
 <tr>
 <td>7</td>
-<td><code>azure-functions-python-library</code> installed</td>
-<td>Required for Programming Model v2 decorator syntax</td>
-<td>✅ Easy</td>
-<td>✅ Implemented</td>
-</tr>
-<tr>
-<td>8</td>
 <td><code>local.settings.json</code> exists (optional)</td>
 <td>Useful for storing app settings locally</td>
-<td>✅ Easy</td>
 <td>✅ Implemented</td>
-</tr>
-<tr>
-<td>9</td>
-<td>Detect use of decorators</td>
-<td>Confirm use of v2-style decorators like <code>@function_name</code></td>
-<td>✅ Easy</td>
-<td>✅ Implemented</td>
-</tr>
-<tr>
-<td>10</td>
-<td>Function mode detection (v1 vs v2)</td>
-<td>Detect whether app uses function.json or decorators</td>
-<td>Medium</td>
-<td>Planned</td>
-</tr>
-<tr>
-<td>11</td>
-<td>Directory structure validation</td>
-<td>Warn if folder structure is non-standard or missing expected files</td>
-<td>✅ Easy</td>
-<td>✅ Implemented</td>
-</tr>
-<tr>
-<td>12</td>
-<td>Durable Functions config in <code>host.json</code></td>
-<td>Check for presence of <code>durableTask</code> section</td>
-<td>Medium</td>
-<td>Planned</td>
-</tr>
-<tr>
-<td>13</td>
-<td>HTTP trigger validation</td>
-<td>Ensure <code>authLevel</code>, <code>methods</code>, <code>route</code> in binding are valid</td>
-<td>Medium</td>
-<td>Planned</td>
-</tr>
-<tr>
-<td>14</td>
-<td>Timer trigger CRON validation</td>
-<td>Validate correct CRON format</td>
-<td>Medium</td>
-<td>Planned</td>
-</tr>
-<tr>
-<td>15</td>
-<td>App Insights configuration</td>
-<td>Validate presence of instrumentation key or connection string</td>
-<td>Medium</td>
-<td>Planned</td>
-</tr>
-<tr>
-<td>16</td>
-<td>EntryPoint in <code>function.json</code> (v1 only)</td>
-<td>Check if entryPoint matches a real function (v1 only)</td>
-<td>✅ Easy</td>
-<td>❌ Not needed</td>
-</tr>
-<tr>
-<td>17</td>
-<td>Function name and folder match (v1 only)</td>
-<td>Ensure folder/function naming aligns (v1 only)</td>
-<td>✅ Easy</td>
-<td>❌ Not needed</td>
-</tr>
-<tr>
-<td>18</td>
-<td>ASGI/WSGI compatibility</td>
-<td>Check if app exposes ASGI/WSGI callable</td>
-<td>Medium</td>
-<td>Planned</td>
-</tr>
-<tr>
-<td>19</td>
-<td>Detect unused or invalid files</td>
-<td>Warn about <code>.pyc</code>, <code>__pycache__</code>, or legacy files</td>
-<td>✅ Low</td>
-<td>🔝 Possible</td>
-</tr>
-<tr>
-<td>20</td>
-<td>Detect long-running blocking patterns</td>
-<td>Detect <code>sleep()</code>, infinite loops, or sync IO blocking</td>
-<td>❌ Hard</td>
-<td>❌ Not feasible</td>
-</tr>
-<tr>
-<td>21</td>
-<td>Excessive logging</td>
-<td>Detect overuse of <code>print()</code> or <code>logging.debug()</code></td>
-<td>❌ Runtime</td>
-<td>❌ Not feasible</td>
-</tr>
-<tr>
-<td>22</td>
-<td>Monolithic layout warning</td>
-<td>Detect if everything is in one large file</td>
-<td>❌ Context</td>
-<td>❌ Not feasible</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>Legend:
-✅ Easy = statically checkable<br />
-✅ Medium = requires additional parsing/context<br />
-❌ = not feasible by static analysis<br />
-Planned = scheduled for future implementation<br />
-🧭 Possible = technically feasible but lower priority</p>
-</blockquote>
 <hr />
-<h3 id="key-changes">✅ Key Changes</h3>
+<h2 id="v1-programming-model-checks-functionjson-based">v1 Programming Model Checks (function.json-based)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Diagnostic Check</th>
+<th>Description</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Python version ≥ 3.6</td>
+<td>Check if the runtime meets minimum requirements for v1</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Virtual environment (.venv) active</td>
+<td>Ensure Python environment is isolated via virtualenv</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Python executable exists</td>
+<td>Validate Python executable path</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>requirements.txt</code> exists</td>
+<td>Check for dependency management file</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>azure-functions-worker</code> installed</td>
+<td>Required for Programming Model v1 function.json syntax</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>host.json</code> exists</td>
+<td>Required runtime configuration file must be present</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>local.settings.json</code> exists (optional)</td>
+<td>Useful for storing app settings locally</td>
+<td>✅ Implemented</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="planned-future-checks">Planned Future Checks</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Diagnostic Check</th>
+<th>Description</th>
+<th>v1 Support</th>
+<th>v2 Support</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9</td>
+<td>Durable Functions config in <code>host.json</code></td>
+<td>Check for presence of <code>durableTask</code> section</td>
+<td>✅</td>
+<td>✅</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>10</td>
+<td>HTTP trigger validation</td>
+<td>Ensure <code>authLevel</code>, <code>methods</code>, <code>route</code> in binding are valid</td>
+<td>✅</td>
+<td>✅</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Timer trigger CRON validation</td>
+<td>Validate correct CRON format</td>
+<td>✅</td>
+<td>✅</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>12</td>
+<td>App Insights configuration</td>
+<td>Validate presence of instrumentation key or connection string</td>
+<td>✅</td>
+<td>✅</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>13</td>
+<td>EntryPoint in <code>function.json</code> (v1 only)</td>
+<td>Check if entryPoint matches a real function (v1 only)</td>
+<td>✅</td>
+<td>❌</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Function name and folder match (v1 only)</td>
+<td>Ensure folder/function naming aligns (v1 only)</td>
+<td>✅</td>
+<td>❌</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>15</td>
+<td>ASGI/WSGI compatibility</td>
+<td>Check if app exposes ASGI/WSGI callable</td>
+<td>✅</td>
+<td>✅</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Detect unused or invalid files</td>
+<td>Warn about <code>.pyc</code>, <code>__pycache__</code>, or legacy files</td>
+<td>✅</td>
+<td>✅</td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="not-feasible-checks">Not Feasible Checks</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Diagnostic Check</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>17</td>
+<td>Detect long-running blocking patterns</td>
+<td>Requires runtime analysis, not feasible by static analysis</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Excessive logging</td>
+<td>Requires runtime analysis, not feasible by static analysis</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Monolithic layout warning</td>
+<td>Requires context analysis, not feasible by static analysis</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="key-features">✅ Key Features</h3>
 <ul>
-<li>Removed <code>main.py</code> check (was v1 specific)</li>
-<li>Added decorator detection (v2 model confirmation)</li>
-<li>Excluded v1-only checks like <code>entryPoint</code>, <code>function.json</code> folder matching</li>
-<li>Included v2-only checks like <code>azure-functions-python-library</code></li>
-<li>Clarified feasibility and implementation status across all checks</li>
+<li><strong>Programming Model Support</strong>: Supports both v1 and v2 projects with automatic detection</li>
+<li><strong>Model-Specific Rules</strong>: Different requirements and checks for each programming model</li>
+<li><strong>Unified Interface</strong>: Same CLI interface for both models with clear model indication</li>
+<li><strong>v1 Limited Support</strong>: v1 projects show "(limited support)" warning but still get basic diagnostics</li>
+<li><strong>Rule Separation</strong>: Separate rule sets for v1 and v2 with independent check_order management</li>
+<li><strong>Extensible Design</strong>: Easy to add new checks for either programming model</li>
 </ul>
 
 
