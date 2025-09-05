@@ -1,12 +1,9 @@
 import importlib.resources
 import json
-import sys
 import time
 from collections import defaultdict
 from pathlib import Path
 from typing import TypedDict
-
-from rich.console import Console
 
 from azure_functions_doctor.handlers import Rule, generic_handler
 from azure_functions_doctor.logging_config import get_logger, log_rule_execution
@@ -37,47 +34,99 @@ class Doctor:
 
     def __init__(self, path: str = ".") -> None:
         self.project_path: Path = Path(path).resolve()
-        self._check_compatibility()
+        self.programming_model = self._detect_programming_model()
 
-    def _check_compatibility(self) -> None:
-        """Check if the project is compatible with this tool (currently v2 only)."""
-        # Check for v1 function.json files
+    def _detect_programming_model(self) -> str:
+        """Detect the Azure Functions programming model version.
+
+        Returns:
+            str: 'v1' if function.json files are found, 'v2' if @app decorators are found,
+                 'v2' as default if neither is clearly detected.
+        """
+        # Check for v1: function.json files
         function_json_files = list(self.project_path.rglob("function.json"))
         if function_json_files:
-            console = Console()
-            console.print("❌ [red]Incompatible project detected![/red]")
-            console.print(
-                "[yellow]This tool currently supports Azure Functions Python Programming Model v2 only.[/yellow]"
-            )
-            console.print("[yellow]Your project appears to use v1 (function.json based).[/yellow]")
-            console.print()
-            console.print("[bold]To use this tool:[/bold]")
-            console.print(
-                "1. Migrate your project to v2 using decorators "
-                "([cyan]@app.route[/cyan], [cyan]@app.schedule[/cyan], etc.)"
-            )
-            console.print("2. Or use a different diagnostic tool that supports v1")
-            console.print()
-            console.print(
-                "[blue]Learn more:[/blue] https://learn.microsoft.com/azure/azure-functions/functions-python-develop-v2"
-            )
-            sys.exit(1)
+            return "v1"
+
+        # Check for v2: @app decorators in Python files
+        if self._has_v2_decorators():
+            return "v2"
+
+        # Default to v2 (current primary support)
+        return "v2"
+
+    def _has_v2_decorators(self) -> bool:
+        """Check if the project uses v2 decorators (@app.*)."""
+        python_files = list(self.project_path.rglob("*.py"))
+
+        for py_file in python_files:
+            try:
+                with py_file.open(encoding="utf-8") as f:
+                    content = f.read()
+                    if "@app." in content:
+                        return True
+            except (OSError, UnicodeDecodeError):
+                # Skip files that can't be read
+                continue
+
+        return False
 
     def load_rules(self) -> list[Rule]:
+        """Load rules based on detected programming model."""
+        try:
+            if self.programming_model == "v2":
+                return self._load_v2_rules()
+            elif self.programming_model == "v1":
+                return self._load_v1_rules()
+            else:
+                # Fallback to legacy rules.json
+                return self._load_legacy_rules()
+
+        except Exception as e:
+            logger.error(f"Failed to load rules: {e}")
+            raise RuntimeError(f"Failed to load rules: {e}") from e
+
+    def _load_v2_rules(self) -> list[Rule]:
+        """Load complete v2 rules set."""
+        try:
+            rules_path = importlib.resources.files("azure_functions_doctor.assets.rules").joinpath("v2.json")
+            with rules_path.open(encoding="utf-8") as f:
+                rules = json.load(f)
+            return sorted(rules, key=lambda r: r.get("check_order", 999))
+        except FileNotFoundError:
+            logger.warning("v2.json not found, falling back to legacy rules.json")
+            return self._load_legacy_rules()
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in v2.json: {e}")
+            raise RuntimeError(f"Failed to parse v2.json: {e}") from e
+
+    def _load_v1_rules(self) -> list[Rule]:
+        """Load complete v1 rules set."""
+        try:
+            rules_path = importlib.resources.files("azure_functions_doctor.assets.rules").joinpath("v1.json")
+            with rules_path.open(encoding="utf-8") as f:
+                rules = json.load(f)
+            return sorted(rules, key=lambda r: r.get("check_order", 999))
+        except FileNotFoundError:
+            logger.warning("v1.json not found, falling back to legacy rules.json")
+            return self._load_legacy_rules()
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in v1.json: {e}")
+            raise RuntimeError(f"Failed to parse v1.json: {e}") from e
+
+    def _load_legacy_rules(self) -> list[Rule]:
+        """Load legacy rules.json for backward compatibility."""
         try:
             rules_path = importlib.resources.files("azure_functions_doctor.assets").joinpath("rules.json")
             with rules_path.open(encoding="utf-8") as f:
                 rules: list[Rule] = json.load(f)
-            return sorted(rules, key=lambda r: r.get("check_order", 999))
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in rules file: {e}")
-            raise RuntimeError(f"Failed to parse rules.json: {e}") from e
+                return rules
         except FileNotFoundError as e:
-            logger.error("rules.json not found in package")
-            raise RuntimeError("Rules file not found") from e
-        except Exception as e:
-            logger.error(f"Unexpected error loading rules: {e}")
-            raise RuntimeError(f"Failed to load rules: {e}") from e
+            logger.error("No rules files found")
+            raise RuntimeError("No rules files found") from e
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in rules.json: {e}")
+            raise RuntimeError(f"Failed to parse rules.json: {e}") from e
 
     def run_all_checks(self) -> list[SectionResult]:
         rules = self.load_rules()
