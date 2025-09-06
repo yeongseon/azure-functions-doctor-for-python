@@ -61,7 +61,7 @@ Feel free to [open an issue](https://github.com/yeongseon/azure-functions-doctor
 
 ## Example Output
 
-![CLI output](assets/func-doctor-example.png)
+![CLI output](assets/azure-functions-doctor-example.png)
 
 ---
 

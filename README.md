@@ -144,7 +144,7 @@ pip install -e .
 azure-functions doctor
 ```
 
-<img src="docs/assets/func-doctor-example.png" alt="Sample output" width="100%" />
+<img src="docs/assets/azure-functions-doctor-example.png" alt="Sample output" width="100%" />
 
 ### Show Help
 
