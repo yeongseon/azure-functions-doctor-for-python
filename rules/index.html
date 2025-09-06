@@ -839,17 +839,16 @@
 <pre><code>src/
 └── azure_functions_doctor/
     └── assets/
-        ├── rules.json          👈 Legacy (fallback)
-        └── rules/
-            ├── v1.json         👈 v1 Programming Model rules
-            └── v2.json         👈 v2 Programming Model rules
+      └── rules/
+        ├── v1.json         👈 v1 Programming Model rules
+        └── v2.json         👈 v2 Programming Model rules
 </code></pre>
 <h3 id="rule-file-selection">Rule File Selection</h3>
 <p>The tool automatically selects the appropriate rule file based on the detected programming model:</p>
 <ul>
 <li><strong>v1 projects</strong>: Uses <code>v1.json</code> (function.json-based projects)</li>
-<li><strong>v2 projects</strong>: Uses <code>v2.json</code> (decorator-based projects)  </li>
-<li><strong>Fallback</strong>: Uses legacy <code>rules.json</code> if new files are not found</li>
+<li><strong>v2 projects</strong>: Uses <code>v2.json</code> (decorator-based projects)<br />
+Rules are read from the <code>assets/rules/v1.json</code> or <code>assets/rules/v2.json</code> files depending on the detected programming model. Legacy <code>rules.json</code> support has been removed.</li>
 </ul>
 <hr />
 <h2 id="structure-of-a-rule">⌐ Structure of a Rule</h2>
@@ -1007,7 +1006,7 @@
 </ul>
 <hr />
 <h2 id="testing-your-changes">🥪 Testing Your Changes</h2>
-<p>After editing <code>rules.json</code>, you can run:</p>
+<p>After editing <code>v1.json</code> or <code>v2.json</code>, you can run:</p>
 <pre><code class="language-bash">func-doctor diagnose --verbose
 </code></pre>
 <p>To see grouped results and hints.</p>
