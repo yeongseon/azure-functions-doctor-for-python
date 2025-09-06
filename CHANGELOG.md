@@ -1,5 +1,15 @@
 # 📦 Changelog
 
+- bump version to 0.10.0 (2979e22dc658b0cf2f1b0266a58f4ba9ddebc6b8)
+
+- update CLI name references and use new example screenshot filename (ec953a1e677e1e28ed3693ed24e813b56f24357a)
+
+- accept 'jsonpath' in Condition TypedDict (fix mypy) (cbcf52850cdd1f86823008baaf267ee22d40f81c)
+
+- rename command to 'azure-functions doctor' and update UI; doctor: include severity metadata and normalize statuses (7b327f9f9dbceb5afc13e6d090be14f1daccadc3)
+
+- update changelog (7c01e2cba5f71ebd4326bc8a441e4a81d278bf76)
+
 - bump version to 0.9.0 (6cf33bc61cb2c8256f1eff52295292ae365d256b)
 
 - replace 'func-doctor' with 'azure-functions' in docs and examples (30057fce6f80fba9e5a4d15dcdbc795823a9b90f)
