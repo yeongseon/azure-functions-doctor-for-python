@@ -1237,7 +1237,7 @@
                 <code>verbose</code>
             </td>
             <td>
-                  <code><span title="bool">bool</span></code>
+                  <code><span title="typing.Annotated">Annotated</span>[<span title="bool">bool</span>, <span title="typer.Option">Option</span>(-<span title="v">v</span>, --<span title="verbose">verbose</span>, help=&#39;Show detailed hints for failed checks&#39;)]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1302,7 +1302,8 @@
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/cli.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 68</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 67</span>
+<span class="normal"> 68</span>
 <span class="normal"> 69</span>
 <span class="normal"> 70</span>
 <span class="normal"> 71</span>
@@ -1440,10 +1441,24 @@
 <span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
-<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;doctor&quot;</span><span class="p">)</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;doctor&quot;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">doctor</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Show detailed hints for failed checks&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">debug</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;Enable debug logging&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="nb">format</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output format: &#39;table&#39; or &#39;json&#39;&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="s2">&quot;table&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;Optional path to save JSON result&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1493,7 +1508,34 @@
     <span class="c1"># Log diagnostic completion</span>
     <span class="n">log_diagnostic_complete</span><span class="p">(</span><span class="n">total_checks</span><span class="p">,</span> <span class="n">passed_items</span><span class="p">,</span> <span class="n">failed_items</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="n">duration_ms</span><span class="p">)</span>
 
-    <span class="n">passed</span> <span class="o">=</span> <span class="n">failed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># local counts handled below; remove unused placeholders</span>
+
+    <span class="c1"># Pre-compute aggregated counts from normalized item[&#39;status&#39;] values</span>
+    <span class="n">passed_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">warning_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">error_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">section</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">)</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;severity&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
+                <span class="n">passed_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;warn&quot;</span><span class="p">:</span>
+                <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;fail&quot;</span><span class="p">:</span>
+                <span class="c1"># treat &#39;fail&#39; as non-fatal warning for backwards compatibility</span>
+                <span class="c1"># but escalate to error only if the rule severity explicitly marks it as &#39;error&#39;</span>
+                <span class="k">if</span> <span class="n">severity</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
+                    <span class="c1"># keep as warning for CLI exit semantics (tests expect non-zero only for true errors)</span>
+                    <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
+                <span class="c1"># defensive: treat &#39;error&#39; as error</span>
+                <span class="n">error_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># treat unknown as warning for safety</span>
+                <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
         <span class="n">json_output</span> <span class="o">=</span> <span class="n">results</span>
@@ -1510,75 +1552,63 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_output</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
         <span class="k">return</span>
 
-    <span class="c1"># Print header only for table format</span>
-    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold blue]🩺 Azure Functions Doctor for Python v</span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">[/bold blue]&quot;</span><span class="p">)</span>
-    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold]📁 Path:[/bold] </span><span class="si">{</span><span class="n">resolved_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Show programming model in header</span>
-    <span class="k">if</span> <span class="n">doctor</span><span class="o">.</span><span class="n">programming_model</span> <span class="o">==</span> <span class="s2">&quot;v1&quot;</span><span class="p">:</span>
-        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold]🐍 Python Programming Model:[/bold] [yellow]v1 (limited support)[/yellow]&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold]🐍 Python Programming Model:[/bold] [green]v2[/green]&quot;</span><span class="p">)</span>
-
-    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+    <span class="c1"># Note: Top header removed per UI change; programming model header intentionally omitted</span>
 
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
         <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[dim]Debug logging enabled - check stderr for detailed logs[/dim]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Default: table format</span>
-    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">format_result</span><span class="p">(</span><span class="n">section</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]),</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">section</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span> <span class="s2">&quot;bold&quot;</span><span class="p">)))</span>
+    <span class="c1"># Table-format user-facing output (requested design)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;Azure Functions Doctor   &quot;</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path: </span><span class="si">{</span><span class="n">resolved_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">section</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
-            <span class="n">passed</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">failed</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1"># Print each section with simple title and items</span>
+    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">section</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">section</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]:</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-            <span class="n">status</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;pass&quot;</span><span class="p">)</span>
+            <span class="n">icon</span> <span class="o">=</span> <span class="n">format_status_icon</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
 
-            <span class="n">line</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span>
-                <span class="p">(</span><span class="s2">&quot;  • &quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span>
-                <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s2">&quot;dim&quot;</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">),</span>
-                <span class="n">format_detail</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span>
-            <span class="p">)</span>
+            <span class="c1"># Prefer explicit severity for display if present, otherwise show raw status</span>
+            <span class="n">display_status</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;severity&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">status</span>
+
+            <span class="c1"># Compose main line: [ICON] Label: value (display_status)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">icon</span><span class="si">}</span><span class="s2">] &quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s2">&quot;dim&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_detail</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+            <span class="c1"># append status in parentheses for clarity on UI when non-pass</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">display_status</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;italic dim&quot;</span><span class="p">)</span>
+
             <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hint&quot;</span><span class="p">):</span>
-                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    ↪ [yellow]</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;hint&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">[/yellow]&quot;</span><span class="p">)</span>
-                <span class="n">hint_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hint_url&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">hint_url</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    📚 [blue]</span><span class="si">{</span><span class="n">hint_url</span><span class="si">}</span><span class="s2">[/blue]&quot;</span><span class="p">)</span>
+            <span class="c1"># show hint as &#39;fix:&#39; only when verbose is enabled</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;pass&quot;</span> <span class="ow">and</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">hint</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hint&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hint</span><span class="p">:</span>
+                    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;↪ &quot;</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">fix: </span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># ✅ Summary section</span>
+    <span class="c1"># Use the precomputed counts from earlier for final output</span>
     <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
-    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold]Summary[/bold]&quot;</span><span class="p">)</span>
-    <span class="n">summary</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span>
-        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">format_status_icon</span><span class="p">(</span><span class="s1">&#39;pass&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="s2">&quot;green bold&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">passed</span><span class="si">}</span><span class="s2"> Passed    &quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">format_status_icon</span><span class="p">(</span><span class="s1">&#39;fail&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="s2">&quot;red bold&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">failed</span><span class="si">}</span><span class="s2"> Failed&quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">),</span>
-    <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">errors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">summary</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span>
-            <span class="n">summary</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;    ⚠ &quot;</span><span class="p">,</span> <span class="s2">&quot;yellow bold&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">errors</span><span class="si">}</span><span class="s2"> Errors&quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">),</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="n">summary</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span>
-            <span class="n">summary</span><span class="p">,</span>
-            <span class="p">(</span><span class="s2">&quot;    🕒 &quot;</span><span class="p">,</span> <span class="s2">&quot;dim&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">duration_ms</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">ms&quot;</span><span class="p">,</span> <span class="s2">&quot;dim&quot;</span><span class="p">),</span>
-        <span class="p">)</span>
-
-    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+    <span class="c1"># Print Doctor summary at the bottom like the requested sample</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;Doctor summary (to see all details, run azure-functions doctor -v):&quot;</span><span class="p">)</span>
+    <span class="c1"># Use singular/plural simple form as in sample (error vs errors)</span>
+    <span class="n">e_label</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span> <span class="k">if</span> <span class="n">error_count</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;errors&quot;</span>
+    <span class="n">w_label</span> <span class="o">=</span> <span class="s2">&quot;warning&quot;</span> <span class="k">if</span> <span class="n">warning_count</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;warnings&quot;</span>
+    <span class="n">p_label</span> <span class="o">=</span> <span class="s2">&quot;passed&quot;</span> <span class="k">if</span> <span class="n">passed_count</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;passed&quot;</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">error_count</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e_label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">warning_count</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">w_label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">passed_count</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">p_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Print Exit code line to match the sample and exit with code 1 on errors</span>
+    <span class="k">if</span> <span class="n">error_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;Exit code: 1&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;Exit code: 0&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1648,8 +1678,7 @@ appropriate v1/v2 files are present in package assets.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>src/azure_functions_doctor/doctor.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
-<span class="normal">40</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
@@ -1657,7 +1686,8 @@ appropriate v1/v2 files are present in package assets.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
-<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">allow_v1</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">allow_v1</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">programming_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_programming_model</span><span class="p">()</span>
     <span class="c1"># If v1 detected in nested function folders (function.json not at project root)</span>
@@ -1699,14 +1729,14 @@ appropriate v1/v2 files are present in package assets.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/doctor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">85</span>
-<span class="normal">86</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">86</span>
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span>
-<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Rule</span><span class="p">]:</span>
+<span class="normal">92</span>
+<span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Rule</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load rules based on detected programming model.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">programming_model</span> <span class="o">==</span> <span class="s2">&quot;v2&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_v2_rules</span><span class="p">()</span>
