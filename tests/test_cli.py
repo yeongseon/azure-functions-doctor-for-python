@@ -34,4 +34,4 @@ def test_cli_verbose_output() -> None:
     """Test CLI outputs verbose hints when enabled."""
     result = runner.invoke(app, ["doctor", "--format", "table", "--verbose"])
     assert result.exit_code == 0
-    assert "↪" in result.output  # hint indicator
+    assert "fix:" in result.output  # hint indicator now printed as 'fix:'

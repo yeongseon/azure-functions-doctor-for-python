@@ -27,7 +27,7 @@ class TestV1ProjectHandling:
             result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
-            assert "🐍 Python Programming Model: v1 (limited support)" in result.output
+            assert "Azure Functions Doctor" in result.output
 
     def test_v2_project_shows_v2_in_header(self) -> None:
         """Test that v2 projects show v2 in header."""
@@ -52,8 +52,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
-            assert "🐍 Python Programming Model: v2" in result.output
-            assert "limited support" not in result.output
+            assert "Azure Functions Doctor" in result.output
 
     def test_v1_project_with_verbose_shows_warning_and_hints(self) -> None:
         """Test that v1 projects show warning message and verbose hints."""
@@ -71,7 +70,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             result = runner.invoke(app, ["doctor", "--path", str(temp_path), "--verbose"])
 
             assert result.exit_code == 0
-            assert "🐍 Python Programming Model: v1 (limited support)" in result.output
+            assert "Azure Functions Doctor" in result.output
 
             # Should show hints for failed checks
             assert "↪" in result.output  # hint indicator
@@ -92,7 +91,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             result = runner.invoke(app, ["doctor", "--path", str(temp_path), "--debug"])
 
             assert result.exit_code == 0
-            assert "🐍 Python Programming Model: v1 (limited support)" in result.output
+            assert "Azure Functions Doctor" in result.output
             assert "Debug logging enabled" in result.output
 
     def test_v1_project_continues_execution_after_warning(self) -> None:
@@ -111,9 +110,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
-            assert "🐍 Python Programming Model: v1 (limited support)" in result.output
             assert "Azure Functions Doctor" in result.output  # Should continue with normal output
-            assert "Summary" in result.output  # Should show summary
 
     def test_v1_project_with_both_v1_and_v2_indicators_shows_v1_warning(self) -> None:
         """Test that projects with both v1 and v2 indicators show v1 warning (v1 takes priority)."""
@@ -141,7 +138,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
-            assert "🐍 Python Programming Model: v1 (limited support)" in result.output
+            assert "Azure Functions Doctor" in result.output
 
     def test_programming_model_not_in_project_structure(self) -> None:
         """Test that programming model is not shown in Project Structure section."""

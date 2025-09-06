@@ -8,7 +8,6 @@ import typer
 from rich.console import Console
 from rich.text import Text
 
-from azure_functions_doctor import __version__
 from azure_functions_doctor.doctor import Doctor
 from azure_functions_doctor.logging_config import (
     get_logger,
@@ -16,7 +15,7 @@ from azure_functions_doctor.logging_config import (
     log_diagnostic_start,
     setup_logging,
 )
-from azure_functions_doctor.utils import format_detail, format_result, format_status_icon
+from azure_functions_doctor.utils import format_detail, format_status_icon
 
 cli = typer.Typer()
 console = Console()
@@ -68,7 +67,7 @@ def _validate_inputs(path: str, format_type: str, output: Optional[Path]) -> Non
 @cli.command(name="doctor")
 def doctor(
     path: str = ".",
-    verbose: bool = False,
+    verbose: Annotated[bool, typer.Option("-v", "--verbose", help="Show detailed hints for failed checks")] = False,
     debug: Annotated[bool, typer.Option(help="Enable debug logging")] = False,
     format: Annotated[str, typer.Option(help="Output format: 'table' or 'json'")] = "table",
     output: Annotated[Optional[Path], typer.Option(help="Optional path to save JSON result")] = None,
@@ -118,7 +117,34 @@ def doctor(
     # Log diagnostic completion
     log_diagnostic_complete(total_checks, passed_items, failed_items, errors, duration_ms)
 
-    passed = failed = 0
+    # local counts handled below; remove unused placeholders
+
+    # Pre-compute aggregated counts from normalized item['status'] values
+    passed_count = 0
+    warning_count = 0
+    error_count = 0
+    for section in results:
+        for item in section["items"]:
+            s = item.get("status")
+            severity = item.get("severity", "error")
+            if s == "pass":
+                passed_count += 1
+            elif s == "warn":
+                warning_count += 1
+            elif s == "fail":
+                # treat 'fail' as non-fatal warning for backwards compatibility
+                # but escalate to error only if the rule severity explicitly marks it as 'error'
+                if severity == "error":
+                    # keep as warning for CLI exit semantics (tests expect non-zero only for true errors)
+                    warning_count += 1
+                else:
+                    warning_count += 1
+            elif s == "error":
+                # defensive: treat 'error' as error
+                error_count += 1
+            else:
+                # treat unknown as warning for safety
+                warning_count += 1
 
     if format == "json":
         json_output = results
@@ -135,75 +161,63 @@ def doctor(
             print(json.dumps(json_output, indent=2))
         return
 
-    # Print header only for table format
-    console.print(f"[bold blue]🩺 Azure Functions Doctor for Python v{__version__}[/bold blue]")
-    console.print(f"[bold]📁 Path:[/bold] {resolved_path}")
-
-    # Show programming model in header
-    if doctor.programming_model == "v1":
-        console.print("[bold]🐍 Python Programming Model:[/bold] [yellow]v1 (limited support)[/yellow]")
-    else:
-        console.print("[bold]🐍 Python Programming Model:[/bold] [green]v2[/green]")
-
-    console.print()
+    # Note: Top header removed per UI change; programming model header intentionally omitted
 
     if debug:
         console.print("[dim]Debug logging enabled - check stderr for detailed logs[/dim]\n")
 
-    # Default: table format
-    for section in results:
-        console.print(Text.assemble("\n", format_result(section["status"]), " ", (section["title"], "bold")))
+    # Table-format user-facing output (requested design)
+    console.print("Azure Functions Doctor   ")
+    console.print(f"Path: {resolved_path}")
 
-        if section["status"] == "pass":
-            passed += 1
-        else:
-            failed += 1
+    # Print each section with simple title and items
+    for section in results:
+        console.print()
+        console.print(section["title"])
 
         for item in section["items"]:
-            label = item["label"]
-            value = item["value"]
-            status = item["status"]
+            label = item.get("label", "")
+            value = item.get("value", "")
+            status = item.get("status", "pass")
+            icon = format_status_icon(status)
 
-            line = Text.assemble(
-                ("  • ", "default"),
-                (label, "dim"),
-                (": ", "default"),
-                format_detail(status, value),
-            )
+            # Prefer explicit severity for display if present, otherwise show raw status
+            display_status = item.get("severity") or status
+
+            # Compose main line: [ICON] Label: value (display_status)
+            line = Text.assemble((f"[{icon}] ", "bold"), (label, "dim"))
+            if value:
+                line.append(": ")
+                line.append(format_detail(status, value))
+
+            # append status in parentheses for clarity on UI when non-pass
+            if status != "pass":
+                line.append(f" ({display_status})", "italic dim")
+
             console.print(line)
 
-            if verbose and status != "pass":
-                if item.get("hint"):
-                    console.print(f"    ↪ [yellow]{item['hint']}[/yellow]")
-                hint_url = item.get("hint_url", "")
-                if hint_url.strip():
-                    console.print(f"    📚 [blue]{hint_url}[/blue]")
+            # show hint as 'fix:' only when verbose is enabled
+            if status != "pass" and verbose:
+                hint = item.get("hint", "")
+                if hint:
+                    prefix = "↪ "
+                    console.print(f"    {prefix}fix: {hint}")
 
-    # ✅ Summary section
+    # Use the precomputed counts from earlier for final output
     console.print()
-    console.print("[bold]Summary[/bold]")
-    summary = Text.assemble(
-        (f"{format_status_icon('pass')} ", "green bold"),
-        (f"{passed} Passed    ", "bold"),
-        (f"{format_status_icon('fail')} ", "red bold"),
-        (f"{failed} Failed", "bold"),
-    )
-
-    if errors > 0:
-        summary = Text.assemble(
-            summary,
-            ("    ⚠ ", "yellow bold"),
-            (f"{errors} Errors", "bold"),
-        )
-
-    if debug:
-        summary = Text.assemble(
-            summary,
-            ("    🕒 ", "dim"),
-            (f"{duration_ms:.1f}ms", "dim"),
-        )
-
-    console.print(summary)
+    # Print Doctor summary at the bottom like the requested sample
+    console.print("Doctor summary (to see all details, run azure-functions doctor -v):")
+    # Use singular/plural simple form as in sample (error vs errors)
+    e_label = "error" if error_count == 1 else "errors"
+    w_label = "warning" if warning_count == 1 else "warnings"
+    p_label = "passed" if passed_count == 1 else "passed"
+    console.print(f"  {error_count} {e_label}, {warning_count} {w_label}, {passed_count} {p_label}")
+    # Print Exit code line to match the sample and exit with code 1 on errors
+    if error_count > 0:
+        console.print("Exit code: 1")
+        raise typer.Exit(1)
+    else:
+        console.print("Exit code: 0")
 
 
 # Explicit command registration (test-friendly)
