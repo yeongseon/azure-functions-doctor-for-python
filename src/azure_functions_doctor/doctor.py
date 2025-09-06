@@ -29,7 +29,11 @@ class SectionResult(TypedDict):
 class Doctor:
     """
     Diagnostic runner for Azure Functions apps.
-    Loads checks from rules.json and executes them against a target project path.
+
+    Loads checks from model-specific rule assets located in
+    `azure_functions_doctor.assets.rules.v1.json` and `v2.json`. Legacy
+    `rules.json` support has been removed; callers should ensure the
+    appropriate v1/v2 files are present in package assets.
     """
 
     def __init__(self, path: str = ".", allow_v1: bool = False) -> None:
@@ -85,8 +89,7 @@ class Doctor:
         elif self.programming_model == "v1":
             return self._load_v1_rules()
         else:
-            # Fallback to legacy rules.json
-            return self._load_legacy_rules()
+            raise RuntimeError("Unknown programming model; no rules to load")
 
     def _load_v2_rules(self) -> list[Rule]:
         """Load complete v2 rules set."""
@@ -94,7 +97,7 @@ class Doctor:
 
         # Load v2 rules from assets/rules/v2.json only
         try:
-            rules_path = files_obj.joinpath("rules").joinpath("v2.json")
+            rules_path = files_obj.joinpath("rules/v2.json")
             with rules_path.open(encoding="utf-8") as f:
                 v2_rules = json.load(f)
         except FileNotFoundError as e:
@@ -112,7 +115,7 @@ class Doctor:
 
         # Load v1 rules from assets/rules/v1.json only
         try:
-            rules_path = files_obj.joinpath("rules").joinpath("v1.json")
+            rules_path = files_obj.joinpath("rules/v1.json")
             with rules_path.open(encoding="utf-8") as f:
                 v1_rules = json.load(f)
         except FileNotFoundError as e:
@@ -124,32 +127,7 @@ class Doctor:
 
         return sorted(list(v1_rules), key=lambda r: r.get("check_order", 999))
 
-    def _load_legacy_rules(self) -> list[Rule]:
-        """Load legacy rules.json for backward compatibility."""
-        try:
-            files_obj = importlib.resources.files("azure_functions_doctor.assets")
-            rules_path = files_obj.joinpath("rules.json")
-            try:
-                with rules_path.open(encoding="utf-8") as f:
-                    legacy_rules: list[Rule] = json.load(f)
-                    return legacy_rules
-            except FileNotFoundError:
-                # Test harnesses sometimes mock importlib.resources.files and
-                # attach a different path object on joinpath.return_path. Try
-                # that as a fallback to be compatible with unit tests.
-                joiner = getattr(files_obj, "joinpath", None)
-                if joiner is not None and hasattr(joiner, "return_path"):
-                    try:
-                        with joiner.return_path.open(encoding="utf-8") as f:
-                            rules: list[Rule] = json.load(f)
-                            return rules
-                    except Exception:
-                        pass
-                logger.error("No rules files found")
-                raise RuntimeError("No rules files found") from None
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in rules.json: {e}")
-            raise RuntimeError(f"Failed to parse rules.json: {e}") from e
+    # Legacy `rules.json` support removed per repository simplification.
 
     def run_all_checks(self) -> list[SectionResult]:
         rules = self.load_rules()

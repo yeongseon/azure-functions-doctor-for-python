@@ -136,7 +136,7 @@ make check-all   # Run all checks
 
 Our diagnostic system is designed to be easily extensible:
 
-1. **Define the rule** in `src/azure_functions_doctor/assets/rules.json`:
+1. **Define the rule** in `src/azure_functions_doctor/assets/rules/v2.json` (and/or `v1.json` for v1 projects):
    ```json
    {
      "id": "check_my_feature",
@@ -177,7 +177,9 @@ src/azure_functions_doctor/
 ├── logging_config.py # Centralized logging system
 ├── target_resolver.py # Version resolution utilities
 └── assets/
-    └── rules.json   # Declarative rule definitions
+   └── rules/
+      ├── v1.json
+      └── v2.json
 ```
 
 ### Handler Guidelines

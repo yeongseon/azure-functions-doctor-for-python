@@ -1,8 +1,6 @@
 import json
 import os
-import shutil
 import tempfile
-from importlib.resources import files
 
 import pytest
 
@@ -12,9 +10,7 @@ from azure_functions_doctor.doctor import Doctor
 def test_doctor_checks_pass() -> None:
     """Tests that the Doctor class runs checks and returns results."""
     with tempfile.TemporaryDirectory() as tmp:
-        # Copy embedded rules.json
-        rules_path = files("azure_functions_doctor.assets").joinpath("rules.json")
-        shutil.copy(str(rules_path), os.path.join(tmp, "rules.json"))
+        # Ensure v2 rules are available in package assets (no legacy rules.json)
 
         # Create required files
         with open(os.path.join(tmp, "host.json"), "w") as f:
@@ -40,9 +36,7 @@ def test_doctor_checks_pass() -> None:
 def test_missing_files() -> None:
     """Tests that the Doctor class detects missing files."""
     with tempfile.TemporaryDirectory() as tmp:
-        rules_path = files("azure_functions_doctor.assets").joinpath("rules.json")
-        shutil.copy(str(rules_path), os.path.join(tmp, "rules.json"))
-
+        # No rules.json copy; doctor should load v2 rules from package assets
         doctor = Doctor(tmp)
         results = doctor.run_all_checks()
 

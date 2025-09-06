@@ -64,7 +64,7 @@ Azure Functions Doctor uses a modular, rule-based architecture for extensibility
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   CLI Interface │    │  Core Diagnostic │    │   Rule System   │
-│    (cli.py)     │───▶│    Engine        │───▶│  (rules.json)   │
+│    (cli.py)     │───▶│    Engine        │───▶│  (assets/rules/v2.json or v1.json)   │
 │                 │    │   (doctor.py)    │    │                 │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                        │                       │
@@ -103,7 +103,7 @@ Azure Functions Doctor uses a modular, rule-based architecture for extensibility
 - **Results Aggregator**: Collects and structures all diagnostic outcomes
 - **Output Formatter**: Renders results as colorized CLI output or machine-readable JSON
 
-This design allows easy extension by adding new rules to `rules.json` and implementing corresponding handlers, without modifying core engine logic.
+This design allows easy extension by adding new rules to `src/azure_functions_doctor/assets/rules/v2.json` (and `v1.json` for v1 projects) and implementing corresponding handlers, without modifying core engine logic.
 
 ---
 

@@ -14,10 +14,9 @@ The rules are organized in separate files under the **assets/rules/** directory:
 src/
 └── azure_functions_doctor/
     └── assets/
-        ├── rules.json          👈 Legacy (fallback)
-        └── rules/
-            ├── v1.json         👈 v1 Programming Model rules
-            └── v2.json         👈 v2 Programming Model rules
+      └── rules/
+        ├── v1.json         👈 v1 Programming Model rules
+        └── v2.json         👈 v2 Programming Model rules
 ```
 
 ### Rule File Selection
@@ -26,7 +25,7 @@ The tool automatically selects the appropriate rule file based on the detected p
 
 - **v1 projects**: Uses `v1.json` (function.json-based projects)
 - **v2 projects**: Uses `v2.json` (decorator-based projects)  
-- **Fallback**: Uses legacy `rules.json` if new files are not found
+Rules are read from the `assets/rules/v1.json` or `assets/rules/v2.json` files depending on the detected programming model. Legacy `rules.json` support has been removed.
 
 ---
 
@@ -183,7 +182,7 @@ Example:
 
 ## 🥪 Testing Your Changes
 
-After editing `rules.json`, you can run:
+After editing `v1.json` or `v2.json`, you can run:
 
 ```bash
 func-doctor diagnose --verbose
