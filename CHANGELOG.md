@@ -1,5 +1,11 @@
 # 📦 Changelog
 
+- bump version to 0.8.0 (52b07238fbc699434e615e00b7828ab06e5dbe82)
+
+- Run formatters (black/ruff) adjustments (1895c63c1d014ba42b6c8e2d899c9178227637f1)
+
+- update changelog (31e2c19f216b44d7a60c33e31cbad87e3561fad4)
+
 - bump version to 0.7.0 (f1a3ebb19a11194282a9e86222174fd89aedfff7)
 
 - merge new handler tests and update programming model/rule-loading tests (019d875570b245ff787e8b73e72097df32cdfb11)
