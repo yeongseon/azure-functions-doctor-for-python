@@ -1,5 +1,15 @@
 # 📦 Changelog
 
+- bump version to 0.9.0 (6cf33bc61cb2c8256f1eff52295292ae365d256b)
+
+- replace 'func-doctor' with 'azure-functions' in docs and examples (30057fce6f80fba9e5a4d15dcdbc795823a9b90f)
+
+- update CLI tests to use 'doctor' subcommand (25423c5fb1ea81f3a6401cb9a6f0bfbb9adce300)
+
+- rename subcommand to 'doctor' and add 'azure-functions' console script entrypoints (7101e7f92ecb25f3c9d382674048bb94adc628c7)
+
+- update changelog (c0cb87053d831b1003518e78768f4645ee570dc7)
+
 - bump version to 0.8.0 (52b07238fbc699434e615e00b7828ab06e5dbe82)
 
 - Run formatters (black/ruff) adjustments (1895c63c1d014ba42b6c8e2d899c9178227637f1)
