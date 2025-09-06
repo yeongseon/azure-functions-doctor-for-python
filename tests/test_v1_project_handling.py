@@ -24,7 +24,7 @@ class TestV1ProjectHandling:
             python_file.write_text("def main(req): return 'Hello'")
 
             runner = CliRunner()
-            result = runner.invoke(app, ["diagnose", "--path", str(temp_path)])
+            result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
             assert "🐍 Python Programming Model: v1 (limited support)" in result.output
@@ -49,7 +49,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             )
 
             runner = CliRunner()
-            result = runner.invoke(app, ["diagnose", "--path", str(temp_path)])
+            result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
             assert "🐍 Python Programming Model: v2" in result.output
@@ -68,7 +68,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             python_file.write_text("def main(req): return 'Hello'")
 
             runner = CliRunner()
-            result = runner.invoke(app, ["diagnose", "--path", str(temp_path), "--verbose"])
+            result = runner.invoke(app, ["doctor", "--path", str(temp_path), "--verbose"])
 
             assert result.exit_code == 0
             assert "🐍 Python Programming Model: v1 (limited support)" in result.output
@@ -89,7 +89,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             python_file.write_text("def main(req): return 'Hello'")
 
             runner = CliRunner()
-            result = runner.invoke(app, ["diagnose", "--path", str(temp_path), "--debug"])
+            result = runner.invoke(app, ["doctor", "--path", str(temp_path), "--debug"])
 
             assert result.exit_code == 0
             assert "🐍 Python Programming Model: v1 (limited support)" in result.output
@@ -108,7 +108,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             python_file.write_text("def main(req): return 'Hello'")
 
             runner = CliRunner()
-            result = runner.invoke(app, ["diagnose", "--path", str(temp_path)])
+            result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
             assert "🐍 Python Programming Model: v1 (limited support)" in result.output
@@ -138,7 +138,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             )
 
             runner = CliRunner()
-            result = runner.invoke(app, ["diagnose", "--path", str(temp_path)])
+            result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
             assert "🐍 Python Programming Model: v1 (limited support)" in result.output
@@ -156,7 +156,7 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             python_file.write_text("def main(req): return 'Hello'")
 
             runner = CliRunner()
-            result = runner.invoke(app, ["diagnose", "--path", str(temp_path)])
+            result = runner.invoke(app, ["doctor", "--path", str(temp_path)])
 
             assert result.exit_code == 0
             # Should not show programming model in Project Structure section

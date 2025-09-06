@@ -9,7 +9,7 @@ runner = CliRunner()
 
 def test_cli_table_output() -> None:
     """Test CLI outputs result in table format."""
-    result = runner.invoke(app, ["diagnose", "--format", "table"])
+    result = runner.invoke(app, ["doctor", "--format", "table"])
     assert result.exit_code == 0
     assert "Azure Functions Doctor" in result.output
     assert any(icon in result.output for icon in ["✔", "✖", "⚠"])
@@ -17,7 +17,7 @@ def test_cli_table_output() -> None:
 
 def test_cli_json_output() -> None:
     """Test CLI outputs result in JSON format without extra text."""
-    result = runner.invoke(app, ["diagnose", "--format", "json"])
+    result = runner.invoke(app, ["doctor", "--format", "json"])
     assert result.exit_code == 0
 
     # Try to isolate the first JSON array in output
@@ -32,6 +32,6 @@ def test_cli_json_output() -> None:
 
 def test_cli_verbose_output() -> None:
     """Test CLI outputs verbose hints when enabled."""
-    result = runner.invoke(app, ["diagnose", "--format", "table", "--verbose"])
+    result = runner.invoke(app, ["doctor", "--format", "table", "--verbose"])
     assert result.exit_code == 0
     assert "↪" in result.output  # hint indicator
