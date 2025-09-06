@@ -977,13 +977,13 @@ Rules are read from the <code>assets/rules/v1.json</code> or <code>assets/rules/
 <ol>
 <li>Open <code>src/azure_functions_doctor/assets/rules/v2.json</code></li>
 <li>Append your rule object to the array</li>
-<li>Save and rerun <code>func-doctor</code></li>
+<li>Save and rerun <code>azure-functions doctor</code></li>
 </ol>
 <h3 id="for-v1-projects">For v1 Projects</h3>
 <ol>
 <li>Open <code>src/azure_functions_doctor/assets/rules/v1.json</code></li>
 <li>Append your rule object to the array</li>
-<li>Save and rerun <code>func-doctor</code></li>
+<li>Save and rerun <code>azure-functions doctor</code></li>
 </ol>
 <h3 id="for-universal-rules">For Universal Rules</h3>
 <p>If you want a rule to apply to both v1 and v2 projects, you'll need to add it to both files with appropriate model-specific configurations.</p>
@@ -1007,7 +1007,7 @@ Rules are read from the <code>assets/rules/v1.json</code> or <code>assets/rules/
 <hr />
 <h2 id="testing-your-changes">🥪 Testing Your Changes</h2>
 <p>After editing <code>v1.json</code> or <code>v2.json</code>, you can run:</p>
-<pre><code class="language-bash">func-doctor diagnose --verbose
+<pre><code class="language-bash">azure-functions doctor --verbose
 </code></pre>
 <p>To see grouped results and hints.</p>
 <hr />

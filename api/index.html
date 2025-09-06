@@ -402,9 +402,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#azure_functions_doctor.cli.diagnose" class="md-nav__link">
+  <a href="#azure_functions_doctor.cli.doctor" class="md-nav__link">
     <span class="md-ellipsis">
-      diagnose
+      doctor
     </span>
   </a>
   
@@ -809,9 +809,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#azure_functions_doctor.cli.diagnose" class="md-nav__link">
+  <a href="#azure_functions_doctor.cli.doctor" class="md-nav__link">
     <span class="md-ellipsis">
-      diagnose
+      doctor
     </span>
   </a>
   
@@ -1194,8 +1194,8 @@
 <div class="doc doc-object doc-function">
 
 
-<h2 id="azure_functions_doctor.cli.diagnose" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">diagnose</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<h2 id="azure_functions_doctor.cli.doctor" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">doctor</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1440,8 +1440,8 @@
 <span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
-<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">diagnose</span><span class="p">(</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;doctor&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">doctor</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">debug</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;Enable debug logging&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
