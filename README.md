@@ -141,7 +141,7 @@ pip install -e .
 ### Run the Doctor
 
 ```bash
-func-doctor diagnose
+azure-functions doctor
 ```
 
 <img src="docs/assets/func-doctor-example.png" alt="Sample output" width="100%" />
@@ -149,7 +149,7 @@ func-doctor diagnose
 ### Show Help
 
 ```bash
-func-doctor --help
+azure-functions --help
 ```
 
 Sample: [examples/basic-hello/diagnose-output.md](examples/basic-hello/diagnose-output.md)

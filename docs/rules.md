@@ -147,12 +147,12 @@ To add a new rule:
 ### For v2 Projects (Recommended)
 1. Open `src/azure_functions_doctor/assets/rules/v2.json`
 2. Append your rule object to the array
-3. Save and rerun `func-doctor`
+3. Save and rerun `azure-functions doctor`
 
 ### For v1 Projects
 1. Open `src/azure_functions_doctor/assets/rules/v1.json`
 2. Append your rule object to the array
-3. Save and rerun `func-doctor`
+3. Save and rerun `azure-functions doctor`
 
 ### For Universal Rules
 If you want a rule to apply to both v1 and v2 projects, you'll need to add it to both files with appropriate model-specific configurations.
@@ -185,7 +185,7 @@ Example:
 After editing `v1.json` or `v2.json`, you can run:
 
 ```bash
-func-doctor diagnose --verbose
+azure-functions doctor --verbose
 ```
 
 To see grouped results and hints.

@@ -33,7 +33,7 @@ It provides **clear emoji-based output**, **rule-based extensibility**, and **op
 
 ```bash
 pip install azure-functions-doctor
-func-doctor diagnose
+azure-functions doctor
 ```
 
 View [Usage Guide](usage.md) →  

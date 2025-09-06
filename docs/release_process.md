@@ -34,10 +34,9 @@ To test the local build:
 
 ```bash
 pip install dist/azure_functions_doctor-<version>-py3-none-any.whl
-func-doctor --version
+azure-functions --version
 ```
 
----
 
 ## Step 3: Publish to PyPI
 
