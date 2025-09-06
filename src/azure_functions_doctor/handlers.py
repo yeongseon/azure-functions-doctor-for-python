@@ -61,6 +61,7 @@ class Condition(TypedDict, total=False):
     operator: str
     value: Union[str, int, float]
     keyword: str
+    jsonpath: str
 
 
 class Rule(TypedDict, total=False):
