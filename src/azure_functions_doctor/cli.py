@@ -65,8 +65,8 @@ def _validate_inputs(path: str, format_type: str, output: Optional[Path]) -> Non
             raise typer.BadParameter(f"No write permission for output directory: {output_path.parent}")
 
 
-@cli.command()
-def diagnose(
+@cli.command(name="doctor")
+def doctor(
     path: str = ".",
     verbose: bool = False,
     debug: Annotated[bool, typer.Option(help="Enable debug logging")] = False,
@@ -207,7 +207,7 @@ def diagnose(
 
 
 # Explicit command registration (test-friendly)
-cli.command()(diagnose)
+cli.command()(doctor)
 
 if __name__ == "__main__":
     cli()

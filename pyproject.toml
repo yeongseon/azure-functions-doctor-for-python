@@ -86,7 +86,10 @@ dev = [
 
 # CLI entry point
 [project.scripts]
-func-doctor = "azure_functions_doctor.cli:cli"
+# primary CLI entrypoint
+azure-functions = "azure_functions_doctor.cli:cli"
+azure-functions-doctor = "azure_functions_doctor.cli:cli"
+fdoctor = "azure_functions_doctor.cli:cli"
 
 # ----------------------------------------
 # 🧪 Hatch Environments
