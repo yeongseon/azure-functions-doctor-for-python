@@ -3,9 +3,10 @@ from rich.text import Text
 
 # Status to icon
 STATUS_ICONS: dict[str, str] = {
-    "pass": "✔",
-    "fail": "✖",
-    "warn": "⚠",
+    # Unified with README: ✓ (pass), ! (warn), ✗ (fail)
+    "pass": "✓",
+    "warn": "!",
+    "fail": "✗",
 }
 
 # Status to styled Text (for section headers)
@@ -31,7 +32,7 @@ def format_status_icon(status: str) -> str:
         status: Diagnostic status ("pass", "fail", "warn").
 
     Returns:
-        A string icon such as ✔, ✖, or ⚠.
+    A string icon such as ✓, !, or ✗.
     """
     return STATUS_ICONS.get(status, "?")
 

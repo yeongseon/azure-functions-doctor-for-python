@@ -12,7 +12,7 @@ def test_cli_table_output() -> None:
     result = runner.invoke(app, ["doctor", "--format", "table"])
     assert result.exit_code == 0
     assert "Azure Functions Doctor" in result.output
-    assert any(icon in result.output for icon in ["✔", "✖", "⚠"])
+    assert any(icon in result.output for icon in ["✓", "✗", "!"])
 
 
 def test_cli_json_output() -> None:
