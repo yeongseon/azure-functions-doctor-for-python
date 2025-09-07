@@ -1,5 +1,7 @@
 # 📦 Changelog
 
+- bump version to 0.12.0
+
 - remove unused severity field from rules schema and code; simplify statuses to pass|warn|fail (BREAKING for custom rule sets including 'severity') (pending)
 
 - bump version to 0.11.0 (9b64954b1ed7f1ad8fbc9c37fdecf759c6f17f1a)
