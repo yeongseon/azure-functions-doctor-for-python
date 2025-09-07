@@ -160,6 +160,19 @@ Sample: [examples/basic-hello/diagnose-output.md](examples/basic-hello/diagnose-
 
 | Icon | Status | Meaning |
 |------|--------|---------|
+
+### 메시지 간결화 (최근 변경)
+
+일부 출력 문구가 더 짧고 스캔하기 쉽게 다음과 같이 정리되었습니다:
+
+| 이전 | 변경 후 |
+|------|---------|
+| `Executable 'func' found in PATH` | `func detected` |
+| `host.json: /path/.../host.json exists` | `host.json: present` |
+| `requirements.txt: /path/.../requirements.txt exists` | `requirements.txt: present` |
+| `No Durable Functions usage detected; check skipped` | (향후 예정: `No durable usage`) |
+
+문구 축약은 단계적으로 진행 중이며, 추가 축약은 추후 릴리스 노트에 반영됩니다.
 | ✔ | pass | 검사 통과 |
 | ⚠ | warn | 경고 (선택적/권장 구성 누락: 예 `local.settings.json` 등) |
 | ✖ | fail | 오류 (배포 차단 가능 / 필수 구성 문제) |

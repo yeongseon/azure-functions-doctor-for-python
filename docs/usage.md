@@ -53,44 +53,47 @@ The tool automatically detects your project's programming model:
 
 ### v2 Project (Decorator-based)
 ```
-🩺 Azure Functions Doctor for Python v0.5.1
-📁 Path: /path/to/v2-project
-🐍 Python Programming Model: v2
+Azure Functions Doctor
 
-✖ Python Env
-  • Python version: Python version is 3.12.3, expected >=3.9
-  • Virtual environment: VIRTUAL_ENV is set
-  • Python executable: .../bin/python exists
-  • requirements.txt: exists
-  • azure-functions-python-library package: Package 'azure.functions' is not installed
+Programming Model
+[✓] Programming model v2: @app decorator detected
 
-✔ Project Structure
-  • host.json: exists
-  • local.settings.json: is missing (optional for local development)
+Python Env
+[✓] Python version: Python 3.12.3 (>=3.9)
+[✓] Virtual environment: VIRTUAL_ENV set
+[✓] Python executable: /path/to/.venv/bin/python3
+[✓] requirements.txt: present
+[✗] azure-functions-python-library package: Module 'azure.functions' not installed
 
-Summary
-✔ 1 Passed    ✖ 1 Failed
+Project Structure
+[✓] host.json: present
+[!] local.settings.json: missing (optional)
+
+Tooling
+[✓] Azure Functions Core Tools (func): func detected
+
+Summary: 1 error, 1 warning, 12 passed
 ```
 
 ### v1 Project (function.json-based)
 ```
-🩺 Azure Functions Doctor for Python v0.5.1
-📁 Path: /path/to/v1-project
-🐍 Python Programming Model: v1 (limited support)
+Azure Functions Doctor
 
-✖ Python Env
-  • Python version: Python version is 3.12.3, expected >=3.6
-  • Virtual environment: VIRTUAL_ENV is set
-  • Python executable: .../bin/python exists
-  • requirements.txt: exists
-  • azure-functions-worker package: Package 'azure.functions_worker' is not installed
+Programming Model
+[✓] Programming model v1: function.json detected
 
-✖ Project Structure
-  • host.json: is missing
-  • local.settings.json: is missing (optional for local development)
+Python Env
+[✓] Python version: Python 3.11.9 (>=3.6)
+[✓] Virtual environment: VIRTUAL_ENV set
+[✓] Python executable: /path/to/.venv/bin/python
+[✓] requirements.txt: present
+[✗] azure-functions-worker package: Module 'azure.functions_worker' not installed
 
-Summary
-✔ 0 Passed    ✖ 2 Failed
+Project Structure
+[✗] host.json: missing
+[!] local.settings.json: missing (optional)
+
+Summary: 2 errors, 1 warning, 8 passed
 ```
 
 ---
