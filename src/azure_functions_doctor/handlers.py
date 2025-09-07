@@ -163,9 +163,10 @@ class HandlerRegistry:
                 ">": current > expected,
                 "<": current < expected,
             }.get(operator, False)
+            # Simplified concise-style detail for Python version
             return _create_result(
                 "pass" if passed else "fail",
-                f"Python version is {current_version}, expected {operator}{value}",
+                f"Python {current_version} ({operator}{value})",
             )
 
         return _create_result("fail", f"Unknown target for version comparison: {target}")
@@ -419,7 +420,8 @@ class HandlerRegistry:
                 candidate = path / str(t)
                 if candidate.exists():
                     return _create_result("pass", f"Found file/path '{candidate}'")
-        return _create_result("fail", "None of the targets in 'targets' were found")
+        # Shorter failure detail for concise output integration
+        return _create_result("fail", "Targets not found")
 
     def _handle_file_glob_check(self, rule: Rule, path: Path) -> dict[str, str]:
         """Detect unwanted files by glob patterns."""

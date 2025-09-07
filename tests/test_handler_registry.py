@@ -61,7 +61,10 @@ def test_handler_registry_compare_version() -> None:
     result = registry.handle(rule, Path("."))
 
     assert result["status"] == "pass"
-    assert "Python version is" in result["detail"]
+    # Detail format was simplified to: "Python <version> (<operator><expected>)"
+    detail = result["detail"]
+    assert detail.startswith("Python ")
+    assert f"({rule['condition']['operator']}{rule['condition']['value']})" in detail
 
 
 def test_handler_registry_env_var_exists() -> None:
