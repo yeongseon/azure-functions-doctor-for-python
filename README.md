@@ -156,6 +156,16 @@ azure-functions --help
 
 Sample: [examples/basic-hello/diagnose-output.md](examples/basic-hello/diagnose-output.md)
 
+### Icons & Status
+
+| Icon | Status | Meaning |
+|------|--------|---------|
+| ✔ | pass | 검사 통과 |
+| ⚠ | warn | 경고 (선택적/권장 구성 누락: 예 `local.settings.json` 등) |
+| ✖ | fail | 오류 (배포 차단 가능 / 필수 구성 문제) |
+
+CLI 출력에서 `warn` 은 즉각적인 실패는 아니지만 품질이나 향후 배포 안정성을 위해 개선이 권장되는 항목입니다.
+
 ---
 
 ## Example
