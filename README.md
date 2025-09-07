@@ -100,6 +100,8 @@ Azure Functions Doctor uses a modular, rule-based architecture for extensibility
 - **Rule System**: Declarative JSON-based rule definitions for extensibility
 - **Handler Dispatcher**: Routes rule types to appropriate handler functions
 - **Individual Handlers**: Specific diagnostic implementations (file checks, version validation, etc.)
+  - New adapter-style checks: `executable_exists`, `any_of_exists`, `file_glob_check`, `host_json_property`,
+    and lightweight validators `binding_validation` and `cron_validation` (see `docs/rules.md`).
 - **Results Aggregator**: Collects and structures all diagnostic outcomes
 - **Output Formatter**: Renders results as colorized CLI output or machine-readable JSON
 

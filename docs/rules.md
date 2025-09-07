@@ -80,6 +80,21 @@ Compare semantic versions.
 
 ---
 
+### Additional rule types (v2 additions)
+
+The project also includes several adapter-style and higher-level validation checks used by the default `v2.json` ruleset:
+
+- `executable_exists` — verifies an executable is available on PATH (condition: `{"target": "func"}` or similar).
+- `any_of_exists` — accepts `targets: [ ... ]` and passes if any listed target exists (supports env vars, host.json keys via `host.json:<path>`, or relative file paths).
+- `file_glob_check` — searches the project for files matching provided glob `patterns` (useful to flag unwanted files like secrets or build artifacts).
+- `host_json_property` — lightweight check for presence of a property in `host.json` using a simple JSON pointer string (e.g. `"$.extensionBundle"`).
+- `binding_validation` — shallow validation of `function.json` bindings (e.g. ensures `httpTrigger` bindings declare `authLevel` and have `methods` where expected).
+- `cron_validation` — heuristic validation for `timerTrigger` `schedule` expressions found in `function.json` (accepts 5- or 6-field cron-like strings).
+
+These checks are implemented as adapters in `src/azure_functions_doctor/handlers.py` and are intentionally lightweight: they cover common misconfigurations without attempting full schema validation. If you need stricter validation, consider adding a custom handler or extending the existing one.
+
+---
+
 ### 2. `file_exists`
 
 Check whether a file exists.
