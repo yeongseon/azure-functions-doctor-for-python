@@ -1,5 +1,11 @@
 # 📦 Changelog
 
+- bump version to 0.11.0 (9b64954b1ed7f1ad8fbc9c37fdecf759c6f17f1a)
+
+- merge handler tests into single file; remove duplicate; add type hints (f1367558997e6a2630ac4496157683cd23a2bf59)
+
+- update changelog (f6f40e2f48cbaa0fff33bea600480ec61d72aba5)
+
 - bump version to 0.10.0 (2979e22dc658b0cf2f1b0266a58f4ba9ddebc6b8)
 
 - update CLI name references and use new example screenshot filename (ec953a1e677e1e28ed3693ed24e813b56f24357a)
