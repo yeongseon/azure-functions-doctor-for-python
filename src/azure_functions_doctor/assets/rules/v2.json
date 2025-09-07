@@ -6,8 +6,7 @@
     "label": "Python version",
     "description": "Checks if the current Python version is 3.9 or higher.",
     "type": "compare_version",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "target": "python",
       "operator": ">=",
@@ -25,8 +24,7 @@
     "label": "Programming model v2",
     "description": "Confirms the project appears to use the v2 decorator-based programming model.",
     "type": "source_code_contains",
-    "required": true,
-    "severity": "info",
+  "required": true,
     "condition": {
       "keyword": "@app."
     },
@@ -39,8 +37,7 @@
     "label": "Virtual environment",
     "description": "Checks if a virtual environment is activated.",
     "type": "env_var_exists",
-    "required": true,
-    "severity": "warning",
+  "required": true,
     "condition": {
       "target": "VIRTUAL_ENV"
     },
@@ -55,8 +52,7 @@
     "label": "Python executable",
     "description": "Checks if Python executable path exists.",
     "type": "path_exists",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "target": "sys.executable"
     },
@@ -71,8 +67,7 @@
     "label": "requirements.txt",
     "description": "Checks if requirements.txt file exists at the root.",
     "type": "file_exists",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "target": "requirements.txt"
     },
@@ -88,8 +83,7 @@
     "label": "azure-functions-python-library package",
     "description": "Checks if 'azure-functions-python-library' is installed (required for v2 programming model).",
     "type": "package_installed",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "pypi": "azure-functions-python-library",
       "target": "azure.functions"
@@ -106,8 +100,7 @@
     "label": "host.json",
     "description": "Checks if host.json file exists in the root directory.",
     "type": "file_exists",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "target": "host.json"
     },
@@ -125,8 +118,7 @@
     "condition": {
       "target": "local.settings.json"
     },
-    "required": false,
-    "severity": "info",
+  "required": false,
     "hint": "Create local.settings.json for local development if needed.",
     "check_order": 7
   }
@@ -138,8 +130,7 @@
     "label": "Azure Functions Core Tools (func)",
     "description": "Checks if the Azure Functions Core Tools CLI ('func') is available on PATH.",
     "type": "executable_exists",
-    "required": false,
-    "severity": "warning",
+  "required": false,
     "condition": {
       "target": "func"
     },
@@ -154,8 +145,7 @@
     "label": "Durable Functions configuration",
     "description": "Checks for durableTask configuration in host.json when durable functions are present.",
     "type": "conditional_exists",
-    "required": false,
-    "severity": "error",
+  "required": false,
     "condition": {
       "target": "host.json",
       "jsonpath": "$.extensions.durableTask"
@@ -171,8 +161,7 @@
     "label": "HTTP trigger validation",
     "description": "Validate common HTTP trigger binding fields like authLevel, methods, and route across functions.",
     "type": "binding_validation",
-    "required": false,
-    "severity": "error",
+  "required": false,
     "condition": {},
     "hint": "Validate httpTrigger bindings for correct authLevel and methods to avoid security or routing issues.",
     "hint_url": "https://learn.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=python",
@@ -185,8 +174,7 @@
     "label": "Timer trigger CRON validation",
     "description": "Validate timer trigger schedule values and CRON expression format.",
     "type": "cron_validation",
-    "required": false,
-    "severity": "error",
+  "required": false,
     "condition": {},
     "hint": "Ensure CRON expressions are valid for Azure Functions (consider 6-field vs 5-field formats).",
     "hint_url": "https://learn.microsoft.com/azure/azure-functions/functions-bindings-timer?tabs=python",
@@ -199,8 +187,7 @@
     "label": "Application Insights configuration",
     "description": "Checks for Application Insights connection settings via env vars or host.json instrumentationKey/connection string.",
     "type": "any_of_exists",
-    "required": false,
-    "severity": "warning",
+  "required": false,
     "condition": {
       "targets": ["APPLICATIONINSIGHTS_CONNECTION_STRING", "APPINSIGHTS_INSTRUMENTATIONKEY", "host.json:instrumentationKey"]
     },
@@ -231,8 +218,7 @@
     "label": "ASGI/WSGI compatibility",
     "description": "Detect whether the project exposes ASGI/WSGI callable and whether it's wired correctly for Functions host.",
     "type": "callable_detection",
-    "required": false,
-    "severity": "warning",
+  "required": false,
     "condition": {},
     "hint": "Verify ASGI/WSGI app is exposed as expected; misconfiguration can prevent routing or startup.",
     "hint_url": "https://learn.microsoft.com/azure/azure-functions/functions-reference-python#asgi",
@@ -245,8 +231,7 @@
     "label": "Detect unused or invalid files",
     "description": "Detect common unwanted files in project root or deployment (e.g., .pyc, __pycache__, .venv, tests).",
     "type": "file_glob_check",
-    "required": false,
-    "severity": "info",
+  "required": false,
     "condition": {
       "patterns": ["**/__pycache__", "**/*.pyc", ".venv", "tests/"]
     },

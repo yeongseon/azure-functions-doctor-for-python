@@ -1,5 +1,7 @@
 # 📦 Changelog
 
+- remove unused severity field from rules schema and code; simplify statuses to pass|warn|fail (BREAKING for custom rule sets including 'severity') (pending)
+
 - bump version to 0.11.0 (9b64954b1ed7f1ad8fbc9c37fdecf759c6f17f1a)
 
 - merge handler tests into single file; remove duplicate; add type hints (f1367558997e6a2630ac4496157683cd23a2bf59)

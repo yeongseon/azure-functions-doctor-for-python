@@ -18,68 +18,52 @@ class TestSpecificExceptionHandling:
     """Test specific exception handling functionality."""
 
     def test_value_error_handling(self) -> None:
-        """Test handling of ValueError exceptions."""
         result = _handle_specific_exceptions("test operation", ValueError("Invalid value"))
         assert result["status"] == "fail"
         assert "Configuration error" in result["detail"]
-        assert "Please check your rule configuration" in result["detail"]
 
     def test_type_error_handling(self) -> None:
-        """Test handling of TypeError exceptions."""
         result = _handle_specific_exceptions("test operation", TypeError("Wrong type"))
         assert result["status"] == "fail"
         assert "Configuration error" in result["detail"]
 
     def test_os_error_handling(self) -> None:
-        """Test handling of OSError exceptions."""
         result = _handle_specific_exceptions("test operation", OSError("File not found"))
-        assert result["status"] == "error"
+        assert result["status"] == "fail"
         assert "File system error" in result["detail"]
-        assert "Please check file permissions and paths" in result["detail"]
 
     def test_permission_error_handling(self) -> None:
-        """Test handling of PermissionError exceptions."""
         result = _handle_specific_exceptions("test operation", PermissionError("Access denied"))
-        assert result["status"] == "error"
+        assert result["status"] == "fail"
         assert "File system error" in result["detail"]
 
     def test_import_error_handling(self) -> None:
-        """Test handling of ImportError exceptions."""
         result = _handle_specific_exceptions("test operation", ImportError("No module named 'test'"))
         assert result["status"] == "fail"
-        assert "Missing dependency" in result["detail"]
-        assert "Please install required packages" in result["detail"]
+        assert "Import error" in result["detail"]
 
     def test_unicode_decode_error_handling(self) -> None:
-        """Test handling of UnicodeDecodeError exceptions."""
         result = _handle_specific_exceptions("test operation", UnicodeDecodeError("utf-8", b"", 0, 1, "invalid"))
-        assert result["status"] == "error"
-        assert "File encoding error" in result["detail"]
-        assert "Please check file encoding" in result["detail"]
+        assert result["status"] == "fail"
+        assert "Encoding error" in result["detail"]
 
     def test_memory_error_handling(self) -> None:
-        """Test handling of MemoryError exceptions."""
         result = _handle_specific_exceptions("test operation", MemoryError("Out of memory"))
-        assert result["status"] == "error"
+        assert result["status"] == "fail"
         assert "Memory error" in result["detail"]
-        assert "File too large to process" in result["detail"]
 
     def test_keyboard_interrupt_re_raise(self) -> None:
-        """Test that KeyboardInterrupt is re-raised."""
         with pytest.raises(KeyboardInterrupt):
             _handle_specific_exceptions("test operation", KeyboardInterrupt())  # type: ignore[arg-type]
 
     def test_system_exit_re_raise(self) -> None:
-        """Test that SystemExit is re-raised."""
         with pytest.raises(SystemExit):
             _handle_specific_exceptions("test operation", SystemExit(1))  # type: ignore[arg-type]
 
     def test_unknown_exception_handling(self) -> None:
-        """Test handling of unknown exceptions."""
         result = _handle_specific_exceptions("test operation", RuntimeError("Unknown error"))
-        assert result["status"] == "error"
+        assert result["status"] == "fail"
         assert "Unexpected error" in result["detail"]
-        assert "Please check the logs for more details" in result["detail"]
 
 
 class TestTargetResolverErrorHandling:

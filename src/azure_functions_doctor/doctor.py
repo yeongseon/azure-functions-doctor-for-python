@@ -16,7 +16,6 @@ class CheckResult(TypedDict, total=False):
     value: str
     status: str
     hint: str
-    severity: str
     hint_url: str
 
 
@@ -153,41 +152,27 @@ class Doctor:
                 result = generic_handler(rule, self.project_path)
                 rule_duration_ms = (time.time() - rule_start) * 1000
 
-                # Log rule execution (use raw handler status for logging)
                 handler_status = result.get("status", "fail")
                 log_rule_execution(rule["id"], rule["type"], handler_status, rule_duration_ms)
 
-                # Build display value and normalize status based on handler + rule severity
-                value_msg = result.get("detail", "")
-                if handler_status != "pass" and not rule.get("required", True):
-                    value_msg += " (optional)"
-
-                # Severity from rule metadata (default to 'error' for safety)
-                rule_severity = rule.get("severity", "error")
-
-                # Normalize handler status into canonical item status: pass/warn/fail
+                # Simplified canonical mapping: pass stays pass, else required -> fail, optional -> warn
+                required = rule.get("required", True)
                 if handler_status == "pass":
-                    item_status = "pass"
-                elif handler_status == "warn":
-                    item_status = "warn"
-                elif handler_status == "fail":
-                    item_status = "fail"
-                elif handler_status == "error":
-                    # map internal handler 'error' to 'fail' for display
-                    item_status = "fail"
+                    canonical = "pass"
                 else:
-                    # unknown statuses map to 'fail' by default
-                    item_status = "fail"
+                    canonical = "fail" if required else "warn"
+
+                detail = result.get("detail", "")
+                if canonical != "pass" and not required:
+                    detail += " (optional)"
 
                 item: CheckResult = {
                     "label": rule.get("label", rule["id"]),
-                    "value": value_msg,
-                    "status": item_status,
-                    "severity": rule_severity,
+                    "value": detail,
+                    "status": canonical,
                 }
 
-                # If the rule is not passing and is required, set section status to fail
-                if item_status != "pass" and rule.get("required", True):
+                if canonical == "fail" and required:
                     section_result["status"] = "fail"
 
                 if "hint" in rule:

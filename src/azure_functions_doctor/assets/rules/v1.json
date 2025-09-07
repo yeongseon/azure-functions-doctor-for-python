@@ -6,8 +6,7 @@
     "label": "Python version",
     "description": "Checks if the current Python version is 3.6 or higher (v1 supports older versions).",
     "type": "compare_version",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "target": "python",
       "operator": ">=",
@@ -25,8 +24,7 @@
     "label": "Programming model v1",
     "description": "Confirms the project appears to use the v1 function.json programming model.",
     "type": "file_exists",
-    "required": true,
-    "severity": "info",
+  "required": true,
     "condition": {
       "target": "function.json"
     },
@@ -39,8 +37,7 @@
     "label": "Virtual environment",
     "description": "Checks if a virtual environment is activated.",
     "type": "env_var_exists",
-    "required": true,
-    "severity": "warning",
+  "required": true,
     "condition": {
       "target": "VIRTUAL_ENV"
     },
@@ -55,8 +52,7 @@
     "label": "Python executable",
     "description": "Checks if Python executable path exists.",
     "type": "path_exists",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "target": "sys.executable"
     },
@@ -71,8 +67,7 @@
     "label": "requirements.txt",
     "description": "Checks if requirements.txt file exists at the root.",
     "type": "file_exists",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "target": "requirements.txt"
     },
@@ -88,8 +83,7 @@
     "label": "azure-functions-worker package",
     "description": "Checks if 'azure-functions-worker' is installed (required for v1 programming model).",
     "type": "package_installed",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "pypi": "azure-functions-worker",
       "target": "azure.functions_worker"
@@ -106,8 +100,7 @@
     "label": "host.json",
     "description": "Checks if host.json file exists in the root directory.",
     "type": "file_exists",
-    "required": true,
-    "severity": "error",
+  "required": true,
     "condition": {
       "target": "host.json"
     },
@@ -125,8 +118,7 @@
     "condition": {
       "target": "local.settings.json"
     },
-    "required": false,
-    "severity": "info",
+  "required": false,
     "hint": "Create local.settings.json for local development if needed.",
     "check_order": 7
   }

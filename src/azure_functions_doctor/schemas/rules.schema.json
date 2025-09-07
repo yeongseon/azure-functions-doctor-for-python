@@ -7,7 +7,7 @@
     "required": [
       "id", "category", "section", "label",
       "description", "type", "required",
-      "severity", "condition", "hint", "check_order"
+      "condition", "hint", "check_order"
     ],
     "properties": {
       "id": {
@@ -46,11 +46,7 @@
         "type": "boolean",
         "description": "Whether this check is required to pass."
       },
-      "severity": {
-        "type": "string",
-        "description": "Severity level of this check.",
-        "enum": ["error", "warning", "info"]
-      },
+      
       "condition": {
         "type": "object",
         "description": "Condition parameters used by the handler.",

@@ -209,5 +209,6 @@ def test_handler_registry_optional_rules() -> None:
 
         result = registry.handle(rule, tmp_path)
 
-        assert result["status"] == "pass"
-        assert "optional" in result["detail"]
+    # Handlers now always return fail for missing optional resources; optional marking handled at aggregation layer
+    assert result["status"] == "fail"
+    assert "optional" in result["detail"]

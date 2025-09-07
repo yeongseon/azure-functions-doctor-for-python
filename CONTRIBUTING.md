@@ -138,20 +138,19 @@ Our diagnostic system is designed to be easily extensible:
 
 1. **Define the rule** in `src/azure_functions_doctor/assets/rules/v2.json` (and/or `v1.json` for v1 projects):
    ```json
-   {
-     "id": "check_my_feature",
-     "type": "my_check_type",
-     "label": "My Feature Check",
-     "description": "Checks if my feature is properly configured",
-     "section": "my_section",
-     "required": true,
-     "severity": "error",
-     "condition": {
-       "target": "my_target"
-     },
-     "hint": "How to fix this issue",
-     "hint_url": "https://docs.example.com/fix-guide"
-   }
+    {
+       "id": "check_my_feature",
+       "type": "my_check_type",
+       "label": "My Feature Check",
+       "description": "Checks if my feature is properly configured",
+       "section": "my_section",
+       "required": true,
+       "condition": {
+          "target": "my_target"
+       },
+       "hint": "How to fix this issue",
+       "hint_url": "https://docs.example.com/fix-guide"
+    }
    ```
 
 2. **Implement the handler** in `src/azure_functions_doctor/handlers.py`:

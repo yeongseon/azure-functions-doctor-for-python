@@ -126,24 +126,14 @@ def doctor(
     for section in results:
         for item in section["items"]:
             s = item.get("status")
-            severity = item.get("severity", "error")
             if s == "pass":
                 passed_count += 1
             elif s == "warn":
                 warning_count += 1
             elif s == "fail":
-                # treat 'fail' as non-fatal warning for backwards compatibility
-                # but escalate to error only if the rule severity explicitly marks it as 'error'
-                if severity == "error":
-                    # keep as warning for CLI exit semantics (tests expect non-zero only for true errors)
-                    warning_count += 1
-                else:
-                    warning_count += 1
-            elif s == "error":
-                # defensive: treat 'error' as error
-                error_count += 1
+                # treat fail as warning (non-fatal) under simplified model
+                warning_count += 1
             else:
-                # treat unknown as warning for safety
                 warning_count += 1
 
     if format == "json":
@@ -181,10 +171,7 @@ def doctor(
             status = item.get("status", "pass")
             icon = format_status_icon(status)
 
-            # Prefer explicit severity for display if present, otherwise show raw status
-            display_status = item.get("severity") or status
-
-            # Compose main line: [ICON] Label: value (display_status)
+            # Compose main line: [ICON] Label: value (status)
             line = Text.assemble((f"[{icon}] ", "bold"), (label, "dim"))
             if value:
                 line.append(": ")
@@ -192,7 +179,7 @@ def doctor(
 
             # append status in parentheses for clarity on UI when non-pass
             if status != "pass":
-                line.append(f" ({display_status})", "italic dim")
+                line.append(f" ({status})", "italic dim")
 
             console.print(line)
 

@@ -29,8 +29,8 @@ def test_doctor_checks_pass() -> None:
         assert "Python version" in item_map
         assert item_map.get("host.json") == "pass"
         assert item_map.get("requirements.txt") == "pass"
-    # local.settings.json is optional; should be present in the results and pass when missing
-    assert item_map.get("local.settings.json") == "pass"
+    # local.settings.json 은 optional; 새 로직에서는 warn 으로 표시
+    assert item_map.get("local.settings.json") == "warn"
 
 
 def test_missing_files() -> None:
@@ -44,8 +44,8 @@ def test_missing_files() -> None:
 
         assert item_map.get("host.json") == "fail"
         assert item_map.get("requirements.txt") == "fail"
-    # local.settings.json is optional; missing should not cause a fail
-    assert item_map.get("local.settings.json") == "pass"
+    # local.settings.json 은 optional; 존재하지 않으면 warn
+    assert item_map.get("local.settings.json") == "warn"
 
 
 def test_v2_compatibility_check() -> None:

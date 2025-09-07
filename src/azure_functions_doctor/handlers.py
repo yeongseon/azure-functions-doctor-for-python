@@ -13,54 +13,39 @@ from azure_functions_doctor.logging_config import get_logger
 logger = get_logger(__name__)
 
 
-def _create_result(status: str, detail: str) -> dict[str, str]:
-    """Create a standardized result dictionary."""
-    return {"status": status, "detail": detail}
+def _create_result(status: str, detail: str, internal_error: bool = False) -> dict[str, str]:
+    """Create a standardized result dictionary (status limited to 'pass'/'fail')."""
+    res: dict[str, str] = {"status": status, "detail": detail}
+    if internal_error:
+        res["internal_error"] = "true"
+    return res
 
 
 def _handle_exception(operation: str, exc: Exception) -> dict[str, str]:
-    """Handle exceptions consistently across all handlers."""
+    """Handle exceptions consistently across all handlers (always fail)."""
     error_msg = f"Error during {operation}: {exc}"
     logger.error(error_msg, exc_info=True)
-    return _create_result("error", error_msg)
+    return _create_result("fail", error_msg, internal_error=True)
 
 
 def _handle_specific_exceptions(operation: str, exc: Exception) -> dict[str, str]:
-    """Handle specific exception types with user-friendly messages."""
+    """Handle specific exception types with user-friendly messages (fail only)."""
     if isinstance(exc, UnicodeDecodeError):
-        return _create_result(
-            "error",
-            (f"File encoding error in {operation}: {exc}. " "Please check file encoding (UTF-8 recommended)."),
-        )
-    elif isinstance(exc, (ValueError, TypeError)):
-        return _create_result(
-            "fail",
-            f"Configuration error in {operation}: {exc}. Please check your rule configuration.",
-        )
-    elif isinstance(exc, (OSError, PermissionError)):
-        return _create_result(
-            "error",
-            f"File system error in {operation}: {exc}. Please check file permissions and paths.",
-        )
-    elif isinstance(exc, ImportError):
-        return _create_result(
-            "fail",
-            f"Missing dependency in {operation}: {exc}. Please install required packages.",
-        )
-    elif isinstance(exc, MemoryError):
-        return _create_result(
-            "error",
-            f"Memory error in {operation}: File too large to process. Consider using smaller files.",
-        )
-    elif isinstance(exc, KeyboardInterrupt):
-        # Re-raise keyboard interrupt to allow proper cleanup
+        return _create_result("fail", f"Encoding error in {operation}: {exc}.", internal_error=True)
+    if isinstance(exc, (ValueError, TypeError)):
+        return _create_result("fail", f"Configuration error in {operation}: {exc}.", internal_error=True)
+    if isinstance(exc, (OSError, PermissionError)):
+        return _create_result("fail", f"File system error in {operation}: {exc}", internal_error=True)
+    if isinstance(exc, ImportError):
+        return _create_result("fail", f"Import error in {operation}: {exc}", internal_error=True)
+    if isinstance(exc, MemoryError):
+        return _create_result("fail", "Memory error: file too large", internal_error=True)
+    if isinstance(exc, KeyboardInterrupt):
         raise exc
-    elif isinstance(exc, SystemExit):
-        # Re-raise system exit to allow proper cleanup
+    if isinstance(exc, SystemExit):
         raise exc
-    else:
-        logger.error(f"Unexpected error in {operation}: {exc}", exc_info=True)
-        return _create_result("error", f"Unexpected error in {operation}. Please check the logs for more details.")
+    logger.error(f"Unexpected error in {operation}: {exc}", exc_info=True)
+    return _create_result("fail", f"Unexpected error in {operation}", internal_error=True)
 
 
 class Condition(TypedDict, total=False):
@@ -97,7 +82,6 @@ class Rule(TypedDict, total=False):
     section: str
     description: str
     required: bool
-    severity: Literal["error", "warning", "info"]
     condition: Condition
     hint: str
     fix: str
@@ -192,17 +176,12 @@ class HandlerRegistry:
 
         if not target:
             return _create_result("fail", "Missing target path")
-
         resolved_path = sys.executable if target == "sys.executable" else os.path.join(path, target)
         exists = os.path.exists(resolved_path)
-
-        if exists:
-            return _create_result("pass", f"{resolved_path} exists")
-
-        if not rule.get("required", True):
-            return _create_result("pass", f"{resolved_path} is missing (optional)")
-
-        return _create_result("fail", f"{resolved_path} is missing")
+        detail = f"{resolved_path} {'exists' if exists else 'missing'}"
+        if not exists and not rule.get("required", True):
+            detail += " (optional)"
+        return _create_result("pass" if exists else "fail", detail)
 
     def _handle_file_exists(self, rule: Rule, path: Path) -> dict[str, str]:
         """Handle file existence checks."""
@@ -211,20 +190,12 @@ class HandlerRegistry:
 
         if not target:
             return _create_result("fail", "Missing file path")
-
         file_path = os.path.join(path, target)
         exists = os.path.isfile(file_path)
-
-        if exists:
-            return _create_result("pass", f"{file_path} exists")
-
-        if not rule.get("required", True):
-            return _create_result(
-                "pass",
-                f"{file_path} not found (optional for local development)",
-            )
-
-        return _create_result("fail", f"{file_path} not found")
+        detail = f"{file_path} {'exists' if exists else 'not found'}"
+        if not exists and not rule.get("required", True):
+            detail += " (optional)"
+        return _create_result("pass" if exists else "fail", detail)
 
     def _handle_package_installed(self, rule: Rule, path: Path) -> dict[str, str]:
         """Handle Python package installation checks."""
@@ -325,7 +296,7 @@ class HandlerRegistry:
 
         host_path = path / "host.json"
         if not host_path.exists():
-            return _create_result("fail", "host.json not found but Durable Functions detected")
+            return _create_result("fail", "host.json missing (durable usage)")
 
         try:
             host_data = json.loads(host_path.read_text(encoding="utf-8"))
@@ -409,17 +380,17 @@ class HandlerRegistry:
                                 node = None
                                 break
                         if node is not None:
-                            return _create_result("pass", f"Found host.json:{key}")
+                            return _create_result("pass", f"host.json:{key} present")
                     except Exception:
                         continue
             else:
                 # env var
                 if os.getenv(str(t)) is not None:
-                    return _create_result("pass", f"Environment variable '{t}' is set")
+                    return _create_result("pass", f"env:{t} set")
                 # file path
                 candidate = path / str(t)
                 if candidate.exists():
-                    return _create_result("pass", f"Found file/path '{candidate}'")
+                    return _create_result("pass", f"path:{candidate.name} present")
         # Shorter failure detail for concise output integration
         return _create_result("fail", "Targets not found")
 
