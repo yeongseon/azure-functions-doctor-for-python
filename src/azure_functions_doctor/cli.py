@@ -152,9 +152,9 @@ def doctor(
         if output:
             try:
                 output.write_text(json.dumps(json_output, indent=2), encoding="utf-8")
-                console.print(f"[green]✓ JSON output saved to:[/green] {output}")
+                console.print(f"[green]{format_status_icon('pass')} JSON output saved to:[/green] {output}")
             except (OSError, IOError, PermissionError) as e:
-                console.print(f"[red]✗ Failed to write output file:[/red] {e}")
+                console.print(f"[red]{format_status_icon('fail')} Failed to write output file:[/red] {e}")
                 logger.error(f"Failed to write JSON output to {output}: {e}")
                 raise typer.Exit(1) from e
         else:
