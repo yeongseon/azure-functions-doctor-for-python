@@ -1464,20 +1464,7 @@
 <span class="normal">204</span>
 <span class="normal">205</span>
 <span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;doctor&quot;</span><span class="p">)</span>
+<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;doctor&quot;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">doctor</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Show detailed hints for failed checks&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1539,24 +1526,14 @@
     <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">section</span><span class="p">[</span><span class="s2">&quot;items&quot;</span><span class="p">]:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">)</span>
-            <span class="n">severity</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;severity&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
                 <span class="n">passed_count</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;warn&quot;</span><span class="p">:</span>
                 <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;fail&quot;</span><span class="p">:</span>
-                <span class="c1"># treat &#39;fail&#39; as non-fatal warning for backwards compatibility</span>
-                <span class="c1"># but escalate to error only if the rule severity explicitly marks it as &#39;error&#39;</span>
-                <span class="k">if</span> <span class="n">severity</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
-                    <span class="c1"># keep as warning for CLI exit semantics (tests expect non-zero only for true errors)</span>
-                    <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span>
-                <span class="c1"># defensive: treat &#39;error&#39; as error</span>
-                <span class="n">error_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># treat fail as warning (non-fatal) under simplified model</span>
+                <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># treat unknown as warning for safety</span>
                 <span class="n">warning_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
@@ -1594,10 +1571,7 @@
             <span class="n">status</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;pass&quot;</span><span class="p">)</span>
             <span class="n">icon</span> <span class="o">=</span> <span class="n">format_status_icon</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
 
-            <span class="c1"># Prefer explicit severity for display if present, otherwise show raw status</span>
-            <span class="n">display_status</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;severity&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">status</span>
-
-            <span class="c1"># Compose main line: [ICON] Label: value (display_status)</span>
+            <span class="c1"># Compose main line: [ICON] Label: value (status)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">assemble</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">icon</span><span class="si">}</span><span class="s2">] &quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s2">&quot;dim&quot;</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
                 <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
@@ -1605,7 +1579,7 @@
 
             <span class="c1"># append status in parentheses for clarity on UI when non-pass</span>
             <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;pass&quot;</span><span class="p">:</span>
-                <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">display_status</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;italic dim&quot;</span><span class="p">)</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;italic dim&quot;</span><span class="p">)</span>
 
             <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
@@ -1700,7 +1674,8 @@ appropriate v1/v2 files are present in package assets.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>src/azure_functions_doctor/doctor.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
+<span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
@@ -1708,8 +1683,7 @@ appropriate v1/v2 files are present in package assets.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">allow_v1</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">allow_v1</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">programming_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_programming_model</span><span class="p">()</span>
     <span class="c1"># If v1 detected in nested function folders (function.json not at project root)</span>
@@ -1751,14 +1725,14 @@ appropriate v1/v2 files are present in package assets.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/doctor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">86</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">85</span>
+<span class="normal">86</span>
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span>
 <span class="normal">90</span>
 <span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Rule</span><span class="p">]:</span>
+<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Rule</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load rules based on detected programming model.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">programming_model</span> <span class="o">==</span> <span class="s2">&quot;v2&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_v2_rules</span><span class="p">()</span>
@@ -1840,23 +1814,23 @@ appropriate v1/v2 files are present in package assets.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>src/azure_functions_doctor/handlers.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;compare_version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_compare_version</span><span class="p">,</span>
         <span class="s2">&quot;env_var_exists&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_env_var_exists</span><span class="p">,</span>
@@ -1905,20 +1879,20 @@ appropriate v1/v2 files are present in package assets.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/handlers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Route rule execution to appropriate handler.&quot;&quot;&quot;</span>
     <span class="n">check_type</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">check_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2034,20 +2008,20 @@ appropriate v1/v2 files are present in package assets.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/azure_functions_doctor/handlers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
-<span class="normal">543</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generic_handler</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generic_handler</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Execute a diagnostic rule based on its type and condition.</span>
 
