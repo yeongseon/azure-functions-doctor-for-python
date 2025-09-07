@@ -18,7 +18,7 @@
         <link rel="prev" href="../diagnostics/">
       
       
-        <link rel="next" href="../development/">
+        <link rel="next" href="../handlers/">
       
       
       <link rel="icon" href="../logo_assets/logo_favicon_16px.png">
@@ -407,6 +407,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#additional-rule-types-v2-additions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional rule types (v2 additions)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#2-file_exists" class="md-nav__link">
     <span class="md-ellipsis">
       2. file_exists
@@ -529,6 +538,28 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handlers
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -687,6 +718,15 @@
   <a href="#1-compare_version" class="md-nav__link">
     <span class="md-ellipsis">
       1. compare_version
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-rule-types-v2-additions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional rule types (v2 additions)
     </span>
   </a>
   
@@ -930,6 +970,18 @@ Rules are read from the <code>assets/rules/v1.json</code> or <code>assets/rules/
 <ul>
 <li>Valid <code>target</code>: <code>"python"</code>, <code>"azure-functions-core-tools"</code></li>
 </ul>
+<hr />
+<h3 id="additional-rule-types-v2-additions">Additional rule types (v2 additions)</h3>
+<p>The project also includes several adapter-style and higher-level validation checks used by the default <code>v2.json</code> ruleset:</p>
+<ul>
+<li><code>executable_exists</code> — verifies an executable is available on PATH (condition: <code>{"target": "func"}</code> or similar).</li>
+<li><code>any_of_exists</code> — accepts <code>targets: [ ... ]</code> and passes if any listed target exists (supports env vars, host.json keys via <code>host.json:&lt;path&gt;</code>, or relative file paths).</li>
+<li><code>file_glob_check</code> — searches the project for files matching provided glob <code>patterns</code> (useful to flag unwanted files like secrets or build artifacts).</li>
+<li><code>host_json_property</code> — lightweight check for presence of a property in <code>host.json</code> using a simple JSON pointer string (e.g. <code>"$.extensionBundle"</code>).</li>
+<li><code>binding_validation</code> — shallow validation of <code>function.json</code> bindings (e.g. ensures <code>httpTrigger</code> bindings declare <code>authLevel</code> and have <code>methods</code> where expected).</li>
+<li><code>cron_validation</code> — heuristic validation for <code>timerTrigger</code> <code>schedule</code> expressions found in <code>function.json</code> (accepts 5- or 6-field cron-like strings).</li>
+</ul>
+<p>These checks are implemented as adapters in <code>src/azure_functions_doctor/handlers.py</code> and are intentionally lightweight: they cover common misconfigurations without attempting full schema validation. If you need stricter validation, consider adding a custom handler or extending the existing one.</p>
 <hr />
 <h3 id="2-file_exists">2. <code>file_exists</code></h3>
 <p>Check whether a file exists.</p>

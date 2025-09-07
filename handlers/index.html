@@ -12,13 +12,13 @@
         <meta name="author" content="Yeongseon Choe">
       
       
-        <link rel="canonical" href="https://yeongseon.github.io/azure-functions-doctor-for-python/development/">
+        <link rel="canonical" href="https://yeongseon.github.io/azure-functions-doctor-for-python/handlers/">
       
       
-        <link rel="prev" href="../handlers/">
+        <link rel="prev" href="../rules/">
       
       
-        <link rel="next" href="../api/">
+        <link rel="next" href="../development/">
       
       
       <link rel="icon" href="../logo_assets/logo_favicon_16px.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Development - Azure Functions Doctor for Python</title>
+        <title>Handlers - Azure Functions Doctor for Python</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#development-guide-hatch-based" class="md-skip">
+        <a href="#handlers" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Development
+              Handlers
             
           </span>
         </div>
@@ -309,28 +309,6 @@
       
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../handlers/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Handlers
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
     
   
   
@@ -348,7 +326,7 @@
   
   
   <span class="md-ellipsis">
-    Development
+    Handlers
     
   </span>
   
@@ -361,7 +339,7 @@
   
   
   <span class="md-ellipsis">
-    Development
+    Handlers
     
   </span>
   
@@ -384,132 +362,72 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      목적
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#project-structure-overview" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Project Structure Overview
+      기본 제공 핸들러 요약
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#initial-setup" class="md-nav__link">
+  <a href="#v2" class="md-nav__link">
     <span class="md-ellipsis">
-      Initial Setup
+      v2에서 추가된 어댑터/유틸형 핸들러
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-tests-and-quality-checks" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Running Tests and Quality Checks
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running Tests and Quality Checks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-format-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. Format Code
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-lint-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Lint Code
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-type-checking" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. Type Checking
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-run-unit-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Run Unit Tests
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-combined-quality-checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. Combined Quality Checks
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6-generate-coverage-report" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. Generate Coverage Report
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#development-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      Development Workflow
+      어댑터 패턴 사용 가이드
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#makefile-targets-reference" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Makefile Targets Reference
+      커스텀 핸들러 작성 (간단 예시)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#contributing" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      🤝 Contributing
+      테스트 및 디버깅 팁
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#license" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      📄 License
+      예시 규칙
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      확장 아이디어
     </span>
   </a>
   
@@ -519,6 +437,28 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -594,132 +534,72 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      목적
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#project-structure-overview" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Project Structure Overview
+      기본 제공 핸들러 요약
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#initial-setup" class="md-nav__link">
+  <a href="#v2" class="md-nav__link">
     <span class="md-ellipsis">
-      Initial Setup
+      v2에서 추가된 어댑터/유틸형 핸들러
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-tests-and-quality-checks" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Running Tests and Quality Checks
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running Tests and Quality Checks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-format-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. Format Code
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-lint-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Lint Code
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-type-checking" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. Type Checking
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-run-unit-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Run Unit Tests
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-combined-quality-checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. Combined Quality Checks
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6-generate-coverage-report" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. Generate Coverage Report
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#development-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      Development Workflow
+      어댑터 패턴 사용 가이드
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#makefile-targets-reference" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Makefile Targets Reference
+      커스텀 핸들러 작성 (간단 예시)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#contributing" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      🤝 Contributing
+      테스트 및 디버깅 팁
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#license" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      📄 License
+      예시 규칙
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      확장 아이디어
     </span>
   </a>
   
@@ -744,231 +624,138 @@
   
 
 
-<h1 id="development-guide-hatch-based">Development Guide (Hatch-based)</h1>
-<p>This guide covers how to set up a local development environment, run tests, and manage code quality for <strong>Azure Functions Doctor</strong>, using Hatch and a Makefile for workflow automation.</p>
+<h1 id="handlers">핸들러 (Handlers)</h1>
+<p>이 문서는 <code>src/azure_functions_doctor/handlers.py</code>에 구현된 검사(핸들러)의 계약, 기본 제공 핸들러 설명, 어댑터 패턴 사용 예시, 확장 방법 및 테스트/디버깅 팁을 정리합니다.</p>
+<h2 id="_1">목적</h2>
+<p>핸들러는 규칙(rule) 정의(<code>assets/rules/*.json</code>)와 실제 검사 로직을 연결합니다. 규칙은 선언적이며, 핸들러는 다음 계약을 따릅니다:</p>
+<p>핸들러 계약(간단한 명세)
+- 입력: <code>rule: dict</code> (rule 오브젝트 전체), <code>path: pathlib.Path</code> (프로젝트 루트)
+- 출력: <code>bool</code> 또는 <code>HandlerResult</code>(프로젝트에는 간단한 불리언/메시지 반환을 사용)
+- 실패 모드: 핸들러는 예외를 직접 노출하기보다는 실패(False)로 판단하거나, 로거에 상세 정보를 남겨야 합니다.</p>
+<p>핸들러는 <code>HandlerRegistry</code>에 등록되어 <code>type</code> 필드로 매핑됩니다. 커스텀 핸들러는 <code>@handler.register("your_type")</code> 데코레이터로 등록할 수 있습니다.</p>
 <hr />
-<h2 id="prerequisites">Prerequisites</h2>
+<h2 id="_2">기본 제공 핸들러 요약</h2>
+<p>다음은 저장소에 포함된 주요 핸들러와 사용 예시입니다. 구체 구현은 <code>src/azure_functions_doctor/handlers.py</code>를 참고하세요.</p>
+<p>1) compare_version
+- 설명: 버전 비교(예: Python 또는 Core Tools).
+- 예시 rule:
+  <code>json
+  {"type": "compare_version", "target": "python", "operator": "&gt;=", "value": "3.9"}</code></p>
+<p>2) file_exists
+- 설명: 지정한 파일이 존재하는지 확인.
+- 예시 rule:
+  <code>json
+  {"type": "file_exists", "target": "host.json"}</code></p>
+<p>3) file_contains
+- 설명: 파일 내 키/문자열 존재 여부 확인. (단순 텍스트 또는 키 경로)</p>
+<hr />
+<h2 id="v2">v2에서 추가된 어댑터/유틸형 핸들러</h2>
+<p>v2 규칙집(<code>assets/rules/v2.json</code>) 에서 사용하는 경량 핸들러들입니다. 의도적으로 간단한 휴리스틱으로 구현되어 일반적인 설정 문제를 포착합니다.</p>
 <ul>
-<li><strong>Python 3.9+</strong> installed on your system</li>
-<li><strong>Git</strong> for version control</li>
-<li><strong>Hatch</strong> as the build and environment manager (installed via <code>pip install hatch</code>)</li>
-<li><strong>Make</strong> (for running the provided Makefile targets)</li>
-<li>(Optional) <strong>uv</strong> for fast dependency installation (<code>pip install uv</code>)</li>
+<li>executable_exists</li>
+<li>기능: PATH 상에 실행 파일(예: <code>func</code>) 존재 확인.</li>
+<li>
+<p>condition 예시: <code>{ "target": "func" }</code></p>
+</li>
+<li>
+<p>any_of_exists</p>
+</li>
+<li>기능: <code>targets: [ ... ]</code> 목록 중 하나라도 존재하면 통과 (환경변수 참조, <code>host.json:&lt;jsonpath&gt;</code> 또는 상대 경로 파일 지원).</li>
+<li>
+<p>condition 예시: <code>{ "targets": ["requirements.txt", "Pipfile"] }</code></p>
+</li>
+<li>
+<p>file_glob_check</p>
+</li>
+<li>기능: 프로젝트 루트에서 glob 패턴으로 파일 검색. 민감 파일(예: .env, .pem) 또는 불필요한 아티팩트 탐지에 유용.</li>
+<li>
+<p>condition 예시: <code>{ "patterns": ["**/.env", "**/*.pem"] }</code></p>
+</li>
+<li>
+<p>host_json_property</p>
+</li>
+<li>기능: <code>host.json</code> 안의 단순 경로(예: <code>$.extensionBundle.id</code>) 존재 또는 값 체크.</li>
+<li>
+<p>condition 예시: <code>{ "key": "$.extensionBundle" }</code></p>
+</li>
+<li>
+<p>binding_validation</p>
+</li>
+<li>기능: <code>function.json</code> 기반 바인딩을 약식 검사 (예: <code>httpTrigger</code>에 <code>authLevel</code> 및 <code>methods</code> 유무 확인).</li>
+<li>
+<p>목적: 심층 스키마 검증 대신 일반적인 누락/오타를 빠르게 잡음.</p>
+</li>
+<li>
+<p>cron_validation</p>
+</li>
+<li>기능: <code>timerTrigger</code>의 <code>schedule</code> 문자열에 대한 휴리스틱 검사(5-혹은 6-필드 cron 형태 허용).</li>
+<li>목적: 흔한 형식 오류(필드 수, 비어있는 필드 등)를 감지.</li>
 </ul>
-<hr />
-<h2 id="project-structure-overview">Project Structure Overview</h2>
-<pre><code class="language-text">azure-functions-doctor-for-python/
-├── Makefile
-├── pyproject.toml
-├── hatch.toml
-├── src/
-│   └── azure_functions_doctor/
-│       ├── __init__.py
-│       ├── cli.py
-│       ├── doctor.py
-│       ├── handlers.py
-│       ├── utils.py
-│       ├── assets/
-│       │   └── rules.json
-│       └── checks/
-├── tests/
-│   ├── test_cli.py
-│   ├── test_handler.py
-│   └── test_*.py
-├── docs/
-│   ├── index.md
-│   ├── usage.md
-│   ├── rules.md
-│   ├── diagnostics.md
-│   └── development.md
-├── examples/
-│   └── basic-hello/
-│       └── diagnose-output.md
-└── ...
-</code></pre>
-<ul>
-<li><strong><code>Makefile</code></strong>: Defines common commands for creating the environment, running tests, linting, formatting, and publishing.</li>
-<li><strong><code>pyproject.toml</code></strong> and <strong><code>hatch.toml</code></strong>: Configuration for Hatch environments and project metadata.</li>
-<li><strong><code>src/azure_functions_doctor/</code></strong>: Core application code, including CLI entrypoint, diagnostic logic, and rule assets.</li>
-<li><strong><code>tests/</code></strong>: Unit and integration tests for the project.</li>
-<li><strong><code>docs/</code></strong>: Documentation files used by MkDocs (if enabled) or GitHub pages.</li>
-<li><strong><code>examples/</code></strong>: Contains sample Azure Functions projects and expected outputs.</li>
-</ul>
-<hr />
-<h2 id="initial-setup">Initial Setup</h2>
-<ol>
-<li>
-<p><strong>Clone the repository</strong>:
-    <code>bash
-    git clone https://github.com/yeongseon/azure-functions-doctor-for-python.git
-    cd azure-functions-doctor-for-python</code></p>
-</li>
-<li>
-<p><strong>Create and activate a virtual environment</strong> using the Makefile:
-    <code>bash
-    make venv
-    source .venv/bin/activate      # On Windows (PowerShell): .venv\Scripts\Activate.ps1</code></p>
-</li>
-<li>
-<p><strong>Install project dependencies</strong> via Hatch (or using <code>uv</code> if preferred):
-    <code>bash
-    make install
-    # or, if using uv: uv install</code></p>
-</li>
-<li>
-<p><strong>Install pre-commit hooks</strong> for code formatting and linting:
-    <code>bash
-    make precommit-install</code></p>
-</li>
-</ol>
 <blockquote>
-<p><strong>Note</strong>: The Makefile ensures Hatch commands run inside the appropriate environment. If you bypass Makefile, you can manually do:
-<code>bash
-hatch env create default
-hatch run pip install -r requirements-dev.txt
-hatch run pre-commit install</code></p>
+<p>주: 이들 핸들러는 전체 스키마/표준을 강제하지 않습니다. 더 엄격한 검증이 필요하면 <code>croniter</code>나 <code>jsonschema</code> 같은 라이브러리를 사용하도록 커스텀 핸들러를 작성하세요.</p>
 </blockquote>
 <hr />
-<h2 id="running-tests-and-quality-checks">Running Tests and Quality Checks</h2>
-<h3 id="1-format-code">1. Format Code</h3>
-<p>Use <strong>Black</strong> and <strong>Ruff</strong> via Makefile to enforce consistent styling:</p>
-<pre><code class="language-bash">make format
+<h2 id="_3">어댑터 패턴 사용 가이드</h2>
+<p>중복되는 로직을 줄이고 여러 규칙에서 재사용하려면 어댑터 스타일 핸들러를 작성하세요. 핵심 아이디어:
+- 규칙 JSON은 간단한 조건(예: <code>targets</code>, <code>patterns</code>, <code>key</code>)만 정의합니다.
+- 핸들러는 다양한 입력 형태(환경변수, 파일 경로, host.json 키 등)를 해석하여 공통 검사 함수로 위임합니다.</p>
+<p>예: <code>any_of_exists</code>는 목록을 순회하고 각 항목에 대해 다음을 시도합니다n- 환경변수(<code>$ENV</code>) 확인
+- <code>host.json:&lt;path&gt;</code> 구문 파싱
+- 상대 경로 파일 존재 확인</p>
+<p>성공 조건: 목록 중 하나라도 발견되면 통과.</p>
+<hr />
+<h2 id="_4">커스텀 핸들러 작성 (간단 예시)</h2>
+<ol>
+<li><code>src/azure_functions_doctor/handlers.py</code>에서 새로운 함수를 추가합니다.</li>
+<li><code>@handler.register("my_custom")</code> 로 타입을 등록합니다.</li>
+<li>규칙 JSON에서 <code>"type": "my_custom"</code>을 사용합니다.</li>
+</ol>
+<p>간단 템플릿:</p>
+<pre><code class="language-python"># src/azure_functions_doctor/handlers.py
+
+@handler.register(&quot;my_custom&quot;)
+def _handle_my_custom(rule: dict, path: pathlib.Path) -&gt; bool:
+    condition = rule.get(&quot;condition&quot;, {})
+    # ... 검사 로직 ...
+    return True  # 또는 False
 </code></pre>
-<h3 id="2-lint-code">2. Lint Code</h3>
-<p>Run <strong>Ruff</strong> and <strong>Mypy</strong> for linting and type checks:</p>
-<pre><code class="language-bash">make lint
+<p>테스트 예:</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;check_my_custom&quot;,
+  &quot;section&quot;: &quot;custom&quot;,
+  &quot;label&quot;: &quot;My custom check&quot;,
+  &quot;type&quot;: &quot;my_custom&quot;,
+  &quot;condition&quot;: {&quot;key&quot;: &quot;value&quot;},
+  &quot;hint&quot;: &quot;Do X if missing&quot;
+}
 </code></pre>
-<h3 id="3-type-checking">3. Type Checking</h3>
-<p>Perform static type analysis with <strong>Mypy</strong>:</p>
-<pre><code class="language-bash">make typecheck
-</code></pre>
-<h3 id="4-run-unit-tests">4. Run Unit Tests</h3>
-<p>Execute all tests using <strong>pytest</strong>:</p>
-<pre><code class="language-bash">make test
-</code></pre>
-<h3 id="5-combined-quality-checks">5. Combined Quality Checks</h3>
-<p>Run formatting, linting, type checking, and tests in one command:</p>
-<pre><code class="language-bash">make check
-</code></pre>
-<h3 id="6-generate-coverage-report">6. Generate Coverage Report</h3>
-<p>Produce a coverage report (HTML + XML):</p>
-<pre><code class="language-bash">make cov
-</code></pre>
+<hr />
+<h2 id="_5">테스트 및 디버깅 팁</h2>
 <ul>
-<li>Opens <code>htmlcov/index.html</code> for browser viewing</li>
-<li>Generates <code>coverage.xml</code> for CI integrations (e.g., Codecov)</li>
+<li>단위 테스트: <code>tests/test_handler.py</code>를 참고하여 새 핸들러의 해피패스와 실패 케이스를 추가하세요.</li>
+<li>로깅: 핸들러 내부에서 <code>logging</code>을 사용해 실패 원인을 남기면 CLI의 verbose 모드에서 유용합니다.</li>
+<li>성능: 파일 글로빙/대규모 검색이 필요한 핸들러는 경로 필터링을 추가해 검색 범위를 제한하세요.</li>
 </ul>
 <hr />
-<h2 id="development-workflow">Development Workflow</h2>
-<ol>
-<li>
-<p><strong>Create a feature branch</strong>:
-    <code>bash
-    git checkout -b feature/your-description</code></p>
-</li>
-<li>
-<p><strong>Implement changes</strong> in <code>src/azure_functions_doctor/</code> and/or update <code>rules.json</code> under <code>src/azure_functions_doctor/assets/</code>.</p>
-</li>
-<li>
-<p><strong>Add new tests</strong> in the <code>tests/</code> directory to cover your changes.</p>
-</li>
-<li>
-<p><strong>Run quality checks</strong> locally:
-    <code>bash
-    make check</code></p>
-</li>
-<li>
-<p><strong>Commit changes</strong> with Conventional Commits format:
-    <code>git commit -m "feat: add new check for custom config file"</code></p>
-</li>
-<li>
-<p><strong>Push and open a Pull Request</strong> to <code>main</code>.</p>
-</li>
-</ol>
+<h2 id="_6">예시 규칙</h2>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;no_env_files&quot;,
+  &quot;section&quot;: &quot;secrets&quot;,
+  &quot;label&quot;: &quot;.env files present&quot;,
+  &quot;type&quot;: &quot;file_glob_check&quot;,
+  &quot;condition&quot;: { &quot;patterns&quot;: [&quot;**/.env&quot;] },
+  &quot;hint&quot;: &quot;Remove secrets from repository or add to .gitignore&quot;
+}
+</code></pre>
 <hr />
-<h2 id="makefile-targets-reference">Makefile Targets Reference</h2>
-<table>
-<thead>
-<tr>
-<th>Target</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>make venv</code></td>
-<td>Create a Python virtual environment at <code>.venv/</code></td>
-</tr>
-<tr>
-<td><code>make install</code></td>
-<td>Install runtime and dev dependencies via Hatch (<code>hatch install</code>)</td>
-</tr>
-<tr>
-<td><code>make precommit-install</code></td>
-<td>Install pre-commit hooks (Black, Ruff, etc.)</td>
-</tr>
-<tr>
-<td><code>make format</code></td>
-<td>Format code with Black and apply Ruff fixes</td>
-</tr>
-<tr>
-<td><code>make lint</code></td>
-<td>Run Ruff and Mypy checks</td>
-</tr>
-<tr>
-<td><code>make typecheck</code></td>
-<td>Perform static type checking with Mypy</td>
-</tr>
-<tr>
-<td><code>make test</code></td>
-<td>Run pytest</td>
-</tr>
-<tr>
-<td><code>make check</code></td>
-<td>Run formatting, linting, typechecking, and tests in sequence</td>
-</tr>
-<tr>
-<td><code>make cov</code></td>
-<td>Generate coverage report and open HTML index</td>
-</tr>
-<tr>
-<td><code>make docs</code></td>
-<td>Serve MkDocs locally (if MkDocs configured)</td>
-</tr>
-<tr>
-<td><code>make release-patch</code></td>
-<td>Bump patch version, update changelog</td>
-</tr>
-<tr>
-<td><code>make release-minor</code></td>
-<td>Bump minor version, update changelog</td>
-</tr>
-<tr>
-<td><code>make release-major</code></td>
-<td>Bump major version, update changelog</td>
-</tr>
-<tr>
-<td><code>make publish</code></td>
-<td>Publish package to PyPI (requires credentials in environment)</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>For detailed release workflow, refer to <a href="../release_process/"><code>release_process.md</code></a>.</p>
-</blockquote>
+<h2 id="_7">확장 아이디어</h2>
+<ul>
+<li>JSONPath 지원 강화: 복잡한 host.json 쿼리를 위해 <code>jsonpath-ng</code> 통합.</li>
+<li>Cron 엄격 검증: <code>croniter</code>를 사용해 표현식의 유효성을 검사.</li>
+<li>고급 바인딩 검사: <code>azure-functions</code> 런타임 스키마에 맞춘 심층 검증.</li>
+</ul>
 <hr />
-<h2 id="contributing">🤝 Contributing</h2>
-<p>We welcome contributions! Please follow these steps:</p>
-<ol>
-<li>Fork the repository and create a new branch.</li>
-<li>Follow the <strong>Development Workflow</strong> above.</li>
-<li>Ensure tests pass and code quality checks succeed.</li>
-<li>Submit a Pull Request with a clear description of your changes.</li>
-</ol>
-<p>Thank you for helping improve Azure Functions Doctor!</p>
-<hr />
-<h2 id="license">📄 License</h2>
-<p>This project is licensed under the <a href="../LICENSE">MIT License</a>.</p>
+<p>더 자세한 API 레퍼런스는 <code>docs/api.md</code>의 <code>Handlers</code> 섹션에서 자동 문서화를 확인하세요.</p>
 
 
 
