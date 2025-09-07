@@ -382,10 +382,10 @@ class HandlerRegistry:
         if not target:
             return _create_result("fail", "Missing 'target' for executable_exists")
         found = shutil.which(target) is not None
-        return _create_result(
-            "pass" if found else "fail",
-            f"Executable '{target}' {'found' if found else 'not found'} in PATH",
-        )
+        if found:
+            # Concise style: "<name> detected"
+            return _create_result("pass", f"{target} detected")
+        return _create_result("fail", f"{target} not found")
 
     def _handle_any_of_exists(self, rule: Rule, path: Path) -> dict[str, str]:
         """Check if any of a list of targets exist (env vars, host.json keys, files)."""
