@@ -1,2 +1,0 @@
-# Deprecated placeholder. No dependencies.
-# The Python Worker is managed by the Azure Functions platform
