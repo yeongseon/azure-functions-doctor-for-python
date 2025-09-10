@@ -154,7 +154,7 @@ azure-functions doctor
 azure-functions --help
 ```
 
-Sample: [examples/basic-hello/diagnose-output.md](examples/basic-hello/diagnose-output.md)
+Sample (v2): [examples/v2/multi-trigger](examples/v2/multi-trigger)
 
 ### Icons & Status
 
@@ -183,7 +183,10 @@ CLI 출력에서 `warn` 은 즉각적인 실패는 아니지만 품질이나 향
 
 ## Example
 
-See [`examples/basic-hello`](examples/basic-hello) for:
+See examples for:
+
+- Programming Model v2: [`examples/v2/multi-trigger`](examples/v2/multi-trigger)
+- Programming Model v1: [`examples/v1/HttpExample`](examples/v1/HttpExample)
 
 - Minimal Azure Functions structure setup
 - Running the CLI and inspecting results

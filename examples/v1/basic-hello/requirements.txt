@@ -1,0 +1,3 @@
+# Programming Model v1 example dependencies
+azure-functions
+azure-functions-doctor

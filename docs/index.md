@@ -37,7 +37,7 @@ azure-functions doctor
 ```
 
 View [Usage Guide](usage.md) →  
-See [Example Project](../examples/basic-hello/README.md) →
+See Examples: [v2](../examples/v2/multi-trigger/README.md) | [v1](../examples/v1/HttpExample/README.md) →
 
 ---
 

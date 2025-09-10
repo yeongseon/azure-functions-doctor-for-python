@@ -105,4 +105,6 @@ azure-functions --help
 azure-functions doctor --help
 ```
 
-For more examples, see the [example project](../examples/basic-hello/README.md).
+For more examples:
+- v2 (decorator): [examples/v2/multi-trigger](../examples/v2/multi-trigger/README.md)
+- v1 (function.json): [examples/v1/HttpExample](../examples/v1/HttpExample/README.md)
