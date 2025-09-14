@@ -164,6 +164,7 @@ See [`examples/v2/http-trigger`](examples/v2/http-trigger) for:
 - Running the CLI and inspecting results
 
 See [`examples/v1/http-trigger`](examples/v1/http-trigger) for the legacy function.json model counterpart.
+See [`examples/v1/multi-trigger`](examples/v1/multi-trigger) for multiple v1 triggers (HTTP, Timer, Queue).
 
 ---
 
