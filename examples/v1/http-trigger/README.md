@@ -1,11 +1,11 @@
-# HttpExample (Programming Model v1)
+# http-trigger (Programming Model v1)
 
-Legacy v1 function folder illustrating HTTP trigger via function.json.
+Legacy v1 function folder illustrating an HTTP trigger via function.json.
 
 ## Structure
 ```
-v1/HttpExample/
-├── HttpExample/
+v1/http-trigger/
+├── http_trigger_function/
 │   ├── __init__.py
 │   └── function.json
 ├── host.json
@@ -16,7 +16,7 @@ v1/HttpExample/
 
 ## Run
 ```bash
-cd examples/v1/HttpExample
+cd examples/v1/http-trigger
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -29,4 +29,4 @@ func start
 azure-functions doctor --path .
 ```
 
-Compare with v2 multi trigger sample in `examples/v2/multi-trigger`.
+Compare with the v2 single example in `examples/v2/http-trigger` or multi trigger sample in `examples/v2/multi-trigger`.

@@ -53,47 +53,44 @@ The tool automatically detects your project's programming model:
 
 ### v2 Project (Decorator-based)
 ```
-Azure Functions Doctor
+🩺 Azure Functions Doctor for Python v0.5.1
+📁 Path: /path/to/v2-project
+🐍 Python Programming Model: v2
 
-Programming Model
-[✓] Programming model v2: @app decorator detected
+✖ Python Env
+  • Python version: Python version is 3.12.3, expected >=3.9
+  • Virtual environment: VIRTUAL_ENV is set
+  • Python executable: .../bin/python exists
+  • requirements.txt: exists
+  • azure-functions-python-library package: Package 'azure.functions' is not installed
 
-Python Env
-[✓] Python version: Python 3.12.3 (>=3.9)
-[✓] Virtual environment: VIRTUAL_ENV set
-[✓] Python executable: /path/to/.venv/bin/python3
-[✓] requirements.txt: present
-[✗] azure-functions-python-library package: Module 'azure.functions' not installed
+✔ Project Structure
+  • host.json: exists
+  • local.settings.json: is missing (optional for local development)
 
-Project Structure
-[✓] host.json: present
-[!] local.settings.json: missing (optional)
-
-Tooling
-[✓] Azure Functions Core Tools (func): func detected
-
-Summary: 1 error, 1 warning, 12 passed
+Summary
+✔ 1 Passed    ✖ 1 Failed
 ```
 
 ### v1 Project (function.json-based)
 ```
-Azure Functions Doctor
+🩺 Azure Functions Doctor for Python v0.5.1
+📁 Path: /path/to/v1-project
+🐍 Python Programming Model: v1 (limited support)
 
-Programming Model
-[✓] Programming model v1: function.json detected
+✖ Python Env
+  • Python version: Python version is 3.12.3, expected >=3.6
+  • Virtual environment: VIRTUAL_ENV is set
+  • Python executable: .../bin/python exists
+  • requirements.txt: exists
+  • azure-functions-worker package: Package 'azure.functions_worker' is not installed
 
-Python Env
-[✓] Python version: Python 3.11.9 (>=3.6)
-[✓] Virtual environment: VIRTUAL_ENV set
-[✓] Python executable: /path/to/.venv/bin/python
-[✓] requirements.txt: present
-[✗] azure-functions-worker package: Module 'azure.functions_worker' not installed
+✖ Project Structure
+  • host.json: is missing
+  • local.settings.json: is missing (optional for local development)
 
-Project Structure
-[✗] host.json: missing
-[!] local.settings.json: missing (optional)
-
-Summary: 2 errors, 1 warning, 8 passed
+Summary
+✔ 0 Passed    ✖ 2 Failed
 ```
 
 ---
@@ -107,4 +104,4 @@ azure-functions doctor --help
 
 For more examples:
 - v2 (decorator): [examples/v2/multi-trigger](../examples/v2/multi-trigger/README.md)
-- v1 (function.json): [examples/v1/HttpExample](../examples/v1/HttpExample/README.md)
+- v1 (function.json): [examples/v1/http-trigger](../examples/v1/http-trigger/README.md)

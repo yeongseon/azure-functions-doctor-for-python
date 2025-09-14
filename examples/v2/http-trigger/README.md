@@ -1,59 +1,35 @@
-# HTTP Trigger Function (Programming Model v2)
+# http-trigger (Programming Model v2)
 
-Minimal Azure Functions example using the **Python Programming Model v2** with an HTTP trigger.
-
----
+Minimal single HTTP trigger for the Python v2 programming model.
 
 ## Structure
-
 ```
 v2/http-trigger/
 ├── function_app.py
 ├── host.json
 ├── requirements.txt
+├── local.settings.sample.json
 └── README.md
 ```
 
----
+## Key Points
+- Uses the decorator-based programming model.
+- Single HTTP route returning a greeting.
+- Mirrors the v1 example structure for comparison (see `examples/v1/http-trigger`).
 
-## Run Locally
-
-1. Create a virtual environment:
-
+## Run
 ```bash
 cd examples/v2/http-trigger
 python3 -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-```
-
-2. Install dependencies:
-
-```bash
+source .venv/bin/activate
 pip install -r requirements.txt
-pip install azure-functions-doctor  # optional: ensure latest doctor locally
-```
-
-3. Start the Azure Functions host:
-
-```bash
+cp local.settings.sample.json local.settings.json
 func start
 ```
 
-> Ensure Azure Functions Core Tools (v4) is installed: `npm i -g azure-functions-core-tools@4 --unsafe-perm true`
-
----
-
-## Run Diagnostics
-
+## Diagnostics
 ```bash
 azure-functions doctor --path .
 ```
 
-Example output path references will now show `examples/v2/http-trigger`.
-
----
-
-## Notes
-
-* Programming Model v2 uses decorators (`@app.route`, etc.) instead of `function.json`.
-* Compare with the v1 example in `examples/v1/HttpExample` for structural differences.
+* Compare with the v1 example in `examples/v1/http-trigger` for structural differences.

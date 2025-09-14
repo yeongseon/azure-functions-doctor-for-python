@@ -37,7 +37,7 @@ azure-functions doctor
 ```
 
 View [Usage Guide](usage.md) →  
-See Examples: [v2](../examples/v2/multi-trigger/README.md) | [v1](../examples/v1/HttpExample/README.md) →
+See Examples: [v2](../examples/v2/multi-trigger/README.md) | [v1](../examples/v1/http-trigger/README.md) →
 
 ---
 
@@ -61,7 +61,7 @@ Feel free to [open an issue](https://github.com/yeongseon/azure-functions-doctor
 
 ## Example Output
 
-![CLI output](assets/azure-functions-doctor-example.png)
+![CLI output](assets/func-doctor-example.png)
 
 ---
 

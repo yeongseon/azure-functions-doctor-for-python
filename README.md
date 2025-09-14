@@ -163,6 +163,8 @@ See [`examples/v2/http-trigger`](examples/v2/http-trigger) for:
 - Minimal Azure Functions structure setup
 - Running the CLI and inspecting results
 
+See [`examples/v1/http-trigger`](examples/v1/http-trigger) for the legacy function.json model counterpart.
+
 ---
 
 ## Documentation
