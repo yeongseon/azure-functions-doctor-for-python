@@ -1,4 +1,4 @@
-# Basic Hello Function (Programming Model v2)
+# HTTP Trigger Function (Programming Model v2)
 
 Minimal Azure Functions example using the **Python Programming Model v2** with an HTTP trigger.
 
@@ -7,7 +7,7 @@ Minimal Azure Functions example using the **Python Programming Model v2** with a
 ## Structure
 
 ```
-v2/basic-hello/
+v2/http-trigger/
 ├── function_app.py
 ├── host.json
 ├── requirements.txt
@@ -21,7 +21,7 @@ v2/basic-hello/
 1. Create a virtual environment:
 
 ```bash
-cd examples/v2/basic-hello
+cd examples/v2/http-trigger
 python3 -m venv .venv
 source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
 ```
@@ -49,11 +49,11 @@ func start
 azure-functions doctor --path .
 ```
 
-Example (illustrative) output path references will now show `examples/v2/basic-hello`.
+Example output path references will now show `examples/v2/http-trigger`.
 
 ---
 
 ## Notes
 
 * Programming Model v2 uses decorators (`@app.route`, etc.) instead of `function.json`.
-* Compare with the v1 example in `examples/v1/basic-hello` for structural differences.
+* Compare with the v1 example in `examples/v1/HttpExample` for structural differences.

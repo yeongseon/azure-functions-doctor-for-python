@@ -4,6 +4,7 @@ Collection of sample Azure Functions projects demonstrating both Python programm
 
 | Model | Path | Description |
 |-------|------|-------------|
+| v2 (Decorator) | `examples/v2/http-trigger` | Minimal single HTTP trigger project. |
 | v2 (Decorator) | `examples/v2/multi-trigger` | Modern model, multiple triggers in one project. |
 | v1 (function.json) | `examples/v1/HttpExample` | Legacy single HTTP trigger function folder. |
 

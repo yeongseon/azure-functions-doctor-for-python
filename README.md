@@ -100,8 +100,6 @@ Azure Functions Doctor uses a modular, rule-based architecture for extensibility
 - **Rule System**: Declarative JSON-based rule definitions for extensibility
 - **Handler Dispatcher**: Routes rule types to appropriate handler functions
 - **Individual Handlers**: Specific diagnostic implementations (file checks, version validation, etc.)
-  - New adapter-style checks: `executable_exists`, `any_of_exists`, `file_glob_check`, `host_json_property`,
-    and lightweight validators `binding_validation` and `cron_validation` (see `docs/rules.md`).
 - **Results Aggregator**: Collects and structures all diagnostic outcomes
 - **Output Formatter**: Renders results as colorized CLI output or machine-readable JSON
 
@@ -146,7 +144,7 @@ pip install -e .
 azure-functions doctor
 ```
 
-<img src="docs/assets/azure-functions-doctor-example.png" alt="Sample output" width="100%" />
+<img src="docs/assets/func-doctor-example.png" alt="Sample output" width="100%" />
 
 ### Show Help
 
@@ -154,39 +152,13 @@ azure-functions doctor
 azure-functions --help
 ```
 
-Sample (v2): [examples/v2/multi-trigger](examples/v2/multi-trigger)
-
-### Icons & Status
-
-| Icon | Status | Meaning |
-|------|--------|---------|
-
-### 메시지 간결화 (최근 변경)
-
-일부 출력 문구가 더 짧고 스캔하기 쉽게 다음과 같이 정리되었습니다:
-
-| 이전 | 변경 후 |
-|------|---------|
-| `Executable 'func' found in PATH` | `func detected` |
-| `host.json: /path/.../host.json exists` | `host.json: present` |
-| `requirements.txt: /path/.../requirements.txt exists` | `requirements.txt: present` |
-| `No Durable Functions usage detected; check skipped` | (향후 예정: `No durable usage`) |
-
-문구 축약은 단계적으로 진행 중이며, 추가 축약은 추후 릴리스 노트에 반영됩니다.
-| ✔ | pass | 검사 통과 |
-| ⚠ | warn | 경고 (선택적/권장 구성 누락: 예 `local.settings.json` 등) |
-| ✖ | fail | 오류 (배포 차단 가능 / 필수 구성 문제) |
-
-CLI 출력에서 `warn` 은 즉각적인 실패는 아니지만 품질이나 향후 배포 안정성을 위해 개선이 권장되는 항목입니다.
+Sample: [examples/v2/http-trigger/diagnose-output.md](examples/v2/http-trigger/diagnose-output.md)
 
 ---
 
 ## Example
 
-See examples for:
-
-- Programming Model v2: [`examples/v2/multi-trigger`](examples/v2/multi-trigger)
-- Programming Model v1: [`examples/v1/HttpExample`](examples/v1/HttpExample)
+See [`examples/v2/http-trigger`](examples/v2/http-trigger) for:
 
 - Minimal Azure Functions structure setup
 - Running the CLI and inspecting results
