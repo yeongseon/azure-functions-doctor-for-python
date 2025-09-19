@@ -1,5 +1,23 @@
 # 📦 Changelog
 
+- bump version to 0.14.0 (bf16918e69ed0ba42d832434bcaea0d3c9048834)
+
+- bypass hatch and build mkdocs directly in CI (89cbf52d6f84c80eef0fc657523542498f90d8f2)
+
+- drop hatch usage and run tools directly (adabf3ea0917c719d6f3d99ce95fbd18a3e11988)
+
+- use existing hatch 1.9.4 and simplify env creation (1ca38d2a10dd2407ea997fb8c98792c3edb3f89f)
+
+- pin hatch & skip pre-commit in CI env (859eb6d8d2e8020ac0af66aea36e9eaa8c22b5e4)
+
+- skip pre-commit install in CI (b1ba3ebdebaa7eef3d27bb777c16056279a44e52)
+
+- correct indentation and typing for package_declared handler (d7768207bc95a420301c7ba1ab6643a0c851fe06)
+
+- require 'azure-functions' instead of deprecated 'azure-functions-python-library' (ad4bec2b431e81ef98c0d349dd812147bdd57b3c)
+
+- update changelog (d70a51bff1ddbcb3cfdac09b3c9aa4e9b128de3b)
+
 - bump version to 0.13.0 (95fef3a1e1123bde297c8215a37a52e57470b0f1)
 
 - align CLI tests with strict fail exit semantics (a7b60c3d03549b956c09cfb9ee79d10c5113e931)
