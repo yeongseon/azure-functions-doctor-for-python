@@ -183,8 +183,16 @@ publish-pypi: ensure-hatch
 # ------------------------------
 
 .PHONY: docs
-docs: ensure-hatch
-	@$(HATCH) run mkdocs build
+docs:
+	@if [ -n "$$CI" ]; then \
+		echo "📚 CI detected: running mkdocs directly"; \
+		python -m pip install --upgrade pip >/dev/null 2>&1 || true; \
+		pip install mkdocs mkdocs-material mkdocstrings[python] >/dev/null 2>&1; \
+		mkdocs build; \
+	else \
+		$(MAKE) ensure-hatch >/dev/null; \
+		$(HATCH) run mkdocs build; \
+	fi
 
 .PHONY: docs-serve
 docs-serve: ensure-hatch

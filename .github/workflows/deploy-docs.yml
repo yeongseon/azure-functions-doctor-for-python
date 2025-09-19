@@ -20,10 +20,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Hatch & dependencies
+      - name: Install doc dependencies
         run: |
-          pip install hatch make
-          hatch env create
+          python -m pip install --upgrade pip
+          pip install mkdocs mkdocs-material mkdocstrings[python]
+          pip install -e .
           make docs
 
       - name: Deploy to GitHub Pages
