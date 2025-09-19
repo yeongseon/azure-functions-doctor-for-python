@@ -44,7 +44,7 @@ The tool automatically detects your project's programming model:
 | Category | v2 Checks | v1 Checks |
 |----------|-----------|-----------|
 | Python Environment | Python ≥ 3.9, virtualenv, executable | Python ≥ 3.6, virtualenv, executable |
-| Dependencies | `azure-functions-python-library` | `azure-functions-worker` |
+| Dependencies | `azure-functions` | `azure-functions-worker` |
 | Project Files | `host.json`, `local.settings.json` | `host.json`, `local.settings.json`, `function.json` |
 
 ---
@@ -62,7 +62,7 @@ The tool automatically detects your project's programming model:
   • Virtual environment: VIRTUAL_ENV is set
   • Python executable: .../bin/python exists
   • requirements.txt: exists
-  • azure-functions-python-library package: Package 'azure.functions' is not installed
+  • azure-functions package: Module 'azure.functions' is not installed
 
 ✔ Project Structure
   • host.json: exists

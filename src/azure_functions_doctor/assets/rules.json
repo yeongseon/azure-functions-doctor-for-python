@@ -71,18 +71,18 @@
     "id": "check_azure_functions_library",
     "category": "dependencies",
     "section": "python_env",
-    "label": "azure-functions-python-library package",
-    "description": "Checks if 'azure-functions-python-library' is installed (required for v2 programming model).",
+  "label": "azure-functions package",
+  "description": "Checks if the 'azure-functions' package is installed (required for Python Azure Functions projects).",
     "type": "package_installed",
     "required": true,
     "severity": "error",
     "condition": {
-      "pypi": "azure-functions-python-library",
+  "pypi": "azure-functions",
       "target": "azure.functions"
     },
-    "hint": "Install it with: pip install azure-functions-python-library",
-    "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=asgi&pivots=python-mode-decorators#azure-functions-python-library",
-    "fix_command": "pip install azure-functions-python-library",
+  "hint": "Install it with: pip install azure-functions",
+  "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python",
+  "fix_command": "pip install azure-functions",
     "check_order": 5
   },
   {

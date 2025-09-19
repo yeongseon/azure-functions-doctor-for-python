@@ -15,7 +15,7 @@ Note: Checks now produce only three statuses: pass, warn (optional check failed)
 | 2  | Virtual environment (.venv) active         | Ensure Python environment is isolated (use virtualenv/venv for local development)                            | ✅ Implemented  |
 | 3  | Python executable exists                   | Validate Python executable path is present and usable                                                       | ✅ Implemented  |
 | 4  | `requirements.txt` exists                  | Check for dependency file; recommend pinning critical packages and checking for incompatible packages        | ✅ Implemented  |
-| 5  | `azure-functions-python-library` installed | Ensure `azure.functions` package present for decorator-based programming model                              | ✅ Implemented  |
+| 5  | `azure-functions` installed | Ensure `azure.functions` package present for decorator-based programming model                              | ✅ Implemented  |
 | 6  | `host.json` exists                         | Ensure `host.json` is present; validate basic schema and common fields (e.g., logging, extensionBundle)      | ✅ Implemented  |
 | 7  | `local.settings.json` exists (optional)    | Optional local settings file for development (check presence and warn about missing common keys/SECRETS)      | ✅ Implemented  |
 | 8  | Azure Functions Core Tools (`func`)        | Recommend checking `func` is installed for local testing and tooling (version compatibility)                 | Planned        |
