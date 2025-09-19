@@ -1,8 +1,44 @@
 # 📦 Changelog
 
-- bump version to 0.12.0
+- bump version to 0.13.0 (95fef3a1e1123bde297c8215a37a52e57470b0f1)
 
-- remove unused severity field from rules schema and code; simplify statuses to pass|warn|fail (BREAKING for custom rule sets including 'severity') (pending)
+- align CLI tests with strict fail exit semantics (a7b60c3d03549b956c09cfb9ee79d10c5113e931)
+
+- exit with code 1 when fails present and document semantics (a8e38ed7e741fc68ccb9993ceb096978d0019191)
+
+- summarize fails instead of errors without changing exit behavior (f07b16b18f51bd4c38b80689d0408b5cdaa4a7da)
+
+- add v1 multi-trigger sample (http, timer, queue) (e3ea509270d2c2a1f8f374096d6892e942b26f4e)
+
+- rename v1 HttpExample to http-trigger and update docs (beda5550be8ec97eaec829aa24d62b00d58161e1)
+
+- rename v2 basic-hello to http-trigger (8a8e0f23b82fd970f9148b39556ff308fbb714de)
+
+- remove duplicate examples/v1/basic-hello (734cf38c076b4b0d640fe19d75c3c8dff3956a48)
+
+- add installation steps and CLI usage (d9eff0d1a711705943830885e58725e2bd90efad)
+
+- remove deprecated examples/basic-hello (2c2ecd854a4f31d715868bdd669adf4218cf1560)
+
+- split examples into v2/multi-trigger and v1/HttpExample; update docs (c423686945ee3b1247d72d08537976862fcea6f6)
+
+- bump version to 0.12.0 (f47589ae0d6d228041441b81b008c72e30f7c782)
+
+- remove severity field and simplify status model (BREAKING) (3ad0bbc016e1e714010448f67a14ae4bbb6f7b71)
+
+- update usage examples and README for concise messages (03938076cd61823210a4e639ba1001c9bb3937cb)
+
+- shorten executable_exists detail (e.g. 'func detected') (d4e84af95aea624aeceb04b8cf6682689b9dce41)
+
+- unify status icons to README set (✓ ! ✗) (e6316fc717e49f88944fac382ecbee7de52576a1)
+
+- simplify compare_version detail string and update test (ee99799cc177ac678557de10f27bd4bf4d3427f2)
+
+- unify status icons using format_status_icon for JSON output and errors (e784df6e78178f2248e95d9d822b034f4e54708f)
+
+- add icons & status legend (pass/warn/fail) (101644291175c7c3b30c507a514d634dcfab6c2f)
+
+- update changelog (6a122dcd3351e3933514c33bfbd3027cb0397890)
 
 - bump version to 0.11.0 (9b64954b1ed7f1ad8fbc9c37fdecf759c6f17f1a)
 
