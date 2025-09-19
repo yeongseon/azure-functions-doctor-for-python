@@ -23,12 +23,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Hatch and Make
-        run: pip install hatch make
-
-      - name: Create Hatch environment & run all checks
+      - name: Install base tooling
         run: |
-          make install
+          python -m pip install --upgrade pip
+          pip install "hatch==1.9.6" make "pre-commit==3.7.1"
+
+      - name: Create environment (no pre-commit install in CI)
+        env:
+          CI: 1
+        run: |
+          make bootstrap
+          .venv/bin/hatch env create
           make check
 
       - name: Generate Coverage Report
