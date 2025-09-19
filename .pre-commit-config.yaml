@@ -21,3 +21,12 @@ repos:
           - typer
           - requests
         exclude: ^examples/
+
+  - repo: local
+    hooks:
+      - id: forbid-korean
+        name: Forbid Korean Characters
+        entry: bash -c 'if grep -RIl --exclude-dir=.venv --exclude-dir=.git -n "[가-힣]" docs src README.md CHANGELOG.md; then echo "Korean characters detected. Please use English only."; exit 1; fi'
+        language: system
+        pass_filenames: false
+        stages: [commit]
