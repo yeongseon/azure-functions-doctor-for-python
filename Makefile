@@ -28,7 +28,11 @@ ensure-hatch: bootstrap
 .PHONY: install
 install: ensure-hatch
 	@$(HATCH) env create
-	@make precommit-install
+	@if [ -n "$$CI" ]; then \
+		echo "🚫 CI detected: skipping pre-commit hook installation"; \
+	else \
+		make precommit-install; \
+	fi
 
 .PHONY: shell
 shell: ensure-hatch
