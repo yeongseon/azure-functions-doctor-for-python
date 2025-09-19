@@ -137,7 +137,6 @@ def doctor(
 
     if format == "json":
         json_output = results
-
         if output:
             try:
                 output.write_text(json.dumps(json_output, indent=2), encoding="utf-8")
@@ -148,7 +147,8 @@ def doctor(
                 raise typer.Exit(1) from e
         else:
             print(json.dumps(json_output, indent=2))
-        return
+        fail_count_json = sum(1 for section in results for item in section["items"] if item.get("status") == "fail")
+        raise typer.Exit(1 if fail_count_json > 0 else 0)
 
     # Note: Top header removed per UI change; programming model header intentionally omitted
 
@@ -199,9 +199,10 @@ def doctor(
     f_label = "fail" if fail_count == 1 else "fails"
     # 'passed' label remains same for singular/plural in current design
     console.print(f"  {fail_count} {f_label}, {warning_count} {w_label}, {passed_count} passed")
-    # Exit code 1 if any fails detected
-    # Preserve historical behavior: do not fail process on fails (future: add --strict)
-    console.print("Exit code: 0")
+    exit_code = 1 if fail_count > 0 else 0
+    console.print(f"Exit code: {exit_code}")
+    if exit_code != 0:
+        raise typer.Exit(exit_code)
 
 
 # Explicit command registration (test-friendly)
