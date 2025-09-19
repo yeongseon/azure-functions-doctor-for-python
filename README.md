@@ -154,6 +154,16 @@ azure-functions --help
 
 Sample: [examples/v2/http-trigger/diagnose-output.md](examples/v2/http-trigger/diagnose-output.md)
 
+### Exit Codes
+
+| Exit Code | Meaning                           |
+|-----------|-----------------------------------|
+| 0         | No fails (passes and warnings ok) |
+| 1         | One or more fails detected        |
+| >1        | Reserved for internal errors      |
+
+Warnings(`warn`)는 빌드를 중단하지 않지만, `fail` 항목이 하나라도 있으면 프로세스는 1로 종료되어 CI에서 바로 감지할 수 있습니다.
+
 ---
 
 ## Example
