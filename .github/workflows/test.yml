@@ -26,13 +26,16 @@ jobs:
       - name: Install base tooling
         run: |
           python -m pip install --upgrade pip
-          pip install "hatch==1.9.6" make "pre-commit==3.7.1"
+          pip install "hatch==1.9.4" make "pre-commit==3.7.1"
 
       - name: Create environment (no pre-commit install in CI)
         env:
           CI: 1
         run: |
-          make bootstrap
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          # Hatch already installed globally in the runner env (user site) above
+          .venv/bin/pip install hatch
           .venv/bin/hatch env create
           make check
 
