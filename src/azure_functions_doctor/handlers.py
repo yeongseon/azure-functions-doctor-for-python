@@ -100,6 +100,7 @@ class HandlerRegistry:
             "path_exists": self._handle_path_exists,
             "file_exists": self._handle_file_exists,
             "package_installed": self._handle_package_installed,
+            "package_declared": self._handle_package_declared,
             "source_code_contains": self._handle_source_code_contains,
             "conditional_exists": self._handle_conditional_exists,
             "callable_detection": self._handle_callable_detection,
@@ -254,6 +255,33 @@ class HandlerRegistry:
         return _create_result(
             "pass" if found else "fail",
             f"Keyword '{keyword}' {'found' if found else 'not found'} in source code",
+        )
+
+    def _handle_package_declared(self, rule: Rule, path: Path) -> dict[str, str]:
+        """Check that a package name appears in requirements.txt (declaration-level)."""
+        condition = rule.get("condition", {}) or {}
+        package_name_obj = condition.get("package") or condition.get("target")
+        req_file_obj = condition.get("file", "requirements.txt")
+        if not isinstance(package_name_obj, str):
+            return _create_result("fail", "Missing 'package' in condition")
+        package_name = package_name_obj
+        req_file = str(req_file_obj)
+        req_path = path / Path(req_file)
+        if not req_path.exists():
+            return _create_result("fail", f"{req_path} not found")
+        try:
+            content = req_path.read_text(encoding="utf-8").splitlines()
+        except Exception as exc:
+            return _handle_specific_exceptions(f"reading {req_file}", exc)
+        normalized = [
+            re.split(pattern=r"[=<>!~]", string=line.strip(), maxsplit=1)[0].lower()
+            for line in content
+            if line.strip() and not line.strip().startswith("#")
+        ]
+        declared = package_name.lower() in normalized
+        return _create_result(
+            "pass" if declared else "fail",
+            f"Package '{package_name}' {'declared' if declared else 'not declared'} in {req_file}",
         )
 
     def _handle_conditional_exists(self, rule: Rule, path: Path) -> dict[str, str]:

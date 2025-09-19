@@ -73,16 +73,16 @@
     "section": "python_env",
   "label": "azure-functions package",
   "description": "Checks if the 'azure-functions' package is installed (required for Python Azure Functions projects).",
-    "type": "package_installed",
+  "type": "package_declared",
     "required": true,
     "severity": "error",
     "condition": {
-  "pypi": "azure-functions",
-      "target": "azure.functions"
+      "package": "azure-functions",
+      "file": "requirements.txt"
     },
-  "hint": "Install it with: pip install azure-functions",
+    "hint": "Add it with: echo azure-functions >> requirements.txt",
   "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python",
-  "fix_command": "pip install azure-functions",
+  "fix_command": "echo azure-functions >> requirements.txt",
     "check_order": 5
   },
   {
