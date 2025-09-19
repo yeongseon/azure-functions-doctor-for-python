@@ -121,8 +121,8 @@ def doctor(
 
     # Pre-compute aggregated counts from normalized item['status'] values
     passed_count = 0
-    warning_count = 0
-    error_count = 0
+    warning_count = 0  # explicit 'warn' statuses
+    fail_count = 0  # explicit 'fail' statuses
     for section in results:
         for item in section["items"]:
             s = item.get("status")
@@ -131,10 +131,9 @@ def doctor(
             elif s == "warn":
                 warning_count += 1
             elif s == "fail":
-                # treat fail as warning (non-fatal) under simplified model
-                warning_count += 1
+                fail_count += 1
             else:
-                warning_count += 1
+                warning_count += 1  # unknown treated as warning
 
     if format == "json":
         json_output = results
@@ -195,16 +194,14 @@ def doctor(
     # Print Doctor summary at the bottom like the requested sample
     console.print("Doctor summary (to see all details, run azure-functions doctor -v):")
     # Use singular/plural simple form as in sample (error vs errors)
-    e_label = "error" if error_count == 1 else "errors"
+    # Summary now reflects canonical statuses: fails, warnings, passed
     w_label = "warning" if warning_count == 1 else "warnings"
-    p_label = "passed" if passed_count == 1 else "passed"
-    console.print(f"  {error_count} {e_label}, {warning_count} {w_label}, {passed_count} {p_label}")
-    # Print Exit code line to match the sample and exit with code 1 on errors
-    if error_count > 0:
-        console.print("Exit code: 1")
-        raise typer.Exit(1)
-    else:
-        console.print("Exit code: 0")
+    f_label = "fail" if fail_count == 1 else "fails"
+    # 'passed' label remains same for singular/plural in current design
+    console.print(f"  {fail_count} {f_label}, {warning_count} {w_label}, {passed_count} passed")
+    # Exit code 1 if any fails detected
+    # Preserve historical behavior: do not fail process on fails (future: add --strict)
+    console.print("Exit code: 0")
 
 
 # Explicit command registration (test-friendly)
