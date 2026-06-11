@@ -54,4 +54,8 @@ jobs:
         run: python -m build
 
       - name: Publish to PyPI
+        # Exception to the SHA-pinning policy: PyPA's official guidance is to
+        # consume this action via the `release/v1` channel rather than a commit
+        # SHA, so trusted-publisher token issuance keeps working across patch
+        # releases. See CONTRIBUTING.md § "GitHub Actions Pinning" for details.
         uses: pypa/gh-action-pypi-publish@release/v1

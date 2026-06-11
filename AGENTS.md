@@ -19,6 +19,9 @@
 - If a CLI option or exit code changes, update docs and tests in the same change.
 - Preserve Python 3.10+ compatibility declared in `pyproject.toml`.
 
+### Action Pinning
+- All external `uses:` references in `.github/workflows/` must be SHA-pinned per `CONTRIBUTING.md` § "GitHub Actions Pinning". The PyPA publish action, local composite actions (`uses: ./...`), and the end-user `azure-functions-preflight.yml` template are the only documented exceptions and must carry an inline comment at the call site.
+
 ## Issue Conventions
 
 Follow these conventions when opening issues so the backlog stays consistent with sibling DX Toolkit repositories.
