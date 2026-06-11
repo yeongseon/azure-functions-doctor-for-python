@@ -31,10 +31,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://yeongseon.github.io/azure-functions-doctor/"
-Documentation = "https://yeongseon.github.io/azure-functions-doctor/"
-Repository = "https://github.com/yeongseon/azure-functions-doctor"
-Issues = "https://github.com/yeongseon/azure-functions-doctor/issues"
+Homepage = "https://yeongseon.github.io/azure-functions-doctor-python/"
+Documentation = "https://yeongseon.github.io/azure-functions-doctor-python/"
+Repository = "https://github.com/yeongseon/azure-functions-doctor-python"
+Issues = "https://github.com/yeongseon/azure-functions-doctor-python/issues"
 
 [project.optional-dependencies]
 dev = [
