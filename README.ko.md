@@ -2,12 +2,12 @@
 
 [![PyPI](https://img.shields.io/pypi/v/azure-functions-doctor.svg)](https://pypi.org/project/azure-functions-doctor/)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://pypi.org/project/azure-functions-doctor/)
-[![CI](https://github.com/yeongseon/azure-functions-doctor/actions/workflows/ci-test.yml/badge.svg)](https://github.com/yeongseon/azure-functions-doctor/actions/workflows/ci-test.yml)
-[![Release](https://github.com/yeongseon/azure-functions-doctor/actions/workflows/release.yml/badge.svg)](https://github.com/yeongseon/azure-functions-doctor/actions/workflows/release.yml)
-[![Security Scans](https://github.com/yeongseon/azure-functions-doctor/actions/workflows/security.yml/badge.svg)](https://github.com/yeongseon/azure-functions-doctor/actions/workflows/security.yml)
-[![codecov](https://codecov.io/gh/yeongseon/azure-functions-doctor/branch/main/graph/badge.svg)](https://codecov.io/gh/yeongseon/azure-functions-doctor)
+[![CI](https://github.com/yeongseon/azure-functions-doctor-python/actions/workflows/ci-test.yml/badge.svg)](https://github.com/yeongseon/azure-functions-doctor-python/actions/workflows/ci-test.yml)
+[![Release](https://github.com/yeongseon/azure-functions-doctor-python/actions/workflows/publish-pypi.yml/badge.svg)](https://github.com/yeongseon/azure-functions-doctor-python/actions/workflows/publish-pypi.yml)
+[![Security Scans](https://github.com/yeongseon/azure-functions-doctor-python/actions/workflows/security.yml/badge.svg)](https://github.com/yeongseon/azure-functions-doctor-python/actions/workflows/security.yml)
+[![codecov](https://codecov.io/gh/yeongseon/azure-functions-doctor-python/branch/main/graph/badge.svg)](https://codecov.io/gh/yeongseon/azure-functions-doctor-python)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
-[![Docs](https://img.shields.io/badge/docs-gh--pages-blue)](https://yeongseon.github.io/azure-functions-doctor/)
+[![Docs](https://img.shields.io/badge/docs-gh--pages-blue)](https://yeongseon.github.io/azure-functions-doctor-python/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 다른 언어: [English](README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md)
@@ -45,7 +45,7 @@ pip install azure-functions-doctor
 소스에서 설치:
 
 ```bash
-git clone https://github.com/yeongseon/azure-functions-doctor.git
+git clone https://github.com/yeongseon/azure-functions-doctor-python.git
 cd azure-functions-doctor
 python3 -m venv .venv
 source .venv/bin/activate
