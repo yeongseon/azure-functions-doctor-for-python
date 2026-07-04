@@ -10,7 +10,7 @@ body:
       value: |
         Thank you for opening an issue! This template is for general issues that don't fit into bug reports or feature requests.
         
-        **Note**: For questions or discussions, consider using [GitHub Discussions](https://github.com/yeongseon/azure-functions-doctor/discussions) instead.
+        **Note**: For questions or discussions, consider using [GitHub Discussions](https://github.com/yeongseon/azure-functions-doctor-python/discussions) instead.
 
   - type: dropdown
     id: issue-type
