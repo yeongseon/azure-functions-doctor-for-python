@@ -12,7 +12,7 @@ on:
 jobs:
   stale-issues:
     runs-on: ubuntu-latest
-    if: github.repository == 'yeongseon/azure-functions-doctor'
+    if: github.repository == 'yeongseon/azure-functions-doctor-python'
 
     steps:
       - name: "Stale issues and PRs"
@@ -32,7 +32,7 @@ jobs:
 
   stale-branches:
     runs-on: ubuntu-latest
-    if: github.repository == 'yeongseon/azure-functions-doctor'
+    if: github.repository == 'yeongseon/azure-functions-doctor-python'
 
     steps:
       - name: "Checkout code"
