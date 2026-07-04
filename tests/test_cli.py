@@ -89,6 +89,7 @@ def test_cli_sarif_output() -> None:
     tool = run["tool"]["driver"]
     assert tool["name"] == "azure-functions-doctor"
     assert tool["version"]
+    assert tool["informationUri"] == "https://github.com/yeongseon/azure-functions-doctor-python"
     assert run["properties"]["programming_model"]
 
     has_error = any(item.get("level") == "error" for item in run.get("results", []))
