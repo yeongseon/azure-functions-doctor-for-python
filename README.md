@@ -69,7 +69,7 @@ From source:
 
 ```bash
 git clone https://github.com/yeongseon/azure-functions-doctor-python.git
-cd azure-functions-doctor
+cd azure-functions-doctor-python
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
