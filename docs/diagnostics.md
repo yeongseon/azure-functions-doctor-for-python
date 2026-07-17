@@ -21,6 +21,32 @@ For `unsupported_v1`, `mixed`, and `unknown`, no v1-specific checks run and no o
 
 ## How Diagnostics Are Evaluated
 
+The following pipeline shows how a scan moves from the rule asset to formatted
+CLI output. It complements the sequence diagram in
+[architecture.md](architecture.md#diagnostic-pipeline) by focusing on per-rule evaluation.
+
+```mermaid
+flowchart TD
+    A[Load rules from v2.json or custom rules_path] --> B[Validate against rules.schema.json]
+    B --> C{Apply profile filter}
+    C -->|minimal| D[Keep required rules only]
+    C -->|full| E[Keep all rules]
+    D --> F[Sort by check_order and group by section]
+    E --> F
+    F --> G[loop each rule]
+    G --> H[generic_handler dispatches by type]
+    H --> I{Needs a resolved target?}
+    I -->|yes| J[target_resolver resolves value]
+    I -->|no| K[Evaluate condition]
+    J --> K
+    K --> L[Normalize handler status to pass / warn / fail]
+    L --> M[Emit CheckResult]
+    M --> G
+    G --> N[Aggregate CheckResult into SectionResult]
+    N --> O[CLI derives overall status]
+    O --> P[Format output: table / json / sarif / junit]
+```
+
 Each rule is executed by a handler and returns a raw handler status (`pass` or `fail`).
 The doctor then applies canonical mapping based on whether the rule is required:
 

@@ -52,12 +52,12 @@ This project does not aim to:
 
 ```mermaid
 flowchart TD
-    CLI["cli.py\nTyper CLI"]
-    DOC["doctor.py\nDiagnostic runner"]
-    RULES[("assets/\nRule inventory")]
-    HDLR["handlers.py\nType-based dispatch"]
-    TR["target_resolver.py\nVersion resolution"]
-    RES["Structured results\nSectionResult + CheckResult"]
+    CLI["cli.py<br/>Typer CLI"]
+    DOC["doctor.py<br/>Diagnostic runner"]
+    RULES[("assets/<br/>Rule inventory")]
+    HDLR["handlers.py<br/>Type-based dispatch"]
+    TR["target_resolver.py<br/>Version resolution"]
+    RES["Structured results<br/>SectionResult + CheckResult"]
 
     CLI --> DOC
     DOC --> RULES
