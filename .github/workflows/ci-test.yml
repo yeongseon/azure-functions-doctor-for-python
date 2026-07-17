@@ -35,6 +35,12 @@ jobs:
       - name: Run full quality checks
         run: make check-all
 
+      - name: Check documentation consistency
+        if: matrix.python-version == '3.10'
+        run: |
+          python scripts/gen_rule_inventory.py --check
+          python scripts/check_docs_consistency.py
+
       - name: Verify coverage output
         run: ls -lh coverage.xml
 
