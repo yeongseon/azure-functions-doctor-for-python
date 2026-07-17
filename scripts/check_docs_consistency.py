@@ -45,6 +45,7 @@ def _check_version_refs(version: str) -> list[str]:
         "llms.txt": f"- Version: {version}",
         "llms-full.txt": f"- Version: {version}",
         "docs/deployment.md": f"Doctor CLI v{version}",
+        "README.md": f"package version ({version})",
     }
     for rel_path, needle in canonical_refs.items():
         path = ROOT / rel_path
