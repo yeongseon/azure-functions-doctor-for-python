@@ -422,6 +422,26 @@ class Rule(TypedDict, total=False):
     check_order: int
 
 
+_HOST_JSON_MISSING = object()
+
+
+def _resolve_host_json_pointer(data: object, parts: List[str]) -> object:
+    """Walk a host.json object along dotted ``parts``.
+
+    Returns the resolved node, or ``_HOST_JSON_MISSING`` if any part is absent
+    (or an intermediate node is not a dict). An empty ``parts`` list returns
+    ``data`` unchanged.
+    """
+    node: object = data
+    for p in parts:
+        if isinstance(node, dict) and p in node:
+            node = node[p]
+        else:
+            return _HOST_JSON_MISSING
+    return node
+
+
+
 class HandlerRegistry:
     """Registry for diagnostic check handlers with individual handler methods."""
 
@@ -768,15 +788,11 @@ class HandlerRegistry:
 
         pointer = jsonpath.lstrip("$.")
         parts = pointer.split(".") if pointer else []
-        node = host_data
-        for p in parts:
-            if isinstance(node, dict) and p in node:
-                node = node[p]
-            else:
-                return _create_result(
-                    "fail",
-                    f"Required host.json property '{jsonpath}' not found",
-                )
+        if _resolve_host_json_pointer(host_data, parts) is _HOST_JSON_MISSING:
+            return _create_result(
+                "fail",
+                f"Required host.json property '{jsonpath}' not found",
+            )
 
         return _create_result("pass", f"host.json contains '{jsonpath}'")
 
@@ -843,14 +859,8 @@ class HandlerRegistry:
                 if host_path.exists():
                     try:
                         data = json.loads(host_path.read_text(encoding="utf-8"))
-                        node = data
-                        for p in key.split("."):
-                            if isinstance(node, dict) and p in node:
-                                node = node[p]
-                            else:
-                                node = None
-                                break
-                        if node is not None:
+                        node = _resolve_host_json_pointer(data, key.split("."))
+                        if node is not _HOST_JSON_MISSING and node is not None:
                             return _create_result("pass", f"host.json:{key} present")
                     except json.JSONDecodeError as exc:
                         logger.debug(f"Skip invalid host.json while checking {key}: {exc}")
@@ -905,12 +915,8 @@ class HandlerRegistry:
             return _handle_specific_exceptions("reading host.json", exc)
         pointer = jsonpath.lstrip("$.")
         parts = pointer.split(".") if pointer else []
-        node = host_data
-        for p in parts:
-            if isinstance(node, dict) and p in node:
-                node = node[p]
-            else:
-                return _create_result("fail", f"host.json property '{jsonpath}' not found")
+        if _resolve_host_json_pointer(host_data, parts) is _HOST_JSON_MISSING:
+            return _create_result("fail", f"host.json property '{jsonpath}' not found")
         return _create_result("pass", f"host.json contains '{jsonpath}'")
 
     def _handle_host_json_version(
