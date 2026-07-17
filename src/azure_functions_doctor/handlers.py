@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import shutil
 import sys
-from typing import Iterator, List, Literal, Optional, TypedDict, Union
+from typing import Callable, Dict, Iterator, List, Literal, Optional, TypedDict, TypeVar, Union
 
 from packaging.requirements import InvalidRequirement, Requirement
 from packaging.utils import canonicalize_name
@@ -442,30 +442,33 @@ def _resolve_host_json_pointer(data: object, parts: List[str]) -> object:
 
 
 
+_HandlerFn = TypeVar("_HandlerFn", bound=Callable[..., "HandlerResult"])
+
+# Populated at class-definition time by the @_rule_handler decorator:
+# maps a rule type -> the HandlerRegistry method name that handles it.
+_RULE_DISPATCH: Dict[str, str] = {}
+
+
+def _rule_handler(func: _HandlerFn) -> _HandlerFn:
+    """Register a HandlerRegistry method as the handler for its rule type.
+
+    The rule type is derived from the method name by stripping the
+    ``_handle_`` prefix (e.g. ``_handle_compare_version`` -> ``compare_version``).
+    """
+    _RULE_DISPATCH[func.__name__.removeprefix("_handle_")] = func.__name__
+    return func
+
+
+
 class HandlerRegistry:
     """Registry for diagnostic check handlers with individual handler methods."""
 
     def __init__(self) -> None:
-        self._handlers = {
-            "compare_version": self._handle_compare_version,
-            "env_var_exists": self._handle_env_var_exists,
-            "path_exists": self._handle_path_exists,
-            "file_exists": self._handle_file_exists,
-            "package_installed": self._handle_package_installed,
-            "package_declared": self._handle_package_declared,
-            "source_code_contains": self._handle_source_code_contains,
-            "conditional_exists": self._handle_conditional_exists,
-            "callable_detection": self._handle_callable_detection,
-            "executable_exists": self._handle_executable_exists,
-            "any_of_exists": self._handle_any_of_exists,
-            "file_glob_check": self._handle_file_glob_check,
-            "host_json_property": self._handle_host_json_property,
-            "host_json_version": self._handle_host_json_version,
-            "local_settings_security": self._handle_local_settings_security,
-            "host_json_extension_bundle_version": self._handle_host_json_extension_bundle_version,
-            "package_forbidden": self._handle_package_forbidden,
-            "blueprint_registration": self._handle_blueprint_registration,
-            "native_dependency_risk": self._handle_native_dependency_risk,
+        self._handlers: Dict[
+            str, Callable[[Rule, Path, Optional[RuleContext]], HandlerResult]
+        ] = {
+            check_type: getattr(self, method_name)
+            for check_type, method_name in _RULE_DISPATCH.items()
         }
 
     def handle(
@@ -485,6 +488,7 @@ class HandlerRegistry:
         except Exception as exc:
             return _handle_specific_exceptions(f"executing {check_type} check", exc)
 
+    @_rule_handler
     def _handle_compare_version(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -545,6 +549,7 @@ class HandlerRegistry:
 
         return _create_result("fail", f"Unknown target for version comparison: {target}")
 
+    @_rule_handler
     def _handle_env_var_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -561,6 +566,7 @@ class HandlerRegistry:
             f"{target} is {'set' if exists else 'not set'}",
         )
 
+    @_rule_handler
     def _handle_path_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -584,6 +590,7 @@ class HandlerRegistry:
             detail += " (optional)"
         return _create_result("pass" if exists else "fail", detail)
 
+    @_rule_handler
     def _handle_file_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -600,6 +607,7 @@ class HandlerRegistry:
             detail += " (optional)"
         return _create_result("pass" if exists else "fail", detail)
 
+    @_rule_handler
     def _handle_package_installed(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -616,6 +624,7 @@ class HandlerRegistry:
             return _create_result("pass", f"Module '{import_path_str}' is installed")
         return _create_result("fail", f"Module '{import_path_str}' is not installed")
 
+    @_rule_handler
     def _handle_source_code_contains(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -654,6 +663,7 @@ class HandlerRegistry:
             ),
         )
 
+    @_rule_handler
     def _handle_package_declared(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -679,6 +689,7 @@ class HandlerRegistry:
             f"Package '{package_name}' {'declared' if declared else 'not declared'} in {req_file}",
         )
 
+    @_rule_handler
     def _handle_package_forbidden(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -707,6 +718,7 @@ class HandlerRegistry:
             )
         return _create_result("pass", f"Package '{package_name}' not declared in {req_file}")
 
+    @_rule_handler
     def _handle_native_dependency_risk(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -738,6 +750,7 @@ class HandlerRegistry:
                 detail_lines.append(f"- {package}: {hint}")
         return _create_result("fail", "\n".join(detail_lines))
 
+    @_rule_handler
     def _handle_conditional_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -796,6 +809,7 @@ class HandlerRegistry:
 
         return _create_result("pass", f"host.json contains '{jsonpath}'")
 
+    @_rule_handler
     def _handle_callable_detection(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -827,6 +841,7 @@ class HandlerRegistry:
 
     # --- adapters / additional handlers ---
 
+    @_rule_handler
     def _handle_executable_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -843,6 +858,7 @@ class HandlerRegistry:
             return _create_result("pass", f"{target} detected")
         return _create_result("fail", f"{target} not found")
 
+    @_rule_handler
     def _handle_any_of_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -875,6 +891,7 @@ class HandlerRegistry:
         # Shorter failure detail for concise output integration
         return _create_result("fail", "Targets not found")
 
+    @_rule_handler
     def _handle_file_glob_check(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -898,6 +915,7 @@ class HandlerRegistry:
             return _create_result("fail", f"Found unwanted files: {matches[:5]}")
         return _create_result("pass", "No unwanted files detected")
 
+    @_rule_handler
     def _handle_host_json_property(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -919,6 +937,7 @@ class HandlerRegistry:
             return _create_result("fail", f"host.json property '{jsonpath}' not found")
         return _create_result("pass", f"host.json contains '{jsonpath}'")
 
+    @_rule_handler
     def _handle_host_json_version(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -941,6 +960,7 @@ class HandlerRegistry:
             f'host.json version is {version!r}, expected "2.0"',
         )
 
+    @_rule_handler
     def _handle_local_settings_security(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -974,6 +994,7 @@ class HandlerRegistry:
             )
         return _create_result("pass", "local.settings.json is not tracked by git")
 
+    @_rule_handler
     def _handle_host_json_extension_bundle_version(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -1034,6 +1055,7 @@ class HandlerRegistry:
             " recommended v4 range [4.*, 5.0.0)",
         )
 
+    @_rule_handler
     def _handle_blueprint_registration(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
