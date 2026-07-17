@@ -21,6 +21,12 @@ logger = get_logger(__name__)
 EXCLUDED_PROJECT_DIRS = {".venv", "node_modules", "build", "dist", ".pytest_cache", "__pycache__"}
 
 
+class HandlerResult(TypedDict, total=False):
+    status: str
+    detail: str
+    internal_error: str
+
+
 class RuleContext(TypedDict, total=False):
     target_python: Optional[str]
 
@@ -322,22 +328,22 @@ def _detect_native_dependency_risks(content: str) -> list[tuple[str, str]]:
     return matches
 
 
-def _create_result(status: str, detail: str, internal_error: bool = False) -> dict[str, str]:
+def _create_result(status: str, detail: str, internal_error: bool = False) -> HandlerResult:
     """Create a standardized result dictionary (status limited to 'pass'/'fail')."""
-    res: dict[str, str] = {"status": status, "detail": detail}
+    res: HandlerResult = {"status": status, "detail": detail}
     if internal_error:
         res["internal_error"] = "true"
     return res
 
 
-def _handle_exception(operation: str, exc: Exception) -> dict[str, str]:
+def _handle_exception(operation: str, exc: Exception) -> HandlerResult:
     """Handle exceptions consistently across all handlers (always fail)."""
     error_msg = f"Error during {operation}: {exc}"
     logger.error(error_msg, exc_info=True)
     return _create_result("fail", error_msg, internal_error=True)
 
 
-def _handle_specific_exceptions(operation: str, exc: Exception) -> dict[str, str]:
+def _handle_specific_exceptions(operation: str, exc: Exception) -> HandlerResult:
     """Handle specific exception types with user-friendly messages (fail only)."""
     if isinstance(exc, UnicodeDecodeError):
         return _create_result("fail", f"Encoding error in {operation}: {exc}.", internal_error=True)
@@ -444,7 +450,7 @@ class HandlerRegistry:
 
     def handle(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Route rule execution to appropriate handler."""
         check_type = rule.get("type")
         if check_type is None:
@@ -461,7 +467,7 @@ class HandlerRegistry:
 
     def _handle_compare_version(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Handle version comparison checks."""
         condition = rule.get("condition", {}) or {}
         target = condition.get("target")
@@ -521,7 +527,7 @@ class HandlerRegistry:
 
     def _handle_env_var_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Handle environment variable existence checks."""
         condition = rule.get("condition", {}) or {}
         target = condition.get("target")
@@ -537,7 +543,7 @@ class HandlerRegistry:
 
     def _handle_path_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Handle path existence checks."""
         condition = rule.get("condition", {}) or {}
         target = condition.get("target")
@@ -560,7 +566,7 @@ class HandlerRegistry:
 
     def _handle_file_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Handle file existence checks."""
         condition = rule.get("condition", {}) or {}
         target = condition.get("target")
@@ -576,7 +582,7 @@ class HandlerRegistry:
 
     def _handle_package_installed(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Handle Python package installation checks."""
         condition = rule.get("condition", {}) or {}
         target = condition.get("target")
@@ -592,7 +598,7 @@ class HandlerRegistry:
 
     def _handle_source_code_contains(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Handle source code keyword search checks (string or AST mode)."""
         condition = rule.get("condition", {}) or {}
         keyword = condition.get("keyword")
@@ -630,7 +636,7 @@ class HandlerRegistry:
 
     def _handle_package_declared(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Check that a package name appears in requirements.txt (declaration-level)."""
         condition = rule.get("condition", {}) or {}
         package_name_obj = condition.get("package") or condition.get("target")
@@ -655,7 +661,7 @@ class HandlerRegistry:
 
     def _handle_package_forbidden(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Warn when a package that should NOT be pinned appears in requirements.txt."""
         condition = rule.get("condition", {}) or {}
         package_name_obj = condition.get("package") or condition.get("target")
@@ -683,7 +689,7 @@ class HandlerRegistry:
 
     def _handle_native_dependency_risk(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Warn when requirements.txt includes packages with native extension risk."""
         condition = rule.get("condition", {}) or {}
         req_file_obj = condition.get("file", "requirements.txt")
@@ -714,7 +720,7 @@ class HandlerRegistry:
 
     def _handle_conditional_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Handle host.json checks that only matter when a related feature is detected."""
         durable_keywords = [
             "durable",
@@ -776,7 +782,7 @@ class HandlerRegistry:
 
     def _handle_callable_detection(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Detect ASGI/WSGI callable exposure in source files (basic heuristics)."""
         patterns = [
             r"\bAsgiMiddleware\s*\(|\bWsgiMiddleware\s*\(",
@@ -807,7 +813,7 @@ class HandlerRegistry:
 
     def _handle_executable_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Check if an executable is available on PATH."""
         condition = rule.get("condition", {}) or {}
         target = condition.get("target")
@@ -823,7 +829,7 @@ class HandlerRegistry:
 
     def _handle_any_of_exists(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Check if any of a list of targets exist (env vars, host.json keys, files)."""
         condition = rule.get("condition", {}) or {}
         targets = condition.get("targets", [])
@@ -861,7 +867,7 @@ class HandlerRegistry:
 
     def _handle_file_glob_check(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Detect unwanted files by glob patterns."""
         condition = rule.get("condition", {}) or {}
         patterns = condition.get("patterns", [])
@@ -884,7 +890,7 @@ class HandlerRegistry:
 
     def _handle_host_json_property(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Check a property exists in host.json using simple jsonpath-like pointer."""
         condition = rule.get("condition", {}) or {}
         jsonpath = condition.get("jsonpath")
@@ -909,7 +915,7 @@ class HandlerRegistry:
 
     def _handle_host_json_version(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Check that host.json declares \"version\": \"2.0\"."""
         host_path = path / "host.json"
         if not host_path.exists():
@@ -931,7 +937,7 @@ class HandlerRegistry:
 
     def _handle_local_settings_security(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Check that local.settings.json is not tracked by git (security risk)."""
         import subprocess  # nosec B404
 
@@ -964,7 +970,7 @@ class HandlerRegistry:
 
     def _handle_host_json_extension_bundle_version(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Check that extensionBundle in host.json uses the recommended v4 range."""
         host_path = path / "host.json"
         if not host_path.exists():
@@ -1024,7 +1030,7 @@ class HandlerRegistry:
 
     def _handle_blueprint_registration(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
-    ) -> dict[str, str]:
+    ) -> HandlerResult:
         """Warn when decorated Blueprint aliases are never registered."""
         unregistered_aliases = sorted(_collect_unregistered_blueprint_aliases(path))
         if not unregistered_aliases:
@@ -1052,7 +1058,7 @@ _registry = HandlerRegistry()
 
 def generic_handler(
     rule: Rule, path: Path, context: Optional[RuleContext] = None
-) -> dict[str, str]:
+) -> HandlerResult:
     """
     Execute a diagnostic rule based on its type and condition.
 
