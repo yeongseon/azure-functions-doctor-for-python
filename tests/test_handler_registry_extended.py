@@ -50,7 +50,6 @@ def test_compare_version_invalid_version() -> None:
         },
     }
     # Mock func_core_tools to return invalid version
-    # Mock func_core_tools to return invalid version
     _target = "azure_functions_doctor.handlers.registry.resolve_target_value"
     with patch(_target, return_value="invalid!!!version"):
         result = registry.handle(rule, Path("."))
