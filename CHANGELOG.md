@@ -1,5 +1,34 @@
 # Changelog
+## [0.17.2] - 2026-07-18
+
+- bump version to 0.17.2 (03a17a0d9fbc3f2778ed94570f910842b3cbb8e4)
+
+- correct stale site_url in mkdocs.yml (#202) (107d0d987e86a3c77f86b71345003b6d48c3e466)
+
+- reconcile rule inventory and version references (#194) (b5cec767ddf92637638bdf2d089bf38c54b91b61)
+
+- add rule-evaluation pipeline diagram and Mermaid render lint (#195) (09a90fd677265f341b5b8241f9135dc067d50041)
+
+- decouple rule engine internals (6 of 7 from #190) (#198) (1baa9917d76f06bb0087a2bb1f805e5034d090e7)
+
+- add discoverability metadata (pepy badge + llms.txt) (#200) (a9861f22f3b23cdf5581cf9a6ecee2c7324c6418)
+
+- fix From-source clone directory in README (#189) (0c7d7eda563228615fc646c3e40424f31000f3d1)
+
+- align SARIF informationUri with canonical -python repository (#181) (1b3592bf087e29de0fb03547f87ca311cafe718b)
+
+- align translated README badges with canonical -python repository (#180) (8c7d4bde0d88db328b91032ab495612a7e7f4029)
+
+- align issue template URLs with canonical -python repository (#179) (7bc8ef6cc8e717a739cb8457aa79790f5bb17e72)
+
+- correct stale workflow repo-slug check after rename (#178) (51d63fed1e99b6f831c73a698e99a0d5afb88ff3)
+
+- align project URLs with canonical -python repository (#164) (a721a810955e4c24f4948a9576a6fe2daddbaacc)
+
+- standardize Action pinning to immutable SHAs (#162) (dcd834da183558233b5bb3c93a59fc8437cb5ffb)
 ## [0.17.1] - 2026-05-14
+
+- update changelog (f8fa1ba9053e6a8a8f0fae0655bf8d1101079450)
 
 - bump version to 0.17.1 (b3fec870f1f37860109d837ee6854001b0423e32)
 
