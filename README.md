@@ -229,6 +229,25 @@ The default ruleset includes checks for:
 - After upgrading Python version or Azure Functions runtime
 - As a pre-commit hook for configuration validation
 
+## How It Works
+
+`azure-functions doctor` loads a JSON ruleset, dispatches each rule to a
+type-based handler, and aggregates the results into per-section output:
+
+```mermaid
+flowchart LR
+    CLI["cli.py<br/>Typer CLI"] --> DOC["doctor.py<br/>Diagnostic runner"]
+    DOC --> RULES[("assets/<br/>Rule inventory")]
+    DOC --> HDLR["handlers.py<br/>Type-based dispatch"]
+    HDLR --> TR["target_resolver.py<br/>Version resolution"]
+    DOC --> RES["SectionResult<br/>+ CheckResult"]
+    RES --> OUT["table / json<br/>sarif / junit"]
+```
+
+See [docs/architecture.md](docs/architecture.md) for the full component and
+sequence diagrams, and [docs/diagnostics.md](docs/diagnostics.md) for the
+rule-evaluation pipeline.
+
 ## Documentation
 
 - [docs/index.md](docs/index.md)

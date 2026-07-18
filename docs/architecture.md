@@ -39,13 +39,13 @@ CLI is the primary consumer. Python import use is for programmatic embedding onl
 
 ```mermaid
 flowchart TD
-    CLI["cli.py\nTyper CLI"]
-    DOC["doctor.py\nDoctor runner"]
-    HDLR["handlers.py\nRule dispatch + generic_handler"]
-    TR["target_resolver.py\nVersion resolution"]
-    RULES[("assets/\nRule inventory")]
-    SCHEMAS[("schemas/\nJSON schemas")]
-    LOG["logging_config.py\nInternal logging"]
+    CLI["cli.py<br/>Typer CLI"]
+    DOC["doctor.py<br/>Doctor runner"]
+    HDLR["handlers.py<br/>Rule dispatch + generic_handler"]
+    TR["target_resolver.py<br/>Version resolution"]
+    RULES[("assets/<br/>Rule inventory")]
+    SCHEMAS[("schemas/<br/>JSON schemas")]
+    LOG["logging_config.py<br/>Internal logging"]
 
     CLI --> DOC
     DOC --> HDLR
