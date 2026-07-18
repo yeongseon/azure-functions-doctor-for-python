@@ -27,7 +27,7 @@ CLI output. It complements the sequence diagram in
 
 ```mermaid
 flowchart TD
-    A[Load rules from v2.json or custom rules_path] --> B[Validate against rules.schema.json]
+    A[Load rules from v2.json or custom --rules path] --> B[Validate against rules.schema.json]
     B --> C{Apply profile filter}
     C -->|minimal| D[Keep required rules only]
     C -->|full| E[Keep all rules]

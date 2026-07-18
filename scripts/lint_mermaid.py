@@ -97,7 +97,7 @@ def main(argv: list[str]) -> int:
             line_no = text[: match.start()].count("\n") + 1
             for err in _lint_block(block):
                 failures += 1
-                rel = path.relative_to(ROOT) if path.is_absolute() else path
+                rel = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
                 print(f"{rel}:{line_no}: mermaid: {err}")
     if failures:
         print(f"\nMermaid lint FAILED: {failures} problem(s) across {scanned} block(s).")
