@@ -67,6 +67,11 @@ def _rule_ids_from_inventory() -> set[str]:
     content = INVENTORY_MD.read_text(encoding="utf-8")
     # Only inspect the generated "## Rule Table" block; later hand-authored
     # sections (e.g. "## Rule Types") also contain backticked cells.
+    if "## Rule Table" not in content or "## Rule Types" not in content:
+        raise SystemExit(
+            "docs/rule_inventory.md is missing the '## Rule Table' and/or "
+            "'## Rule Types' headings; cannot verify rule-ID parity."
+        )
     start = content.index("## Rule Table")
     end = content.index("## Rule Types")
     table = content[start:end]
