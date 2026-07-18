@@ -13,7 +13,6 @@ structured results that can be consumed in scripts, CI pipelines, or custom tool
 | `Doctor(path, profile, rules_path)` | Lower-level runner with explicit lifecycle methods. | Advanced control over rule loading and execution. |
 | `CheckResult` | Result object for one check item. | Output processing and custom reporting. |
 | `SectionResult` | Result object for a group of checks. | Rendering grouped summaries by category. |
-| `Config` | Environment-backed runtime configuration container. | Internal integration and test overrides. |
 | `HandlerRegistry` | Maps rule `type` to execution handlers. | Handler extension and internal diagnostics flow. |
 
 ## Programmatic Usage with `run_diagnostics`
@@ -108,29 +107,6 @@ def run_with_custom_rules(project_dir: str, custom_rules_file: str) -> list[dict
     return doctor.run_all_checks(rules=rules)
 ```
 
-## Configuration API (`Config`)
-
-`Config` reads defaults and environment variables prefixed with `FUNC_DOCTOR_`.
-Common keys include:
-
-- `FUNC_DOCTOR_LOG_LEVEL`
-- `FUNC_DOCTOR_LOG_FORMAT`
-- `FUNC_DOCTOR_MAX_FILE_SIZE_MB`
-- `FUNC_DOCTOR_SEARCH_TIMEOUT_SECONDS`
-- `FUNC_DOCTOR_OUTPUT_WIDTH`
-- `FUNC_DOCTOR_ENABLE_COLORS`
-- `FUNC_DOCTOR_PARALLEL_EXECUTION`
-
-```python
-from azure_functions_doctor.config import get_config, override_config
-
-
-def configure_for_tests() -> dict:
-    override_config(log_level="DEBUG", output_width=100, enable_colors=False)
-    cfg = get_config()
-    return cfg.to_dict()
-```
-
 ## Handler Registry Integration
 
 `HandlerRegistry` stores the mapping from rule `type` to concrete handler methods.
@@ -159,10 +135,6 @@ def run_single_rule(rule: dict, project_path: str) -> dict[str, str]:
 ## Handlers
 
 ::: azure_functions_doctor.handlers
-
-## Configuration
-
-::: azure_functions_doctor.config
 
 ## Target Resolver
 
