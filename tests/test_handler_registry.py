@@ -263,7 +263,7 @@ def test_compare_version_invalid_version() -> None:
         },
     }
     # Mock func_core_tools to return invalid version
-    _target = "azure_functions_doctor.handlers.resolve_target_value"
+    _target = "azure_functions_doctor.handlers.registry.resolve_target_value"
     with patch(_target, return_value="invalid!!!version"):
         result = registry.handle(rule, Path("."))
         assert result["status"] == "fail"
@@ -538,7 +538,7 @@ def test_conditional_exists_durable_detection_exception() -> None:
             raise ValueError("Simulated read error")
 
         with patch(
-            "azure_functions_doctor.handlers._read_project_python_file",
+            "azure_functions_doctor.handlers.registry._read_project_python_file",
             side_effect=read_with_error,
         ):
             result = registry.handle(rule, tmp_path)
@@ -1037,7 +1037,7 @@ def test_compare_version_func_core_tools_not_installed() -> None:
             "value": "4.0",
         },
     }
-    _target = "azure_functions_doctor.handlers.resolve_target_value"
+    _target = "azure_functions_doctor.handlers.registry.resolve_target_value"
     with patch(_target, return_value="not_installed"):
         result = registry.handle(rule, Path("."))
         assert result["status"] == "fail"
@@ -1786,7 +1786,9 @@ def test_compare_version_func_tools_success() -> None:
             "value": "1.0",
         },
     }
-    with patch("azure_functions_doctor.handlers.resolve_target_value", return_value="5.0.0"):
+    with patch(
+        "azure_functions_doctor.handlers.registry.resolve_target_value", return_value="5.0.0"
+    ):
         result = registry.handle(rule, Path("."))
         assert result["status"] == "pass"
 
