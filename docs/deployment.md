@@ -47,7 +47,7 @@ In this guide you will:
 | Azure CLI | `az --version` | [Install Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) |
 | Azure Functions Core Tools v4 | `func --version` | [Install Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) |
 | Python 3.10-3.13 | `python3 --version` | [python.org](https://www.python.org/downloads/) |
-| Doctor CLI v0.17.1 | `pip show azure-functions-doctor` | `python3 -m pip install azure-functions-doctor` |
+| Doctor CLI v0.17.2 | `pip show azure-functions-doctor` | `python3 -m pip install azure-functions-doctor` |
 
 Install doctor if needed:
 
@@ -142,7 +142,7 @@ Representative JSON output (`doctor-report.json`):
 ```json
 {
   "metadata": {
-    "tool_version": "0.17.1",
+    "tool_version": "0.17.2",
     "target_path": "/data/GitHub/azure-functions-doctor/examples/v2/http-trigger"
   },
   "results": [
@@ -171,7 +171,7 @@ Representative SARIF output (`doctor-report.sarif`):
       "tool": {
         "driver": {
           "name": "azure-functions-doctor",
-          "version": "0.17.1"
+          "version": "0.17.2"
         }
       },
       "results": []
