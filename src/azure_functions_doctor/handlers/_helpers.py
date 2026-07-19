@@ -434,6 +434,18 @@ def _resolve_host_json_pointer(data: object, parts: List[str]) -> object:
     return node
 
 
+def _resolve_host_json_path(data: object, jsonpath: str) -> object:
+    """Resolve a ``$.a.b`` style jsonpath against a loaded host.json object.
+
+    Strips a leading ``$.`` (or ``.``) prefix, splits the remainder on ``.``,
+    and delegates traversal to :func:`_resolve_host_json_pointer`. Returns the
+    resolved node, or ``_HOST_JSON_MISSING`` when the path is absent.
+    """
+    pointer = jsonpath.lstrip("$.")
+    parts = pointer.split(".") if pointer else []
+    return _resolve_host_json_pointer(data, parts)
+
+
 
 _HandlerFn = TypeVar("_HandlerFn", bound=Callable[..., "HandlerResult"])
 
