@@ -38,6 +38,32 @@ class TestParseCompareVersion:
 
     def test_returns_none_when_missing_value(self) -> None:
         assert parse_compare_version({"target": "python", "operator": ">="}) is None
+    def test_accepts_numeric_zero_value(self) -> None:
+        # 0 / 0.0 are valid scalars and must not be treated as missing.
+        assert parse_compare_version(
+            {"target": "x", "operator": "==", "value": 0}
+        ) == CompareVersionParams("x", "==", 0)
+
+    def test_returns_none_when_operator_not_str(self) -> None:
+        assert (
+            parse_compare_version(
+                {"target": "python", "operator": 5, "value": "3.10"}  # type: ignore[typeddict-item]
+            )
+            is None
+        )
+
+    def test_returns_none_when_target_empty(self) -> None:
+        assert (
+            parse_compare_version({"target": "", "operator": ">=", "value": "3.10"}) is None
+        )
+
+    def test_returns_none_when_value_not_scalar(self) -> None:
+        assert (
+            parse_compare_version(
+                {"target": "python", "operator": ">=", "value": ["3.10"]}  # type: ignore[typeddict-item]
+            )
+            is None
+        )
 
 
 class TestParseSourceCode:
@@ -54,6 +80,10 @@ class TestParseSourceCode:
 
     def test_returns_none_when_keyword_not_str(self) -> None:
         assert parse_source_code({"keyword": 5}) is None  # type: ignore[typeddict-item]
+    def test_coerces_unknown_mode_to_string(self) -> None:
+        assert parse_source_code(
+            {"keyword": "@app.", "mode": "bogus"}  # type: ignore[typeddict-item]
+        ) == SourceCodeParams("@app.", "string")
 
 
 class TestParsePackage:
@@ -74,3 +104,10 @@ class TestParsePackage:
 
     def test_returns_none_when_absent(self) -> None:
         assert parse_package({}) is None
+    def test_returns_none_when_package_empty(self) -> None:
+        assert parse_package({"package": ""}) is None
+
+    def test_defaults_file_when_not_str(self) -> None:
+        assert parse_package(
+            {"package": "azure-functions", "file": None}  # type: ignore[typeddict-item]
+        ) == PackageParams("azure-functions", "requirements.txt")

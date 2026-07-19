@@ -438,7 +438,7 @@ class SourceCodeParams(NamedTuple):
     """Validated parameters for the ``source_code_contains`` rule type."""
 
     keyword: str
-    mode: str
+    mode: Literal["string", "ast"]
 
 
 class PackageParams(NamedTuple):
@@ -459,7 +459,14 @@ def parse_compare_version(condition: Condition) -> Optional[CompareVersionParams
     target = condition.get("target")
     operator = condition.get("operator")
     value = condition.get("value")
-    if target and operator and value:
+    if (
+        isinstance(target, str)
+        and target
+        and isinstance(operator, str)
+        and operator
+        and isinstance(value, (str, int, float))
+        and not isinstance(value, bool)
+    ):
         return CompareVersionParams(target, operator, value)
     return None
 
@@ -469,15 +476,20 @@ def parse_source_code(condition: Condition) -> Optional[SourceCodeParams]:
     keyword = condition.get("keyword")
     if not isinstance(keyword, str):
         return None
-    return SourceCodeParams(keyword, condition.get("mode", "string"))
+    if condition.get("mode") == "ast":
+        return SourceCodeParams(keyword, "ast")
+    return SourceCodeParams(keyword, "string")
 
 
 def parse_package(condition: Condition) -> Optional[PackageParams]:
     """Return validated package params, falling back from ``package`` to ``target``."""
     package = condition.get("package") or condition.get("target")
-    if not isinstance(package, str):
+    if not isinstance(package, str) or not package:
         return None
-    return PackageParams(package, str(condition.get("file", "requirements.txt")))
+    file = condition.get("file", "requirements.txt")
+    if not isinstance(file, str) or not file:
+        file = "requirements.txt"
+    return PackageParams(package, file)
 
 
 _HOST_JSON_MISSING = object()
