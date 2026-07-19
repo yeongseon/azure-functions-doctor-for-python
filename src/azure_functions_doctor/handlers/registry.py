@@ -25,6 +25,7 @@ from azure_functions_doctor.handlers._helpers import (
     _iter_project_py_contents,
     _parse_requirements_names,
     _read_project_python_file,
+    _resolve_host_json_path,
     _resolve_host_json_pointer,
     _rule_handler,
     _source_contains_ast,
@@ -369,9 +370,7 @@ class HandlerRegistry:
         except Exception as exc:
             return _handle_specific_exceptions("reading host.json", exc)
 
-        pointer = jsonpath.lstrip("$.")
-        parts = pointer.split(".") if pointer else []
-        if _resolve_host_json_pointer(host_data, parts) is _HOST_JSON_MISSING:
+        if _resolve_host_json_path(host_data, jsonpath) is _HOST_JSON_MISSING:
             return _create_result(
                 "fail",
                 f"Required host.json property '{jsonpath}' not found",
@@ -501,9 +500,7 @@ class HandlerRegistry:
             host_data = json.loads(host_path.read_text(encoding="utf-8"))
         except Exception as exc:
             return _handle_specific_exceptions("reading host.json", exc)
-        pointer = jsonpath.lstrip("$.")
-        parts = pointer.split(".") if pointer else []
-        if _resolve_host_json_pointer(host_data, parts) is _HOST_JSON_MISSING:
+        if _resolve_host_json_path(host_data, jsonpath) is _HOST_JSON_MISSING:
             return _create_result("fail", f"host.json property '{jsonpath}' not found")
         return _create_result("pass", f"host.json contains '{jsonpath}'")
 

@@ -732,3 +732,34 @@ def test_conditional_exists_host_json_exception() -> None:
         result = registry.handle(rule, tmp_path)
         assert result["status"] == "fail"
         assert "internal_error" in result
+
+
+class TestResolveHostJsonPath:
+    """Direct coverage for the shared _resolve_host_json_path jsonpath helper."""
+
+    def test_resolves_dotted_path_with_dollar_prefix(self) -> None:
+        from azure_functions_doctor.handlers._helpers import _resolve_host_json_path
+
+        data = {"extensions": {"durableTask": {"hubName": "h"}}}
+        assert _resolve_host_json_path(data, "$.extensions.durableTask.hubName") == "h"
+
+    def test_resolves_path_without_dollar_prefix(self) -> None:
+        from azure_functions_doctor.handlers._helpers import _resolve_host_json_path
+
+        data = {"version": "2.0"}
+        assert _resolve_host_json_path(data, "version") == "2.0"
+
+    def test_missing_path_returns_sentinel(self) -> None:
+        from azure_functions_doctor.handlers._helpers import (
+            _HOST_JSON_MISSING,
+            _resolve_host_json_path,
+        )
+
+        data: dict[str, object] = {"extensions": {}}
+        assert _resolve_host_json_path(data, "$.extensions.missing") is _HOST_JSON_MISSING
+
+    def test_empty_path_returns_root(self) -> None:
+        from azure_functions_doctor.handlers._helpers import _resolve_host_json_path
+
+        data = {"a": 1}
+        assert _resolve_host_json_path(data, "$.") == data
