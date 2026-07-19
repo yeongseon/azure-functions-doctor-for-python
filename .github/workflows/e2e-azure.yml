@@ -99,7 +99,10 @@ jobs:
           npm install -g "azure-functions-core-tools@${FUNCTIONS_CORE_TOOLS_VERSION}"
           FUNC_VERSION="$(func --version)"
           echo "Installed func: ${FUNC_VERSION}"
-          test "${FUNC_VERSION}" = "${FUNCTIONS_CORE_TOOLS_VERSION}"
+          if [ "${FUNC_VERSION}" != "${FUNCTIONS_CORE_TOOLS_VERSION}" ]; then
+            echo "::error::Azure Functions Core Tools version mismatch: expected ${FUNCTIONS_CORE_TOOLS_VERSION}, but installed ${FUNC_VERSION}" >&2
+            exit 1
+          fi
 
       - name: Publish example http-trigger app
         working-directory: examples/v2/http-trigger
