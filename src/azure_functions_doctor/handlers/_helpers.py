@@ -2,7 +2,18 @@ import ast
 from pathlib import Path
 import re
 import sys
-from typing import Callable, Dict, Iterator, List, Literal, Optional, TypedDict, TypeVar, Union
+from typing import (
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Literal,
+    NamedTuple,
+    Optional,
+    TypedDict,
+    TypeVar,
+    Union,
+)
 
 from packaging.requirements import InvalidRequirement, Requirement
 from packaging.utils import canonicalize_name
@@ -413,6 +424,72 @@ class Rule(TypedDict, total=False):
     why_it_matters: str
     symptoms: str
     check_order: int
+
+
+class CompareVersionParams(NamedTuple):
+    """Validated parameters for the ``compare_version`` rule type."""
+
+    target: str
+    operator: str
+    value: Union[str, int, float]
+
+
+class SourceCodeParams(NamedTuple):
+    """Validated parameters for the ``source_code_contains`` rule type."""
+
+    keyword: str
+    mode: Literal["string", "ast"]
+
+
+class PackageParams(NamedTuple):
+    """Validated parameters for the package declaration rule types."""
+
+    package: str
+    file: str
+
+
+def parse_target(condition: Condition) -> Optional[str]:
+    """Return a non-empty ``target`` string from ``condition``, or ``None``."""
+    target = condition.get("target")
+    return target if isinstance(target, str) and target else None
+
+
+def parse_compare_version(condition: Condition) -> Optional[CompareVersionParams]:
+    """Return validated ``compare_version`` params, or ``None`` if incomplete."""
+    target = condition.get("target")
+    operator = condition.get("operator")
+    value = condition.get("value")
+    if (
+        isinstance(target, str)
+        and target
+        and isinstance(operator, str)
+        and operator
+        and isinstance(value, (str, int, float))
+        and not isinstance(value, bool)
+    ):
+        return CompareVersionParams(target, operator, value)
+    return None
+
+
+def parse_source_code(condition: Condition) -> Optional[SourceCodeParams]:
+    """Return validated ``source_code_contains`` params, or ``None``."""
+    keyword = condition.get("keyword")
+    if not isinstance(keyword, str):
+        return None
+    if condition.get("mode") == "ast":
+        return SourceCodeParams(keyword, "ast")
+    return SourceCodeParams(keyword, "string")
+
+
+def parse_package(condition: Condition) -> Optional[PackageParams]:
+    """Return validated package params, falling back from ``package`` to ``target``."""
+    package = condition.get("package") or condition.get("target")
+    if not isinstance(package, str) or not package:
+        return None
+    file = condition.get("file", "requirements.txt")
+    if not isinstance(file, str) or not file:
+        file = "requirements.txt"
+    return PackageParams(package, file)
 
 
 _HOST_JSON_MISSING = object()
