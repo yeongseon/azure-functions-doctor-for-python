@@ -29,6 +29,10 @@ from azure_functions_doctor.handlers._helpers import (
     _rule_handler,
     _source_contains_ast,
     logger,
+    parse_compare_version,
+    parse_package,
+    parse_source_code,
+    parse_target,
 )
 from azure_functions_doctor.target_resolver import resolve_target_value
 
@@ -67,12 +71,10 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Handle version comparison checks."""
         condition = rule.get("condition", {}) or {}
-        target = condition.get("target")
-        operator = condition.get("operator")
-        value = condition.get("value")
-
-        if not (target and operator and value):
+        params = parse_compare_version(condition)
+        if params is None:
             return _create_result("fail", "Missing condition fields for compare_version")
+        target, operator, value = params
 
         if target == "python":
             target_python = context.get("target_python") if context is not None else None
@@ -128,7 +130,7 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Handle environment variable existence checks."""
         condition = rule.get("condition", {}) or {}
-        target = condition.get("target")
+        target = parse_target(condition)
 
         if not target:
             return _create_result("fail", "Missing environment variable name")
@@ -145,7 +147,7 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Handle path existence checks."""
         condition = rule.get("condition", {}) or {}
-        target = condition.get("target")
+        target = parse_target(condition)
 
         if not target:
             return _create_result("fail", "Missing target path")
@@ -169,7 +171,7 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Handle file existence checks."""
         condition = rule.get("condition", {}) or {}
-        target = condition.get("target")
+        target = parse_target(condition)
 
         if not target:
             return _create_result("fail", "Missing file path")
@@ -186,7 +188,7 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Handle Python package installation checks."""
         condition = rule.get("condition", {}) or {}
-        target = condition.get("target")
+        target = parse_target(condition)
 
         if not target:
             return _create_result("fail", "Missing package name")
@@ -203,11 +205,10 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Handle source code keyword search checks (string or AST mode)."""
         condition = rule.get("condition", {}) or {}
-        keyword = condition.get("keyword")
-        mode = condition.get("mode", "string")
-
-        if not isinstance(keyword, str):
+        params = parse_source_code(condition)
+        if params is None:
             return _create_result("fail", "Missing or invalid 'keyword' in condition")
+        keyword, mode = params
 
         found = False
         if mode == "ast":
@@ -242,12 +243,10 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Check that a package name appears in requirements.txt (declaration-level)."""
         condition = rule.get("condition", {}) or {}
-        package_name_obj = condition.get("package") or condition.get("target")
-        req_file_obj = condition.get("file", "requirements.txt")
-        if not isinstance(package_name_obj, str):
+        params = parse_package(condition)
+        if params is None:
             return _create_result("fail", "Missing 'package' in condition")
-        package_name = package_name_obj
-        req_file = str(req_file_obj)
+        package_name, req_file = params
         req_path = path / Path(req_file)
         if not req_path.exists():
             return _create_result("fail", f"{req_path} not found")
@@ -268,12 +267,10 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Warn when a package that should NOT be pinned appears in requirements.txt."""
         condition = rule.get("condition", {}) or {}
-        package_name_obj = condition.get("package") or condition.get("target")
-        req_file_obj = condition.get("file", "requirements.txt")
-        if not isinstance(package_name_obj, str):
+        params = parse_package(condition)
+        if params is None:
             return _create_result("fail", "Missing 'package' in condition")
-        package_name = package_name_obj
-        req_file = str(req_file_obj)
+        package_name, req_file = params
         req_path = path / Path(req_file)
         if not req_path.exists():
             return _create_result("fail", f"{req_path} not found")
@@ -420,7 +417,7 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Check if an executable is available on PATH."""
         condition = rule.get("condition", {}) or {}
-        target = condition.get("target")
+        target = parse_target(condition)
         if not target:
             return _create_result("fail", "Missing 'target' for executable_exists")
         # Use candidate map for symmetric fallback
