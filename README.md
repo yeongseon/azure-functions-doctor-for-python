@@ -114,7 +114,7 @@ is not the same as the Python version your Function App will run on Azure.
 ### Sample output (excerpt)
 
 ```bash
-azure-functions-doctor doctor --path ./examples/v2/http-trigger
+azure-functions doctor --path ./examples/v2/http-trigger
 ```
 
 ```text
