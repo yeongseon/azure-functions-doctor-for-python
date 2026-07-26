@@ -30,11 +30,11 @@ jobs:
     steps:
       - name: Checkout repository
         # Tag-pinned (not SHA): example workflow exception, see file header.
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
 
       - name: Set up Python
         # Tag-pinned (not SHA): example workflow exception, see file header.
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
