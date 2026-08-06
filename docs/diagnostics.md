@@ -1,5 +1,10 @@
 # Diagnostics Reference
 
+> **Localization:** This is a canonical, English-only reference document
+> (partly generated from the rule set). It is intentionally outside the
+> translated README set (`README.ko.md`, `README.ja.md`, `README.zh-CN.md`)
+> and requires no translation updates when diagnostics change.
+
 Azure Functions Doctor ships with a built-in diagnostics set for the **Azure Functions Python v2 programming model**.
 
 Diagnostics are grouped by section, then evaluated as required or optional checks.

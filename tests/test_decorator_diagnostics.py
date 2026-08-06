@@ -108,13 +108,17 @@ def test_decorator_simple_name_variants() -> None:
 # Unit tests: _collect_inverted_decorator_order edge cases
 # ---------------------------------------------------------------------------
 
+#: Default outermost-first order shipped in the decorator_order rule.
+_ORDER = ["with_context", "validate_http"]
+# ---------------------------------------------------------------------------
+
 
 def test_collect_inverted_decorator_order_only_one_decorator(tmp_path: Path) -> None:
     helpers = import_module("azure_functions_doctor.handlers._helpers")
     (tmp_path / "function_app.py").write_text(
         "@validate_http\ndef f():\n    return None\n", encoding="utf-8"
     )
-    assert helpers._collect_inverted_decorator_order(tmp_path) == []
+    assert helpers._collect_inverted_decorator_order(tmp_path, _ORDER) == []
 
 
 def test_collect_inverted_decorator_order_async_function(tmp_path: Path) -> None:
@@ -123,13 +127,25 @@ def test_collect_inverted_decorator_order_async_function(tmp_path: Path) -> None
         "@app.route(route='x')\n@validate_http\n@with_context\nasync def f():\n    return None\n",
         encoding="utf-8",
     )
-    assert helpers._collect_inverted_decorator_order(tmp_path) == ["function_app.py:f"]
+    assert helpers._collect_inverted_decorator_order(tmp_path, _ORDER) == ["function_app.py:f"]
 
 
 def test_collect_inverted_decorator_order_skips_syntax_error(tmp_path: Path) -> None:
     helpers = import_module("azure_functions_doctor.handlers._helpers")
     (tmp_path / "broken.py").write_text("def f(:\n", encoding="utf-8")
-    assert helpers._collect_inverted_decorator_order(tmp_path) == []
+    assert helpers._collect_inverted_decorator_order(tmp_path, _ORDER) == []
+
+
+def test_collect_inverted_decorator_order_honors_custom_order(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    # @a stacked above @b; with expected order [b, a] this is inverted.
+    (tmp_path / "function_app.py").write_text(
+        "@a\n@b\ndef f():\n    return None\n", encoding="utf-8"
+    )
+    assert helpers._collect_inverted_decorator_order(tmp_path, ["a", "b"]) == []
+    assert helpers._collect_inverted_decorator_order(tmp_path, ["b", "a"]) == [
+        "function_app.py:f"
+    ]
 
 
 # ---------------------------------------------------------------------------

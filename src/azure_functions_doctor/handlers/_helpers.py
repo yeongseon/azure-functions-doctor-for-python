@@ -204,15 +204,18 @@ def _decorator_simple_name(dec: ast.expr) -> Optional[str]:
     return None
 
 
-def _collect_inverted_decorator_order(path: Path) -> list[str]:
-    """Return "file:function" labels where @validate_http is stacked outside
-    (above) @with_context.
+def _collect_inverted_decorator_order(
+    path: Path, expected_order: list[str]
+) -> list[str]:
+    """Return "file:function" labels whose decorators violate *expected_order*.
 
-    The correct order top-to-bottom is ``@app.route`` -> ``@with_context`` ->
-    ``@validate_http`` (validate_http innermost). In ``decorator_list`` index 0
-    is the topmost/outermost decorator, so ``validate_http`` must have the
-    higher index. A lower index for ``validate_http`` than ``with_context``
-    means the stack is inverted.
+    *expected_order* lists decorator leaf names from **outermost to innermost**
+    (the intended top-to-bottom stacking). For the validation/logging pairing
+    that is ``["with_context", "validate_http"]`` (``@with_context`` above
+    ``@validate_http``). In ``decorator_list`` index 0 is the topmost/outermost
+    decorator, so the expected names must appear in the same relative order. A
+    function is flagged when two or more of the expected decorators are present
+    but their actual relative order does not match *expected_order*.
     """
     inverted: list[str] = []
     for py_file, content in _iter_project_py_contents(path):
@@ -225,15 +228,16 @@ def _collect_inverted_decorator_order(path: Path) -> list[str]:
                 continue
             if not node.decorator_list:
                 continue
-            vh_index: Optional[int] = None
-            wc_index: Optional[int] = None
+            positions: dict[str, int] = {}
             for i, dec in enumerate(node.decorator_list):
                 name = _decorator_simple_name(dec)
-                if name == "validate_http":
-                    vh_index = i
-                elif name == "with_context":
-                    wc_index = i
-            if vh_index is not None and wc_index is not None and vh_index < wc_index:
+                if name in expected_order and name not in positions:
+                    positions[name] = i
+            present = [name for name in expected_order if name in positions]
+            if len(present) < 2:
+                continue
+            actual = sorted(present, key=lambda name: positions[name])
+            if actual != present:
                 inverted.append(f"{py_file.relative_to(path)}:{node.name}")
     return inverted
 
@@ -479,7 +483,7 @@ class Condition(TypedDict, total=False):
     pypi: str
     package: str
     file: str
-    decorators: list[str]  # for decorator_order: decorator leaf names to check order of
+    decorators: list[str]  # for decorator_order: expected decorator leaf names, outermost-first
 
 
 class Rule(TypedDict, total=False):

@@ -654,17 +654,25 @@ class HandlerRegistry:
     def _handle_decorator_order(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
-        """Warn when @validate_http is stacked outside (above) @with_context."""
-        inverted = _collect_inverted_decorator_order(path)
+        """Warn when decorators are stacked outside their expected inner order."""
+        condition = rule.get("condition", {})
+        expected_order = condition.get("decorators") or ["with_context", "validate_http"]
+        inverted = _collect_inverted_decorator_order(path, expected_order)
+
         if not inverted:
             return _create_result("pass", "No inverted decorator order detected")
         detail = "\n".join(
             [
                 "Inverted decorator order detected:",
-                *[f"- {fn}: @validate_http is outside @with_context" for fn in inverted[:10]],
+                *[
+                    f"- {fn}: @{expected_order[-1]} is outside @{expected_order[0]}"
+                    for fn in inverted[:10]
+                ],
                 "",
-                "Fix: reorder to @app.route -> @with_context -> @validate_http"
-                " (validate_http innermost).",
+                "Fix: reorder to @app.route -> "
+                + " -> ".join(f"@{name}" for name in expected_order)
+                + f" ({expected_order[-1]} innermost).",
+
             ]
         )
         return _create_result("fail", detail)
