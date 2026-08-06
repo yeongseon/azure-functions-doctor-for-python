@@ -656,6 +656,10 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Warn when decorators are stacked outside their expected inner order."""
         condition = rule.get("condition", {})
+        # ``decorators`` lists the expected order outermost-first. Only the first
+        # and last entries are surfaced in the fix message below, which is exact
+        # for the shipped two-element pairing.
+        expected_order = condition.get("decorators") or ["with_context", "validate_http"]
         expected_order = condition.get("decorators") or ["with_context", "validate_http"]
         inverted = _collect_inverted_decorator_order(path, expected_order)
 
