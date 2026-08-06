@@ -1,0 +1,169 @@
+from importlib import import_module
+from pathlib import Path
+
+from typer.testing import CliRunner
+
+FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "v2"
+runner = CliRunner()
+
+
+def _item_status_by_label(project_path: Path) -> dict[str, str]:
+    doctor_cls = import_module("azure_functions_doctor.doctor").Doctor
+    results = doctor_cls(str(project_path)).run_all_checks()
+    return {item["label"]: item["status"] for section in results for item in section["items"]}
+
+
+# ---------------------------------------------------------------------------
+# Decorator order (fixture-driven)
+# ---------------------------------------------------------------------------
+
+
+def test_decorator_order_correct_passes() -> None:
+    item_map = _item_status_by_label(FIXTURES_DIR / "decorator_order_correct")
+    assert item_map["Decorator order"] == "pass"
+
+
+def test_decorator_order_inverted_warns() -> None:
+    item_map = _item_status_by_label(FIXTURES_DIR / "decorator_order_inverted")
+    assert item_map["Decorator order"] == "warn"
+
+
+# ---------------------------------------------------------------------------
+# Endpoint metadata coverage (fixture-driven)
+# ---------------------------------------------------------------------------
+
+
+def test_endpoint_metadata_covered_passes() -> None:
+    item_map = _item_status_by_label(FIXTURES_DIR / "endpoint_metadata_covered")
+    assert item_map["Endpoint metadata coverage"] == "pass"
+
+
+def test_endpoint_metadata_missing_warns() -> None:
+    item_map = _item_status_by_label(FIXTURES_DIR / "endpoint_metadata_missing")
+    assert item_map["Endpoint metadata coverage"] == "warn"
+
+
+def test_endpoint_metadata_no_dep_passes() -> None:
+    item_map = _item_status_by_label(FIXTURES_DIR / "endpoint_metadata_no_dep")
+    assert item_map["Endpoint metadata coverage"] == "pass"
+
+
+# ---------------------------------------------------------------------------
+# CLI output detail
+# ---------------------------------------------------------------------------
+
+
+def test_cli_shows_decorator_order_fix_detail() -> None:
+    cli_app = import_module("azure_functions_doctor.cli").cli
+    result = runner.invoke(
+        cli_app,
+        [
+            "doctor",
+            "--path",
+            str(FIXTURES_DIR / "decorator_order_inverted"),
+            "--format",
+            "table",
+            "--verbose",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "Decorator order" in result.output
+    assert "Inverted decorator order detected" in result.output
+
+
+# ---------------------------------------------------------------------------
+# Unit tests: _decorator_simple_name
+# ---------------------------------------------------------------------------
+
+
+def test_decorator_simple_name_variants() -> None:
+    import ast
+
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+
+    def _first_decorator(src: str) -> ast.expr:
+        tree = ast.parse(src)
+        func_node = tree.body[0]
+        assert isinstance(func_node, ast.FunctionDef)
+        return func_node.decorator_list[0]
+
+    # bare @name
+    assert helpers._decorator_simple_name(
+        _first_decorator("@validate_http\ndef f():\n    ...")
+    ) == ("validate_http")
+    # attribute @mod.name
+    assert helpers._decorator_simple_name(
+        _first_decorator("@m.validate_http\ndef f():\n    ...")
+    ) == ("validate_http")
+    # call @mod.name(...)
+    assert (
+        helpers._decorator_simple_name(_first_decorator("@app.route(route='x')\ndef f():\n    ..."))
+        == "route"
+    )
+    # subscript decorator -> None
+    assert helpers._decorator_simple_name(_first_decorator("@reg[0]\ndef f():\n    ...")) is None
+
+
+# ---------------------------------------------------------------------------
+# Unit tests: _collect_inverted_decorator_order edge cases
+# ---------------------------------------------------------------------------
+
+
+def test_collect_inverted_decorator_order_only_one_decorator(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "@validate_http\ndef f():\n    return None\n", encoding="utf-8"
+    )
+    assert helpers._collect_inverted_decorator_order(tmp_path) == []
+
+
+def test_collect_inverted_decorator_order_async_function(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "@app.route(route='x')\n@validate_http\n@with_context\nasync def f():\n    return None\n",
+        encoding="utf-8",
+    )
+    assert helpers._collect_inverted_decorator_order(tmp_path) == ["function_app.py:f"]
+
+
+def test_collect_inverted_decorator_order_skips_syntax_error(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "broken.py").write_text("def f(:\n", encoding="utf-8")
+    assert helpers._collect_inverted_decorator_order(tmp_path) == []
+
+
+# ---------------------------------------------------------------------------
+# Unit tests: endpoint metadata helpers
+# ---------------------------------------------------------------------------
+
+
+def test_project_declares_validation_dep_missing_requirements(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    assert helpers._project_declares_validation_dep(tmp_path) is False
+
+
+def test_project_declares_validation_dep_present(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "requirements.txt").write_text(
+        "azure-functions\nazure-functions-validation>=0.1\n", encoding="utf-8"
+    )
+    assert helpers._project_declares_validation_dep(tmp_path) is True
+
+
+def test_collect_routes_missing_validate_http_skips_syntax_error(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "broken.py").write_text("@app.route(\n", encoding="utf-8")
+    assert helpers._collect_routes_missing_validate_http(tmp_path) == []
+
+
+def test_collect_routes_missing_validate_http_custom_alias(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n"
+        "fa = func.FunctionApp()\n\n"
+        "@fa.route(route='x')\n"
+        "def handler(req):\n"
+        "    return req\n",
+        encoding="utf-8",
+    )
+    assert helpers._collect_routes_missing_validate_http(tmp_path) == ["function_app.py:handler"]

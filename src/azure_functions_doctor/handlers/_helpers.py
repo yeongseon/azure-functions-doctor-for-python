@@ -189,6 +189,102 @@ def _collect_unregistered_blueprint_aliases(path: Path) -> set[str]:
     return decorated_blueprint_aliases - registered_blueprint_aliases
 
 
+def _decorator_simple_name(dec: ast.expr) -> Optional[str]:
+    """Extract the leaf name of a decorator.
+
+    Handles bare ``@name``, attribute ``@mod.name`` and call ``@mod.name(...)``
+    forms, returning the final identifier (``name``) or ``None`` when the
+    decorator has no simple name (e.g. subscripts).
+    """
+    node: ast.expr = dec.func if isinstance(dec, ast.Call) else dec
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return node.attr
+    return None
+
+
+def _collect_inverted_decorator_order(path: Path) -> list[str]:
+    """Return "file:function" labels where @validate_http is stacked outside
+    (above) @with_context.
+
+    The correct order top-to-bottom is ``@app.route`` -> ``@with_context`` ->
+    ``@validate_http`` (validate_http innermost). In ``decorator_list`` index 0
+    is the topmost/outermost decorator, so ``validate_http`` must have the
+    higher index. A lower index for ``validate_http`` than ``with_context``
+    means the stack is inverted.
+    """
+    inverted: list[str] = []
+    for py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            if not node.decorator_list:
+                continue
+            vh_index: Optional[int] = None
+            wc_index: Optional[int] = None
+            for i, dec in enumerate(node.decorator_list):
+                name = _decorator_simple_name(dec)
+                if name == "validate_http":
+                    vh_index = i
+                elif name == "with_context":
+                    wc_index = i
+            if vh_index is not None and wc_index is not None and vh_index < wc_index:
+                inverted.append(f"{py_file.relative_to(path)}:{node.name}")
+    return inverted
+
+
+def _project_declares_validation_dep(path: Path) -> bool:
+    """Return True when ``azure-functions-validation`` is declared in
+    ``requirements.txt``. Missing or unreadable file counts as not declared.
+    """
+    req_path = path / "requirements.txt"
+    if not req_path.exists():
+        return False
+    content = _read_project_python_file(req_path)
+    if content is None:
+        return False
+    return canonicalize_name("azure-functions-validation") in _parse_requirements_names(content)
+
+
+def _collect_routes_missing_validate_http(path: Path) -> list[str]:
+    """Return "file:function" labels for HTTP route handlers that lack
+    ``@validate_http`` and therefore emit no endpoint OpenAPI metadata.
+    """
+    uncovered: list[str] = []
+    for py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        app_aliases = _discover_functionapp_aliases(content)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            if not node.decorator_list:
+                continue
+            is_route = False
+            has_validate_http = False
+            for dec in node.decorator_list:
+                inner: ast.expr = dec.func if isinstance(dec, ast.Call) else dec
+                if (
+                    isinstance(inner, ast.Attribute)
+                    and inner.attr == "route"
+                    and isinstance(inner.value, ast.Name)
+                    and inner.value.id in app_aliases
+                ):
+                    is_route = True
+                if _decorator_simple_name(dec) == "validate_http":
+                    has_validate_http = True
+            if is_route and not has_validate_http:
+                uncovered.append(f"{py_file.relative_to(path)}:{node.name}")
+    return uncovered
+
+
 def _source_contains_ast(source: str, identifier: str) -> bool:
     """Return True when the source contains a decorator like ``@identifier.xxx``.
 
@@ -383,6 +479,7 @@ class Condition(TypedDict, total=False):
     pypi: str
     package: str
     file: str
+    decorators: list[str]  # for decorator_order: decorator leaf names to check order of
 
 
 class Rule(TypedDict, total=False):
@@ -407,6 +504,8 @@ class Rule(TypedDict, total=False):
         "package_declared",
         "blueprint_registration",
         "native_dependency_risk",
+        "decorator_order",
+        "endpoint_metadata",
     ]
     label: str
     category: str

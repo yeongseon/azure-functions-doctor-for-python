@@ -18,12 +18,15 @@ from azure_functions_doctor.handlers._helpers import (
     HandlerResult,
     Rule,
     RuleContext,
+    _collect_inverted_decorator_order,
+    _collect_routes_missing_validate_http,
     _collect_unregistered_blueprint_aliases,
     _create_result,
     _detect_native_dependency_risks,
     _handle_specific_exceptions,
     _iter_project_py_contents,
     _parse_requirements_names,
+    _project_declares_validation_dep,
     _read_project_python_file,
     _resolve_host_json_path,
     _resolve_host_json_pointer,
@@ -642,6 +645,48 @@ class HandlerRegistry:
                 "",
                 "Fix: add the missing `app.register_functions(<alias>)` call(s)"
                 " in function_app.py.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+
+    @_rule_handler
+    def _handle_decorator_order(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when @validate_http is stacked outside (above) @with_context."""
+        inverted = _collect_inverted_decorator_order(path)
+        if not inverted:
+            return _create_result("pass", "No inverted decorator order detected")
+        detail = "\n".join(
+            [
+                "Inverted decorator order detected:",
+                *[f"- {fn}: @validate_http is outside @with_context" for fn in inverted[:10]],
+                "",
+                "Fix: reorder to @app.route -> @with_context -> @validate_http"
+                " (validate_http innermost).",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_endpoint_metadata(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when route handlers lack @validate_http in a validation-enabled project."""
+        if not _project_declares_validation_dep(path):
+            return _create_result(
+                "pass", "azure-functions-validation not declared; endpoint metadata check skipped"
+            )
+        uncovered = _collect_routes_missing_validate_http(path)
+        if not uncovered:
+            return _create_result("pass", "All route handlers expose endpoint metadata")
+        detail = "\n".join(
+            [
+                "Route handlers missing @validate_http (no endpoint metadata):",
+                *[f"- {fn}" for fn in uncovered[:10]],
+                "",
+                "Fix: add @validate_http so the route emits OpenAPI endpoint metadata.",
             ]
         )
         return _create_result("fail", detail)
