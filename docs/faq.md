@@ -13,13 +13,13 @@ See [Rule Inventory](rule_inventory.md) for the complete built-in list.
 ## How do I run it quickly?
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 Run against a different directory:
 
 ```bash
-azure-functions doctor --path ./my-function-app
+azure-functions-doctor doctor --path ./my-function-app
 ```
 
 ## How do I use it in CI?
@@ -27,7 +27,7 @@ azure-functions doctor --path ./my-function-app
 Use required-only profile plus JSON output:
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 Then:
@@ -65,7 +65,7 @@ See [Minimal Profile](minimal_profile.md).
 Example:
 
 ```bash
-azure-functions doctor --format sarif --output doctor.sarif
+azure-functions-doctor doctor --format sarif --output doctor.sarif
 ```
 
 ## Is Markdown output supported?
@@ -146,7 +146,7 @@ Not by the doctor itself. Core Tools checks are optional in the built-in ruleset
 Use:
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 That gives:

@@ -7,7 +7,7 @@ This page defines field meanings, stability guarantees, and parser examples.
 ## Emit JSON
 
 ```bash
-azure-functions doctor --format json --output doctor.json
+azure-functions-doctor doctor --format json --output doctor.json
 ```
 
 If `--output` is omitted, JSON is printed to stdout.

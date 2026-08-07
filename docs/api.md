@@ -2,7 +2,7 @@
 
 The public entry point for programmatic usage is
 `azure_functions_doctor.api.run_diagnostics(path, profile, rules_path)`.
-It uses the same diagnostics engine as `azure-functions doctor`, then returns
+It uses the same diagnostics engine as `azure-functions-doctor doctor`, then returns
 structured results that can be consumed in scripts, CI pipelines, or custom tooling.
 
 ## Public API at a Glance

@@ -73,7 +73,7 @@ azure-functions --help
 Run a first diagnostic in current directory:
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 If the command is available, installation succeeded. If checks fail, that means the tool is running correctly and found project issues.

@@ -17,13 +17,13 @@ Install and run in the current project:
 
 ```bash
 python -m pip install azure-functions-doctor
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 Run required-only checks in CI:
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 ## What it checks
@@ -65,7 +65,7 @@ This enables direct CI usage without custom gate wrappers.
 
 ## CLI and API entry points
 
-- CLI: `azure-functions doctor`
+- CLI: `azure-functions-doctor doctor`
 - API: `from azure_functions_doctor.api import run_diagnostics`
 
 Programmatic example:
@@ -116,7 +116,7 @@ def has_required_failures(path: str) -> bool:
 ## Typical adoption path
 
 1. Install package in your development environment
-2. Run `azure-functions doctor` locally and fix required failures
+2. Run `azure-functions-doctor doctor` locally and fix required failures
 3. Add CI job using `--profile minimal --format json`
 4. Publish JSON/SARIF/JUnit artifacts for visibility
 5. Add optional custom rules for organization-specific policy

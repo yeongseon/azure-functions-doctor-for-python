@@ -31,7 +31,7 @@ The intended handoff: scaffold creates the project skeleton, doctor confirms it 
 scaffold new project
       │
       ▼
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
       │
       ├── all pass → ready for development
       │
@@ -51,7 +51,7 @@ func new --name HttpTrigger --template "HTTP trigger"
 **2. Run doctor immediately:**
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 A freshly scaffolded project should pass all five required checks:
@@ -69,13 +69,13 @@ A freshly scaffolded project should pass all five required checks:
 ```bash
 # Example: missing azure-functions in requirements.txt
 echo "azure-functions" >> requirements.txt
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 **4. Optionally run full diagnostics for local guidance:**
 
 ```bash
-azure-functions doctor --verbose
+azure-functions-doctor doctor --verbose
 ```
 
 This surfaces optional warnings (virtual environment, Core Tools version, extension bundle, etc.) without blocking on them.
@@ -111,7 +111,7 @@ jobs:
 
       - name: Run preflight check
         run: |
-          azure-functions doctor \
+          azure-functions-doctor doctor \
             --profile minimal \
             --format json \
             --output doctor.json
@@ -134,7 +134,7 @@ The artifact upload uses `if: always()` to preserve the report even on failure.
 Use `--format json` to produce a machine-readable report for downstream processing.
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 The output structure:
@@ -193,7 +193,7 @@ Surface doctor findings in the GitHub Security tab by emitting SARIF and uploadi
         id: doctor
         run: |
           set +e
-          azure-functions doctor \
+          azure-functions-doctor doctor \
             --profile minimal \
             --format sarif \
             --output doctor.sarif
@@ -235,7 +235,7 @@ The SARIF report maps:
 Use `--format junit` to emit a JUnit XML report compatible with GitHub Actions test summaries, Azure DevOps test results, and Jenkins.
 
 ```bash
-azure-functions doctor --profile minimal --format junit --output doctor-junit.xml
+azure-functions-doctor doctor --profile minimal --format junit --output doctor-junit.xml
 ```
 
 GitHub Actions test summary:
@@ -243,7 +243,7 @@ GitHub Actions test summary:
 ```yaml
       - name: Run doctor (JUnit)
         run: |
-          azure-functions doctor \
+          azure-functions-doctor doctor \
             --profile minimal \
             --format junit \
             --output doctor-junit.xml
@@ -262,9 +262,9 @@ GitHub Actions test summary:
 Emit all formats in a single pipeline run for maximum ecosystem coverage:
 
 ```bash
-azure-functions doctor --profile minimal --format json   --output doctor.json
-azure-functions doctor --profile minimal --format sarif  --output doctor.sarif
-azure-functions doctor --profile minimal --format junit  --output doctor-junit.xml
+azure-functions-doctor doctor --profile minimal --format json   --output doctor.json
+azure-functions-doctor doctor --profile minimal --format sarif  --output doctor.sarif
+azure-functions-doctor doctor --profile minimal --format junit  --output doctor-junit.xml
 ```
 
 The exit code of the first command drives pass/fail.
@@ -287,7 +287,7 @@ strategy:
 steps:
   - name: Run doctor
     run: |
-      azure-functions doctor \
+      azure-functions-doctor doctor \
         --path ${{ matrix.app_path }} \
         --profile minimal \
         --format json \

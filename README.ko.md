@@ -58,31 +58,46 @@ pip install -e .
 현재 프로젝트에서 doctor 실행:
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 특정 프로젝트 경로에서 실행:
 
 ```bash
-azure-functions doctor --path ./examples/v2/http-trigger
+azure-functions-doctor doctor --path ./examples/v2/http-trigger
 ```
 
 필수 항목만 점검하는 프로필 사용:
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 CI를 위한 JSON 출력:
 
 ```bash
-azure-functions doctor --format json
+azure-functions-doctor doctor --format json
 ```
+
+### 명령 이름과 사용 중단된 별칭
+
+`azure-functions-doctor`가 **표준(canonical)** 명령입니다. 두 개의 레거시
+콘솔 스크립트 별칭은 여전히 동작하지만 **사용 중단(deprecated)** 되었으며,
+실행 시 경고를 출력합니다:
+
+| 명령 | 상태 |
+| --- | --- |
+| `azure-functions-doctor` | 표준 — 이 명령을 사용하세요. |
+| `azure-functions` | 사용 중단 — **v1.0.0**에서 제거 예정. |
+| `fdoctor` | 사용 중단 — **v1.0.0**에서 제거 예정. |
+
+v1.0.0 릴리스에서 별칭이 제거되기 전에 스크립트나 CI 파이프라인을
+`azure-functions-doctor`로 마이그레이션하세요.
 
 ## Demo
 
 아래 데모는 VHS를 사용하여 [`demo/doctor-demo.tape`](demo/doctor-demo.tape)에서 생성되었습니다.
-대표적인 예시 프로젝트와 의도적으로 오류를 발생시킨 복사본에 대해 실제 `azure-functions doctor` CLI를 실행하여 성공/실패 대비를 보여줍니다.
+대표적인 예시 프로젝트와 의도적으로 오류를 발생시킨 복사본에 대해 실제 `azure-functions-doctor doctor` CLI를 실행하여 성공/실패 대비를 보여줍니다.
 
 ![Doctor demo](docs/assets/doctor-demo.gif)
 
