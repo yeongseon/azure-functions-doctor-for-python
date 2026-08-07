@@ -1,5 +1,10 @@
 # Diagnostics Reference
 
+> **Localization:** This is a canonical, English-only reference document
+> (partly generated from the rule set). It is intentionally outside the
+> translated README set (`README.ko.md`, `README.ja.md`, `README.zh-CN.md`)
+> and requires no translation updates when diagnostics change.
+
 Azure Functions Doctor ships with a built-in diagnostics set for the **Azure Functions Python v2 programming model**.
 
 Diagnostics are grouped by section, then evaluated as required or optional checks.
@@ -117,6 +122,8 @@ These checks run only after the repository has been classified as a supported `v
 | `extensionBundle` | `check_extension_bundle` | `host_json_property` | `$.extensionBundle` key is not present in `host.json`. |
 | ASGI/WSGI compatibility | `check_asgi_wsgi_exposure` | `callable_detection` | No ASGI/WSGI app exposure patterns are detected. |
 | Unwanted files | `check_unused_files` | `file_glob_check` | Common deploy-time junk patterns are found. |
+| Decorator order | `check_decorator_order` | `decorator_order` | A handler stacks `@validate_http` outside (above) `@with_context`, so validation/OpenAPI metadata is discarded. |
+| Endpoint metadata coverage | `check_endpoint_metadata` | `endpoint_metadata` | The project depends on `azure-functions-validation` but an HTTP route handler lacks `@validate_http`, so it emits no endpoint OpenAPI metadata. |
 ## Status Mapping
 
 - `pass`: check succeeded

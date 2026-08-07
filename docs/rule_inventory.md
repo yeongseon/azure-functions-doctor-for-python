@@ -31,6 +31,8 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_funcignore` | .funcignore | project_health | cleanup | `file_exists` | No | full |
 | `check_local_settings_git_tracked` | local.settings.json not git-tracked | project_health | security | `local_settings_security` | No | full |
 | `check_extension_bundle_v4` | extensionBundle v4 recommended | configuration | extensions | `host_json_extension_bundle_version` | No | full |
+| `check_decorator_order` | Decorator order | framework | programming_model | `decorator_order` | No | full |
+| `check_endpoint_metadata` | Endpoint metadata coverage | framework | programming_model | `endpoint_metadata` | No | full |
 
 ## Rule Types
 

@@ -66,7 +66,9 @@
           "host_json_extension_bundle_version",
           "package_forbidden",
           "blueprint_registration",
-          "native_dependency_risk"
+          "native_dependency_risk",
+          "decorator_order",
+          "endpoint_metadata"
         ]
       },
       "required": {
@@ -88,6 +90,7 @@
           "jsonpath": { "type": "string" },
           "targets": { "type": "array", "items": { "type": "string" } },
           "patterns": { "type": "array", "items": { "type": "string" } },
+          "decorators": { "type": "array", "items": { "type": "string" }, "description": "For decorator_order: decorator leaf names whose relative order is checked." },
           "mode": { "type": "string", "enum": ["string", "ast"], "description": "For source_code_contains: 'string' (default) or 'ast' for AST-based detection." }
         }
       },
