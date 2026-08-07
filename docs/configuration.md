@@ -7,7 +7,7 @@ This page explains how runtime behavior changes with flags, profiles, formats, a
 ## Command shape
 
 ```bash
-azure-functions doctor [OPTIONS]
+azure-functions-doctor doctor [OPTIONS]
 ```
 
 Core options:
@@ -25,13 +25,13 @@ Core options:
 By default, diagnostics run against the current directory.
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 To check another project:
 
 ```bash
-azure-functions doctor --path ./apps/orders-function
+azure-functions-doctor doctor --path ./apps/orders-function
 ```
 
 Path validation behavior:
@@ -59,7 +59,7 @@ Profiles control which rules execute.
 - Stable contract for pass/fail baseline
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 See [Minimal Profile](minimal_profile.md) for complete rule coverage.
@@ -89,7 +89,7 @@ See [Minimal Profile](minimal_profile.md) for complete rule coverage.
 Example:
 
 ```bash
-azure-functions doctor --format json --output artifacts/doctor.json
+azure-functions-doctor doctor --format json --output artifacts/doctor.json
 ```
 
 !!! note
@@ -108,7 +108,7 @@ If `--output` is provided:
 Example:
 
 ```bash
-azure-functions doctor --format sarif --output reports/doctor.sarif
+azure-functions-doctor doctor --format sarif --output reports/doctor.sarif
 ```
 
 ## Verbose and debug modes
@@ -118,7 +118,7 @@ azure-functions doctor --format sarif --output reports/doctor.sarif
 Shows fix hints for non-passing checks in table output.
 
 ```bash
-azure-functions doctor --verbose
+azure-functions-doctor doctor --verbose
 ```
 
 ### `--debug`
@@ -126,7 +126,7 @@ azure-functions doctor --verbose
 Enables debug logging output for deeper troubleshooting.
 
 ```bash
-azure-functions doctor --debug
+azure-functions-doctor doctor --debug
 ```
 
 Use debug mode when diagnosing tool behavior rather than project diagnostics.
@@ -136,7 +136,7 @@ Use debug mode when diagnosing tool behavior rather than project diagnostics.
 You can replace built-in rules with a custom file:
 
 ```bash
-azure-functions doctor --rules ./rules/custom-v2.json
+azure-functions-doctor doctor --rules ./rules/custom-v2.json
 ```
 
 Behavior:
@@ -176,7 +176,7 @@ def current_config() -> dict:
 For merge blocking:
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 Why this shape works well:

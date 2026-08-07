@@ -74,19 +74,19 @@ These remain available in full profile.
 Local blocker-only check:
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 CI-friendly JSON artifact:
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 Path-targeted monorepo check:
 
 ```bash
-azure-functions doctor --path ./apps/orders-function --profile minimal
+azure-functions-doctor doctor --path ./apps/orders-function --profile minimal
 ```
 
 ## Exit code behavior in minimal

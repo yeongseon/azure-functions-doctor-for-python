@@ -1,13 +1,13 @@
 # CLI Usage
 
-`azure-functions doctor` validates Azure Functions Python v2 projects and reports required failures versus optional warnings.
+`azure-functions-doctor doctor` validates Azure Functions Python v2 projects and reports required failures versus optional warnings.
 
 This page is the complete command and workflow reference.
 
 ## Command summary
 
 ```bash
-azure-functions doctor [OPTIONS]
+azure-functions-doctor doctor [OPTIONS]
 ```
 
 The command supports human-readable and machine-readable workflows:
@@ -22,37 +22,37 @@ The command supports human-readable and machine-readable workflows:
 Current directory:
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 Specific path:
 
 ```bash
-azure-functions doctor --path ./apps/orders-function
+azure-functions-doctor doctor --path ./apps/orders-function
 ```
 
 Required-only profile:
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 JSON artifact:
 
 ```bash
-azure-functions doctor --format json --output doctor.json
+azure-functions-doctor doctor --format json --output doctor.json
 ```
 
 Verbose fix hints:
 
 ```bash
-azure-functions doctor --verbose
+azure-functions-doctor doctor --verbose
 ```
 
 Target runtime override:
 
 ```bash
-azure-functions doctor --target-python 3.12
+azure-functions-doctor doctor --target-python 3.12
 ```
 
 ## Full option reference
@@ -95,7 +95,7 @@ Section status is `fail` if any required check in the section failed.
 Best for local terminal feedback.
 
 ```bash
-azure-functions doctor --format table
+azure-functions-doctor doctor --format table
 ```
 
 Includes:
@@ -110,7 +110,7 @@ Includes:
 Best for CI automation and post-processing.
 
 ```bash
-azure-functions doctor --format json --output doctor.json
+azure-functions-doctor doctor --format json --output doctor.json
 ```
 
 JSON includes:
@@ -125,7 +125,7 @@ Contract details: [JSON Output Contract](json_output_contract.md)
 Best for code scanning integrations.
 
 ```bash
-azure-functions doctor --format sarif --output doctor.sarif
+azure-functions-doctor doctor --format sarif --output doctor.sarif
 ```
 
 Generated document follows SARIF `2.1.0` structure.
@@ -135,7 +135,7 @@ Generated document follows SARIF `2.1.0` structure.
 Best for CI systems that visualize test suites.
 
 ```bash
-azure-functions doctor --format junit --output doctor-junit.xml
+azure-functions-doctor doctor --format junit --output doctor-junit.xml
 ```
 
 Each diagnostic item is represented as a test case.
@@ -145,13 +145,13 @@ Each diagnostic item is represented as a test case.
 Single app repository:
 
 ```bash
-azure-functions doctor --path .
+azure-functions-doctor doctor --path .
 ```
 
 Monorepo app path:
 
 ```bash
-azure-functions doctor --path ./services/payments-function
+azure-functions-doctor doctor --path ./services/payments-function
 ```
 
 Use explicit paths in CI to avoid accidental root-level checks.
@@ -176,7 +176,7 @@ tool runtime and table output adds `Target Python: X.Y (override)` near the head
 Example:
 
 ```bash
-azure-functions doctor --path ./apps/orders-function --target-python 3.12
+azure-functions-doctor doctor --path ./apps/orders-function --target-python 3.12
 ```
 
 When omitted, doctor keeps checking the current interpreter and labels it as the
@@ -194,7 +194,7 @@ If `--profile` is omitted, behavior is equivalent to `full`.
 ### Minimal profile
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 `minimal` includes only `required: true` rules.
@@ -212,7 +212,7 @@ Reference: [Minimal Profile](minimal_profile.md)
 Run with custom rule file:
 
 ```bash
-azure-functions doctor --rules ./rules/custom.json
+azure-functions-doctor doctor --rules ./rules/custom.json
 ```
 
 The file must:
@@ -230,7 +230,7 @@ Reference: [Rules](rules.md), [Custom Rules Example](examples/custom_rules.md)
 ### Verbose mode
 
 ```bash
-azure-functions doctor --verbose
+azure-functions-doctor doctor --verbose
 ```
 
 Shows `fix:` guidance for non-passing checks in table output.
@@ -238,7 +238,7 @@ Shows `fix:` guidance for non-passing checks in table output.
 ### Debug mode
 
 ```bash
-azure-functions doctor --debug
+azure-functions-doctor doctor --debug
 ```
 
 Enables debug logging for diagnosing CLI internals and environment issues.
@@ -248,31 +248,31 @@ Enables debug logging for diagnosing CLI internals and environment issues.
 ### Local fast check
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 ### Local full quality sweep
 
 ```bash
-azure-functions doctor --profile full --verbose
+azure-functions-doctor doctor --profile full --verbose
 ```
 
 ### CI gate (required only)
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 ### SARIF generation
 
 ```bash
-azure-functions doctor --profile minimal --format sarif --output doctor.sarif
+azure-functions-doctor doctor --profile minimal --format sarif --output doctor.sarif
 ```
 
 ### JUnit publishing
 
 ```bash
-azure-functions doctor --profile minimal --format junit --output doctor-junit.xml
+azure-functions-doctor doctor --profile minimal --format junit --output doctor-junit.xml
 ```
 
 ## CI usage patterns

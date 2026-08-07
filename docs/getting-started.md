@@ -29,19 +29,19 @@ Azure Functions Doctor validates v2-style projects and expects signals such as:
 Run from your project root:
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 Run against a specific path:
 
 ```bash
-azure-functions doctor --path ./my-function-app
+azure-functions-doctor doctor --path ./my-function-app
 ```
 
 Use verbose mode to show fix hints:
 
 ```bash
-azure-functions doctor --verbose
+azure-functions-doctor doctor --verbose
 ```
 
 ## 4) Understand output statuses
@@ -77,7 +77,7 @@ Python Env
 [✗] requirements.txt: /workspace/my-function-app/requirements.txt not found (fail)
 [✗] azure-functions package: Package 'azure-functions' not declared in requirements.txt (fail)
 
-Doctor summary (to see all details, run azure-functions doctor -v):
+Doctor summary (to see all details, run azure-functions-doctor doctor -v):
   2 fails, 1 warning, 5 passed
 Exit code: 1
 ```
@@ -146,13 +146,13 @@ def hello(req: func.HttpRequest) -> func.HttpResponse:
 Run all built-in checks (default behavior):
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 Run only required checks:
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 Use `minimal` for strict pass/fail gating and low-noise CI.
@@ -164,19 +164,19 @@ See [Minimal Profile](minimal_profile.md) for exact rule coverage.
 JSON:
 
 ```bash
-azure-functions doctor --format json --output doctor-report.json
+azure-functions-doctor doctor --format json --output doctor-report.json
 ```
 
 SARIF:
 
 ```bash
-azure-functions doctor --format sarif --output doctor.sarif
+azure-functions-doctor doctor --format sarif --output doctor.sarif
 ```
 
 JUnit:
 
 ```bash
-azure-functions doctor --format junit --output doctor-junit.xml
+azure-functions-doctor doctor --format junit --output doctor-junit.xml
 ```
 
 !!! note
@@ -205,7 +205,7 @@ See [API Reference](api.md) for detailed module docs.
 
 For teams adopting the doctor:
 
-1. Run `azure-functions doctor` locally during development
+1. Run `azure-functions-doctor doctor` locally during development
 2. Fix all required failures before PR creation
 3. Add CI gate using `--profile minimal --format json`
 4. Publish JSON/SARIF/JUnit artifacts for visibility

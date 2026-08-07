@@ -2,7 +2,7 @@
 
 This example shows a full local loop:
 
-1. Run `azure-functions doctor`
+1. Run `azure-functions-doctor doctor`
 2. Read failures and warnings
 3. Apply fixes
 4. Re-run until required failures are zero
@@ -19,13 +19,13 @@ Assume this project has common setup gaps:
 ## Step 1: Run the doctor
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 You can also target another folder:
 
 ```bash
-azure-functions doctor --path ./examples/v2/http-trigger
+azure-functions-doctor doctor --path ./examples/v2/http-trigger
 ```
 
 ## Step 2: Read status correctly
@@ -49,7 +49,7 @@ Exit codes:
 Verbose mode prints `fix:` hints for non-passing checks.
 
 ```bash
-azure-functions doctor --verbose
+azure-functions-doctor doctor --verbose
 ```
 
 This is the fastest way to map output directly to remediation.
@@ -100,13 +100,13 @@ def health(req: func.HttpRequest) -> func.HttpResponse:
 ## Step 5: Re-run
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 Desired summary shape:
 
 ```text
-Doctor summary (to see all details, run azure-functions doctor -v):
+Doctor summary (to see all details, run azure-functions-doctor doctor -v):
   0 fails, 2 warnings, 13 passed
 Exit code: 0
 ```
@@ -116,7 +116,7 @@ Warnings can remain while required baseline is clean.
 ## Step 6: Export JSON report
 
 ```bash
-azure-functions doctor --format json --output doctor-report.json
+azure-functions-doctor doctor --format json --output doctor-report.json
 ```
 
 The output file includes `metadata` and `results` fields.
@@ -150,13 +150,13 @@ If this returns `0`, required blockers are resolved.
 ## Optional: Generate SARIF for code scanning tools
 
 ```bash
-azure-functions doctor --format sarif --output doctor.sarif
+azure-functions-doctor doctor --format sarif --output doctor.sarif
 ```
 
 ## Optional: Generate JUnit for CI test views
 
 ```bash
-azure-functions doctor --format junit --output doctor-junit.xml
+azure-functions-doctor doctor --format junit --output doctor-junit.xml
 ```
 
 ## What this example validates

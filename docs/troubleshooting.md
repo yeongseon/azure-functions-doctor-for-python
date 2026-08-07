@@ -61,7 +61,7 @@ The CLI validates that target path:
 Action:
 
 ```bash
-azure-functions doctor --path ./correct/project/path
+azure-functions-doctor doctor --path ./correct/project/path
 ```
 
 ### Problem: unknown profile error
@@ -71,7 +71,7 @@ Only `minimal` and `full` are valid profile values.
 Action:
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 ### Problem: invalid format error
@@ -154,7 +154,7 @@ Common causes:
 Action:
 
 ```bash
-azure-functions doctor --format json --output doctor.json
+azure-functions-doctor doctor --format json --output doctor.json
 ```
 
 Then parse `doctor.json` only.
@@ -237,19 +237,19 @@ Recommended issue report contents:
 Verbose local run:
 
 ```bash
-azure-functions doctor --verbose
+azure-functions-doctor doctor --verbose
 ```
 
 Debug run:
 
 ```bash
-azure-functions doctor --debug
+azure-functions-doctor doctor --debug
 ```
 
 Required-only CI run:
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 ## Related docs

@@ -14,13 +14,13 @@ Use custom rules when built-in checks are not enough for your team policy, for e
 ## Command shape
 
 ```bash
-azure-functions doctor --rules ./rules/custom-rules.json
+azure-functions-doctor doctor --rules ./rules/custom-rules.json
 ```
 
 You can combine with profile and output flags:
 
 ```bash
-azure-functions doctor --rules ./rules/custom-rules.json --profile minimal --format json --output doctor-custom.json
+azure-functions-doctor doctor --rules ./rules/custom-rules.json --profile minimal --format json --output doctor-custom.json
 ```
 
 ## Minimal custom rules file
@@ -79,7 +79,7 @@ Create `rules/custom-rules.json`:
 ## Run with the custom file
 
 ```bash
-azure-functions doctor --rules ./rules/custom-rules.json --verbose
+azure-functions-doctor doctor --rules ./rules/custom-rules.json --verbose
 ```
 
 Expected behavior:
@@ -136,7 +136,7 @@ Current built-ins:
 Many teams keep a repository-local baseline rule file and run:
 
 ```bash
-azure-functions doctor --rules ./rules/org-baseline.json --profile minimal --format json --output doctor-org.json
+azure-functions-doctor doctor --rules ./rules/org-baseline.json --profile minimal --format json --output doctor-org.json
 ```
 
 This provides consistent policy in local and CI environments.

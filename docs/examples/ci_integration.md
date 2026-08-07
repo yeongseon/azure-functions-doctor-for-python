@@ -11,7 +11,7 @@ This example shows how to enforce required diagnostics in CI and publish rich ar
 Recommended command:
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 ```
 
 Why this works:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Run doctor (required checks)
         run: |
-          azure-functions doctor \
+          azure-functions-doctor doctor \
             --profile minimal \
             --format json \
             --output doctor.json
@@ -78,7 +78,7 @@ If you want to always upload artifacts before failing, split gate and report ste
         id: doctor
         run: |
           set +e
-          azure-functions doctor --profile minimal --format json --output doctor.json
+          azure-functions-doctor doctor --profile minimal --format json --output doctor.json
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: Upload doctor artifact
@@ -144,9 +144,9 @@ fi
 For richer ecosystem integration, emit multiple formats in separate steps:
 
 ```bash
-azure-functions doctor --profile minimal --format json --output doctor.json
-azure-functions doctor --profile minimal --format sarif --output doctor.sarif
-azure-functions doctor --profile minimal --format junit --output doctor-junit.xml
+azure-functions-doctor doctor --profile minimal --format json --output doctor.json
+azure-functions-doctor doctor --profile minimal --format sarif --output doctor.sarif
+azure-functions-doctor doctor --profile minimal --format junit --output doctor-junit.xml
 ```
 
 Then upload artifacts for each format.
@@ -169,7 +169,7 @@ strategy:
       - apps/payments-function
 
 steps:
-  - run: azure-functions doctor --path ${{ matrix.app_path }} --profile minimal --format json --output doctor-${{ matrix.app_path }}.json
+  - run: azure-functions-doctor doctor --path ${{ matrix.app_path }} --profile minimal --format json --output doctor-${{ matrix.app_path }}.json
 ```
 
 ## Common CI pitfalls
@@ -206,7 +206,7 @@ steps:
 
   - script: |
       set +e
-      azure-functions doctor \
+      azure-functions-doctor doctor \
         --profile minimal \
         --format json \
         --output $(Build.ArtifactStagingDirectory)/doctor.json
@@ -242,7 +242,7 @@ repos:
       - id: azure-functions-doctor
         name: Azure Functions Doctor
         language: system
-        entry: azure-functions doctor --profile minimal
+        entry: azure-functions-doctor doctor --profile minimal
         pass_filenames: false
         always_run: true
 ```
@@ -269,7 +269,7 @@ Run doctor from the VS Code command palette via a workspace task:
     {
       "label": "Azure Functions Doctor",
       "type": "shell",
-      "command": "azure-functions doctor --profile minimal --format json --output doctor.json",
+      "command": "azure-functions-doctor doctor --profile minimal --format json --output doctor.json",
       "group": "build",
       "presentation": {
         "echo": true,
@@ -294,7 +294,7 @@ Upload doctor results as SARIF to surface findings in the GitHub Security tab:
         id: doctor
         run: |
           set +e
-          azure-functions doctor \
+          azure-functions-doctor doctor \
             --profile minimal \
             --format sarif \
             --output doctor.sarif

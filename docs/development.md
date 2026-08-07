@@ -34,7 +34,7 @@ make check-all
 ## Project Areas
 
 - `src/azure_functions_doctor/api.py`: stable programmatic API (`run_diagnostics`)
-- `src/azure_functions_doctor/cli.py`: Typer-based CLI (`azure-functions doctor`)
+- `src/azure_functions_doctor/cli.py`: Typer-based CLI (`azure-functions-doctor doctor`)
 - `src/azure_functions_doctor/doctor.py`: orchestration, rule loading, section aggregation
 - `src/azure_functions_doctor/handlers.py`: handler implementations and registry dispatch
 - `src/azure_functions_doctor/assets/rules/v2.json`: built-in diagnostics rules
@@ -121,7 +121,7 @@ def _handle_sample(self, rule: dict, path: Path) -> dict[str, str]:
 
 ## Debugging Tips
 
-- Use `azure-functions doctor --debug` to enable debug logging.
+- Use `azure-functions-doctor doctor --debug` to enable debug logging.
 - Use `--profile minimal` to isolate required checks first.
 - Run with `--format json` to inspect raw section/item output precisely.
 - Use `--rules <path>` to reproduce issues with a minimal custom ruleset.
