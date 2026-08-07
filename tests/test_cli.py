@@ -275,3 +275,35 @@ def test_validate_inputs_invalid_output_path_raises(
 def test_cli_debug_mode_prints_debug_banner() -> None:
     result = runner.invoke(app, ["doctor", "--debug"])
     assert "Debug logging enabled" in result.output
+
+
+def test_azure_functions_alias_warns_and_delegates(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Deprecated `azure-functions` alias warns on stderr and delegates to cli()."""
+    cli_mock = Mock()
+    monkeypatch.setattr(cli_module, "cli", cli_mock)
+
+    cli_module.azure_functions_alias()
+
+    cli_mock.assert_called_once_with()
+    err = capsys.readouterr().err
+    assert "deprecated" in err
+    assert "v1.0.0" in err
+
+
+def test_fdoctor_alias_warns_and_delegates(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Deprecated `fdoctor` alias warns on stderr and delegates to cli()."""
+    cli_mock = Mock()
+    monkeypatch.setattr(cli_module, "cli", cli_mock)
+
+    cli_module.fdoctor_alias()
+
+    cli_mock.assert_called_once_with()
+    err = capsys.readouterr().err
+    assert "deprecated" in err
+    assert "v1.0.0" in err

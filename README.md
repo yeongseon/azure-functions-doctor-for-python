@@ -81,40 +81,54 @@ pip install -e .
 Run the doctor in the current project:
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 Run against a specific project:
 
 ```bash
-azure-functions doctor --path ./examples/v2/http-trigger
+azure-functions-doctor doctor --path ./examples/v2/http-trigger
 ```
 
 Use a required-only profile:
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 Output JSON for CI:
 
 ```bash
-azure-functions doctor --format json
+azure-functions-doctor doctor --format json
 ```
 
 Pin the Azure Functions target runtime explicitly:
 
 ```bash
-azure-functions doctor --target-python 3.12
+azure-functions-doctor doctor --target-python 3.12
 ```
 
 Use `--target-python` when the Python running `azure-functions-doctor`
 is not the same as the Python version your Function App will run on Azure.
 
+### Command name and deprecated aliases
+
+`azure-functions-doctor` is the **canonical** command. Two legacy console-script
+aliases still work but are **deprecated** and print a warning when invoked:
+
+| Command | Status |
+| --- | --- |
+| `azure-functions-doctor` | Canonical — use this. |
+| `azure-functions` | Deprecated — removal targeted for **v1.0.0**. |
+| `fdoctor` | Deprecated — removal targeted for **v1.0.0**. |
+
+Migrate any scripts or CI pipelines to `azure-functions-doctor` before the
+v1.0.0 release removes the aliases.
+
 ### Sample output (excerpt)
 
 ```bash
-azure-functions doctor --path ./examples/v2/http-trigger
+azure-functions-doctor doctor --path ./examples/v2/http-trigger
 ```
 
 ```text
@@ -155,7 +169,7 @@ Use `azure-functions-doctor` as a CI gate to block deployments on required failu
 - name: Run azure-functions-doctor
   run: |
     pip install azure-functions-doctor
-    azure-functions doctor --profile minimal --format json --output doctor.json
+    azure-functions-doctor doctor --profile minimal --format json --output doctor.json
 
 - name: Upload report
   if: always()
@@ -182,7 +196,7 @@ See [docs/examples/ci_integration.md](docs/examples/ci_integration.md) for Azure
 ## Demo
 
 The demo below is generated from [`demo/doctor-demo.tape`](demo/doctor-demo.tape) with VHS.
-It runs the real `azure-functions doctor` CLI against the representative example
+It runs the real `azure-functions-doctor doctor` CLI against the representative example
 and then against an intentionally broken copy to show the pass/fail contrast.
 
 ![Doctor demo](docs/assets/doctor-demo.gif)
@@ -231,7 +245,7 @@ The default ruleset includes checks for:
 
 ## How It Works
 
-`azure-functions doctor` loads a JSON ruleset, dispatches each rule to a
+`azure-functions-doctor doctor` loads a JSON ruleset, dispatches each rule to a
 type-based handler, and aggregates the results into per-section output:
 
 ```mermaid

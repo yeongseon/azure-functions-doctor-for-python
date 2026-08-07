@@ -58,31 +58,45 @@ pip install -e .
 在当前项目中运行 doctor：
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 针对特定项目路径运行：
 
 ```bash
-azure-functions doctor --path ./examples/v2/http-trigger
+azure-functions-doctor doctor --path ./examples/v2/http-trigger
 ```
 
 使用仅包含必要检查项的配置：
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 为 CI 输出 JSON 格式：
 
 ```bash
-azure-functions doctor --format json
+azure-functions-doctor doctor --format json
 ```
+
+### 命令名称与已弃用的别名
+
+`azure-functions-doctor` 是**正式（canonical）**命令。两个旧的控制台
+脚本别名仍可使用，但已**弃用（deprecated）**，调用时会打印警告：
+
+| 命令 | 状态 |
+| --- | --- |
+| `azure-functions-doctor` | 正式 — 请使用此命令。 |
+| `azure-functions` | 已弃用 — 计划在 **v1.0.0** 移除。 |
+| `fdoctor` | 已弃用 — 计划在 **v1.0.0** 移除。 |
+
+请在 v1.0.0 发布移除别名之前，将脚本或 CI 流水线迁移到
+`azure-functions-doctor`。
 
 ## Demo
 
 以下演示是使用 VHS 从 [`demo/doctor-demo.tape`](demo/doctor-demo.tape) 生成的。
-它通过对代表性示例项目以及一个故意损坏的副本运行真实的 `azure-functions doctor` CLI，来展示成功与失败的对比。
+它通过对代表性示例项目以及一个故意损坏的副本运行真实的 `azure-functions-doctor doctor` CLI，来展示成功与失败的对比。
 
 ![Doctor demo](docs/assets/doctor-demo.gif)
 

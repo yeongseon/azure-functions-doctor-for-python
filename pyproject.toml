@@ -58,9 +58,10 @@ docs = [
 ]
 
 [project.scripts]
-azure-functions = "azure_functions_doctor.cli:cli"
 azure-functions-doctor = "azure_functions_doctor.cli:cli"
-fdoctor = "azure_functions_doctor.cli:cli"
+# Deprecated aliases (removal targeted for v1.0.0); emit a deprecation notice.
+azure-functions = "azure_functions_doctor.cli:azure_functions_alias"
+fdoctor = "azure_functions_doctor.cli:fdoctor_alias"
 
 [build-system]
 requires = ["hatchling"]

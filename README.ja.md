@@ -58,31 +58,46 @@ pip install -e .
 現在のプロジェクトで doctor を実行：
 
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 特定のプロジェクトパスを指定して実行：
 
 ```bash
-azure-functions doctor --path ./examples/v2/http-trigger
+azure-functions-doctor doctor --path ./examples/v2/http-trigger
 ```
 
 必須項目のみをチェックするプロファイルを使用：
 
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 CI 用に JSON 形式で出力：
 
 ```bash
-azure-functions doctor --format json
+azure-functions-doctor doctor --format json
 ```
+
+### コマンド名と非推奨のエイリアス
+
+`azure-functions-doctor` が**正式（canonical）**コマンドです。既存の 2 つの
+コンソールスクリプトエイリアスは引き続き動作しますが、**非推奨（deprecated）**であり、
+実行時に警告を出力します：
+
+| コマンド | 状態 |
+| --- | --- |
+| `azure-functions-doctor` | 正式 — これを使用してください。 |
+| `azure-functions` | 非推奨 — **v1.0.0** で削除予定。 |
+| `fdoctor` | 非推奨 — **v1.0.0** で削除予定。 |
+
+v1.0.0 リリースでエイリアスが削除される前に、スクリプトや CI パイプラインを
+`azure-functions-doctor` に移行してください。
 
 ## Demo
 
 以下のデモは、VHS を使用して [`demo/doctor-demo.tape`](demo/doctor-demo.tape) から生成されました。
-代表的なサンプルプロジェクトと、意図的にエラーを発生させたコピーに対して実際の `azure-functions doctor` CLI を実行し、成功と失敗の対比を示しています。
+代表的なサンプルプロジェクトと、意図的にエラーを発生させたコピーに対して実際の `azure-functions-doctor doctor` CLI を実行し、成功と失敗の対比を示しています。
 
 ![Doctor demo](docs/assets/doctor-demo.gif)
 

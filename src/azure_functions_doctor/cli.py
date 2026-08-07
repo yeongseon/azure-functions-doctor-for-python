@@ -384,7 +384,7 @@ def doctor(
     # Use the precomputed counts from earlier for final output
     console.print()
     # Print Doctor summary at the bottom like the requested sample
-    console.print("Doctor summary (to see all details, run azure-functions doctor -v):")
+    console.print("Doctor summary (to see all details, run azure-functions-doctor doctor -v):")
     # Use singular/plural simple form as in sample (error vs errors)
     # Summary now reflects canonical statuses: fails, warnings, passed
     w_label = "warning" if warning_count == 1 else "warnings"
@@ -399,6 +399,34 @@ def doctor(
 
 # Explicit command registration (test-friendly)
 cli.command()(doctor)
+
+
+# Deprecated console-script aliases. `azure-functions-doctor` is the canonical
+# command; these wrappers emit a deprecation notice (to stderr, so structured
+# stdout output such as JSON/SARIF stays clean) and then delegate to the CLI.
+# Removal is targeted for the next major release (v1.0.0).
+_CANONICAL_COMMAND = "azure-functions-doctor"
+
+
+def _warn_deprecated_alias(alias: str) -> None:
+    """Emit a deprecation notice for a legacy console-script alias."""
+    Console(stderr=True).print(
+        f"[yellow]Warning:[/yellow] the '{alias}' command is deprecated and will be "
+        f"removed in a future release (targeted for v1.0.0). "
+        f"Use '{_CANONICAL_COMMAND}' instead."
+    )
+
+
+def azure_functions_alias() -> None:
+    """Deprecated alias entry point for the `azure-functions` console script."""
+    _warn_deprecated_alias("azure-functions")
+    cli()
+
+
+def fdoctor_alias() -> None:
+    """Deprecated alias entry point for the `fdoctor` console script."""
+    _warn_deprecated_alias("fdoctor")
+    cli()
 
 if __name__ == "__main__":
     cli()
