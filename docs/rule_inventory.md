@@ -33,6 +33,11 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_extension_bundle_v4` | extensionBundle v4 recommended | configuration | extensions | `host_json_extension_bundle_version` | No | full |
 | `check_decorator_order` | Decorator order | framework | programming_model | `decorator_order` | No | full |
 | `check_endpoint_metadata` | Endpoint metadata coverage | framework | programming_model | `endpoint_metadata` | No | full |
+| `check_openapi_version_mixing` | OpenAPI version consistency | framework | programming_model | `openapi_version_mixing` | No | full |
+| `check_scan_before_spec` | Endpoint scan before spec build | framework | programming_model | `scan_before_spec` | No | full |
+| `check_langgraph_anonymous_auth` | LangGraph route authentication | configuration | security | `langgraph_anonymous_auth` | No | full |
+| `check_durable_nondeterminism` | Orchestrator determinism | framework | durable | `durable_nondeterminism` | Yes | minimal, full |
+| `check_unsupported_metadata_version` | Supported metadata version | configuration | extensions | `unsupported_metadata_version` | No | full |
 
 ## Rule Types
 
