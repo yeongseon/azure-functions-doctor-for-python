@@ -18,15 +18,21 @@ from azure_functions_doctor.handlers._helpers import (
     HandlerResult,
     Rule,
     RuleContext,
+    _collect_anonymous_auth_routes,
     _collect_inverted_decorator_order,
+    _collect_openapi_version_mixing,
+    _collect_orchestrator_nondeterminism,
     _collect_routes_missing_validate_http,
+    _collect_scan_before_spec,
     _collect_unregistered_blueprint_aliases,
+    _collect_unsupported_metadata_versions,
     _create_result,
     _detect_native_dependency_risks,
     _handle_specific_exceptions,
     _iter_project_py_contents,
     _parse_requirements_names,
     _project_declares_validation_dep,
+    _project_imports_langgraph,
     _read_project_python_file,
     _resolve_host_json_path,
     _resolve_host_json_pointer,
@@ -699,6 +705,163 @@ class HandlerRegistry:
                 *[f"- {fn}" for fn in uncovered[:10]],
                 "",
                 "Fix: add @validate_http so the route emits OpenAPI endpoint metadata.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_openapi_version_mixing(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when both OpenAPI 3.0 and 3.1 signals appear in one project."""
+        v30, v31 = _collect_openapi_version_mixing(path)
+        if not (v30 and v31):
+            return _create_result("pass", "No OpenAPI version mixing detected")
+        detail = "\n".join(
+            [
+                "Mixed OpenAPI version signals detected:",
+                f"- 3.0 signals: {', '.join(sorted(v30))}",
+                f"- 3.1 signals: {', '.join(sorted(v31))}",
+                "",
+                "Fix: standardise on a single OpenAPI version across the project.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_scan_before_spec(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when the OpenAPI spec is built before endpoints are scanned."""
+        condition = rule.get("condition", {}) or {}
+        scan_names = set(
+            condition.get("scan_names")
+            or [
+                "scan",
+                "scan_endpoints",
+                "discover_endpoints",
+                "register_functions",
+                "register_blueprints",
+            ]
+        )
+        spec_names = set(
+            condition.get("spec_names")
+            or [
+                "build_spec",
+                "build",
+                "get_openapi_spec",
+                "generate_spec",
+                "create_spec",
+            ]
+        )
+        violations = _collect_scan_before_spec(path, scan_names, spec_names)
+        if not violations:
+            return _create_result("pass", "No spec-before-scan ordering issues detected")
+        detail = "\n".join(
+            [
+                "OpenAPI spec built before endpoints were scanned:",
+                *[f"- {loc}" for loc in violations[:10]],
+                "",
+                "Fix: call the endpoint scan/registration before building the spec.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_langgraph_anonymous_auth(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when a LangGraph project exposes routes with anonymous auth."""
+        if not _project_imports_langgraph(path):
+            return _create_result("pass", "langgraph not imported; anonymous auth check skipped")
+        condition = rule.get("condition", {}) or {}
+        flag_missing = bool(condition.get("flag_missing_auth_level", False))
+        flagged = _collect_anonymous_auth_routes(path, flag_missing)
+        if not flagged:
+            return _create_result("pass", "No anonymous-auth routes detected in LangGraph project")
+        detail = "\n".join(
+            [
+                "Anonymous-auth routes detected in a LangGraph project:",
+                *[f"- {loc}" for loc in flagged[:10]],
+                "",
+                "Fix: require authentication (e.g. AuthLevel.FUNCTION) for LangGraph routes.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_durable_nondeterminism(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Fail when orchestrator functions call nondeterministic APIs."""
+        condition = rule.get("condition", {}) or {}
+        blocklist = set(
+            condition.get("blocklist")
+            or [
+                "datetime.now",
+                "datetime.utcnow",
+                "datetime.today",
+                "time.time",
+                "time.monotonic",
+                "time.perf_counter",
+                "random.random",
+                "random.randint",
+                "random.uniform",
+                "random.choice",
+                "random.randrange",
+                "random.getrandbits",
+                "uuid.uuid4",
+                "uuid.uuid1",
+                "requests.get",
+                "requests.post",
+                "requests.put",
+                "requests.delete",
+                "requests.patch",
+                "requests.head",
+                "open",
+                "os.getenv",
+                "os.environ.get",
+            ]
+        )
+        decorator_names = set(
+            condition.get("decorator_names")
+            or ["orchestration_trigger", "entity_trigger"]
+        )
+        flagged = _collect_orchestrator_nondeterminism(path, blocklist, decorator_names)
+        if not flagged:
+            return _create_result("pass", "No nondeterministic calls detected in orchestrators")
+        detail = "\n".join(
+            [
+                "Nondeterministic calls detected in orchestrator/entity functions:",
+                *[f"- {loc}" for loc in flagged[:10]],
+                "",
+                "Fix: move nondeterministic work into activity functions.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_unsupported_metadata_version(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when metadata declares an unsupported version."""
+        condition = rule.get("condition", {}) or {}
+        files = list(condition.get("files") or ["*.meta.json", "extensions.json"])
+        fields = list(condition.get("fields") or ["metadataVersion", "metadata_version"])
+        supported = list(condition.get("supported_versions") or [])
+        if not supported:
+            return _create_result(
+                "pass", "No supported_versions configured; metadata version check skipped"
+            )
+        found = _collect_unsupported_metadata_versions(path, files, fields, supported)
+        if not found:
+            return _create_result("pass", "No unsupported metadata versions detected")
+        detail = "\n".join(
+            [
+                "Unsupported metadata versions detected:",
+                *[f"- {src} = {ver}" for src, ver in found[:10]],
+                "",
+                f"Fix: use a supported version ({', '.join(supported) or 'see docs'}).",
             ]
         )
         return _create_result("fail", detail)
