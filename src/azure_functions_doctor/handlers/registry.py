@@ -713,7 +713,7 @@ class HandlerRegistry:
     def _handle_openapi_version_mixing(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
-        """Warn when both OpenAPI 3.0 and 3.1 signals appear in one project."""
+        """Detect when both OpenAPI 3.0 and 3.1 signals appear in one project."""
         v30, v31 = _collect_openapi_version_mixing(path)
         if not (v30 and v31):
             return _create_result("pass", "No OpenAPI version mixing detected")
@@ -732,7 +732,7 @@ class HandlerRegistry:
     def _handle_scan_before_spec(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
-        """Warn when the OpenAPI spec is built before endpoints are scanned."""
+        """Detect when the OpenAPI spec is built before endpoints are scanned."""
         condition = rule.get("condition", {}) or {}
         scan_names = set(
             condition.get("scan_names")
@@ -771,7 +771,7 @@ class HandlerRegistry:
     def _handle_langgraph_anonymous_auth(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
-        """Warn when a LangGraph project exposes routes with anonymous auth."""
+        """Detect when a LangGraph project exposes routes with anonymous auth."""
         if not _project_imports_langgraph(path):
             return _create_result("pass", "langgraph not imported; anonymous auth check skipped")
         condition = rule.get("condition", {}) or {}
@@ -844,7 +844,7 @@ class HandlerRegistry:
     def _handle_unsupported_metadata_version(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
-        """Warn when metadata declares an unsupported version."""
+        """Detect when metadata declares an unsupported version."""
         condition = rule.get("condition", {}) or {}
         files = list(condition.get("files") or ["*.meta.json", "extensions.json"])
         fields = list(condition.get("fields") or ["metadataVersion", "metadata_version"])
