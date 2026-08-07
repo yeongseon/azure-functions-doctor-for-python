@@ -1,4 +1,5 @@
 import ast
+import json
 from pathlib import Path
 import re
 import sys
@@ -289,6 +290,254 @@ def _collect_routes_missing_validate_http(path: Path) -> list[str]:
     return uncovered
 
 
+def _dotted_call_name(func: ast.expr) -> Optional[str]:
+    """Return the dotted name of a call target, or ``None``.
+
+    Walks an ``ast.Attribute`` chain down to a root ``ast.Name`` and rebuilds
+    the dotted path (e.g. ``datetime.datetime.now`` -> ``"datetime.datetime.now"``,
+    ``random.randint`` -> ``"random.randint"``, bare ``open`` -> ``"open"``).
+    Returns ``None`` when the call target is not a simple name/attribute chain
+    (e.g. a subscript or call result).
+    """
+    parts: list[str] = []
+    node: ast.expr = func
+    while isinstance(node, ast.Attribute):
+        parts.append(node.attr)
+        node = node.value
+    if isinstance(node, ast.Name):
+        parts.append(node.id)
+        return ".".join(reversed(parts))
+    return None
+
+
+def _collect_openapi_version_mixing(path: Path) -> tuple[set[str], set[str]]:
+    """Return (v30_signals, v31_signals) found across the project.
+
+    OpenAPI 3.0 signals: a string constant like ``3.0.N`` or a
+    keyword argument named ``nullable``. OpenAPI 3.1 signals: a string constant
+    like ``3.1.N``. Callers treat a non-empty intersection of both
+    sets as a version-mixing warning.
+    """
+    v30: set[str] = set()
+    v31: set[str] = set()
+    v30_re = re.compile(r"^3\.0\.\d+$")
+    v31_re = re.compile(r"^3\.1\.\d+$")
+    for _py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                if v30_re.match(node.value):
+                    v30.add(node.value)
+                elif v31_re.match(node.value):
+                    v31.add(node.value)
+            elif isinstance(node, ast.keyword) and node.arg == "nullable":
+                v30.add("nullable")
+    return v30, v31
+
+
+def _collect_scan_before_spec(
+    path: Path, scan_names: set[str], spec_names: set[str]
+) -> list[str]:
+    """Return "file:spec_call" labels where a spec build precedes endpoint scan.
+
+    For each file, records the line numbers of scan-style calls and spec-style
+    calls (matched by simple call name). A violation is a spec call whose line
+    precedes the earliest scan call in that file. Additionally, if spec calls
+    exist anywhere in the project but no scan call is ever seen, every spec call
+    is reported (scanning was skipped entirely).
+    """
+    violations: list[str] = []
+    any_scan_seen = False
+    spec_labels: list[str] = []
+    for py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        scan_lines: list[int] = []
+        spec_calls: list[tuple[int, str]] = []
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            name = _dotted_call_name(node.func)
+            if name is None:
+                continue
+            leaf = name.rsplit(".", 1)[-1]
+            if leaf in scan_names:
+                scan_lines.append(node.lineno)
+            elif leaf in spec_names:
+                spec_calls.append((node.lineno, leaf))
+        if scan_lines:
+            any_scan_seen = True
+            first_scan = min(scan_lines)
+            for lineno, leaf in spec_calls:
+                if lineno < first_scan:
+                    violations.append(f"{py_file.relative_to(path)}:{leaf}")
+        for lineno, leaf in spec_calls:
+            spec_labels.append(f"{py_file.relative_to(path)}:{leaf}")
+    if spec_labels and not any_scan_seen:
+        return spec_labels
+    return violations
+
+
+def _project_imports_langgraph(path: Path) -> bool:
+    """Return True when any project module imports ``langgraph``."""
+    for _py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name == "langgraph" or alias.name.startswith("langgraph."):
+                        return True
+            elif isinstance(node, ast.ImportFrom):
+                mod = node.module or ""
+                if mod == "langgraph" or mod.startswith("langgraph."):
+                    return True
+    return False
+
+
+def _collect_anonymous_auth_routes(
+    path: Path, flag_missing_auth_level: bool = False
+) -> list[str]:
+    """Return "file:function" labels for routes using anonymous auth.
+
+    A route is flagged when a decorator keyword ``auth_level`` resolves to
+    ``AuthLevel.ANONYMOUS`` (an attribute whose leaf is ``ANONYMOUS``) or to the
+    string ``"anonymous"`` (case-insensitive). When *flag_missing_auth_level* is
+    True, routes without any ``auth_level`` keyword are also reported.
+    """
+    flagged: list[str] = []
+    for py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        app_aliases = _discover_functionapp_aliases(content)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            for dec in node.decorator_list:
+                if not isinstance(dec, ast.Call):
+                    continue
+                inner = dec.func
+                if not (
+                    isinstance(inner, ast.Attribute)
+                    and inner.attr == "route"
+                    and isinstance(inner.value, ast.Name)
+                    and inner.value.id in app_aliases
+                ):
+                    continue
+                auth_kw = None
+                for kw in dec.keywords:
+                    if kw.arg == "auth_level":
+                        auth_kw = kw.value
+                        break
+                label = f"{py_file.relative_to(path)}:{node.name}"
+                if auth_kw is None:
+                    if flag_missing_auth_level:
+                        flagged.append(label)
+                    continue
+                if isinstance(auth_kw, ast.Attribute) and auth_kw.attr == "ANONYMOUS":
+                    flagged.append(label)
+                elif (
+                    isinstance(auth_kw, ast.Constant)
+                    and isinstance(auth_kw.value, str)
+                    and auth_kw.value.lower() == "anonymous"
+                ):
+                    flagged.append(label)
+    return flagged
+
+
+def _collect_orchestrator_nondeterminism(
+    path: Path, blocklist: set[str], decorator_names: set[str]
+) -> list[str]:
+    """Return "file:function -> call" labels for nondeterministic orchestrator calls.
+
+    Finds functions decorated with any name in *decorator_names* (matched by
+    decorator leaf name, e.g. ``orchestration_trigger``) and reports calls whose
+    dotted name matches an entry in *blocklist* either exactly or as a dotted
+    suffix (``endswith("." + entry)``).
+    """
+    flagged: list[str] = []
+    for py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            dec_names = {_decorator_simple_name(d) for d in node.decorator_list}
+            if dec_names.isdisjoint(decorator_names):
+                continue
+            for sub in ast.walk(node):
+                if not isinstance(sub, ast.Call):
+                    continue
+                dotted = _dotted_call_name(sub.func)
+                if dotted is None:
+                    continue
+                for entry in blocklist:
+                    if dotted == entry or dotted.endswith("." + entry):
+                        flagged.append(
+                            f"{py_file.relative_to(path)}:{node.name} -> {dotted}"
+                        )
+                        break
+    return flagged
+
+
+def _collect_unsupported_metadata_versions(
+    path: Path,
+    files: list[str],
+    fields: list[str],
+    supported: list[str],
+) -> list[tuple[str, str]]:
+    """Return (source, version) tuples for metadata versions outside *supported*.
+
+    Reads ``extensionBundle.version`` from ``host.json`` plus any files matched
+    by the *files* globs, looking up each name in *fields* (e.g.
+    ``metadataVersion``). A version is reported when it is not present in
+    *supported*. Malformed or unreadable JSON is silently skipped.
+    """
+    found: list[tuple[str, str]] = []
+    supported_set = set(supported)
+
+    def _load(p: Path) -> object:
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, ValueError, UnicodeDecodeError):
+            return None
+
+    host_json = path / "host.json"
+    if host_json.exists():
+        data = _load(host_json)
+        bundle = _resolve_host_json_path(data, "$.extensionBundle.version")
+        if isinstance(bundle, str) and bundle not in supported_set:
+            found.append(("host.json:extensionBundle.version", bundle))
+
+    seen: set[Path] = set()
+    for pattern in files:
+        for match in path.rglob(pattern):
+            if match in seen or any(
+                part in EXCLUDED_PROJECT_DIRS for part in match.parts
+            ):
+                continue
+            seen.add(match)
+            data = _load(match)
+            if not isinstance(data, dict):
+                continue
+            for field in fields:
+                value = data.get(field)
+                if isinstance(value, str) and value not in supported_set:
+                    found.append((f"{match.relative_to(path)}:{field}", value))
+    return found
+
+
 def _source_contains_ast(source: str, identifier: str) -> bool:
     """Return True when the source contains a decorator like ``@identifier.xxx``.
 
@@ -484,6 +733,14 @@ class Condition(TypedDict, total=False):
     package: str
     file: str
     decorators: list[str]  # for decorator_order: expected decorator leaf names, outermost-first
+    scan_names: list[str]  # for scan_before_spec: endpoint-scan call names
+    spec_names: list[str]  # for scan_before_spec: spec-build call names
+    flag_missing_auth_level: bool  # for langgraph_anonymous_auth
+    blocklist: list[str]  # for durable_nondeterminism: forbidden dotted call names
+    decorator_names: list[str]  # for durable_nondeterminism: orchestrator decorator names
+    files: list[str]  # for unsupported_metadata_version: metadata file globs
+    fields: list[str]  # for unsupported_metadata_version: version field names
+    supported_versions: list[str]  # for unsupported_metadata_version: allowed versions
 
 
 class Rule(TypedDict, total=False):
@@ -510,6 +767,11 @@ class Rule(TypedDict, total=False):
         "native_dependency_risk",
         "decorator_order",
         "endpoint_metadata",
+        "openapi_version_mixing",
+        "scan_before_spec",
+        "langgraph_anonymous_auth",
+        "durable_nondeterminism",
+        "unsupported_metadata_version",
     ]
     label: str
     category: str
