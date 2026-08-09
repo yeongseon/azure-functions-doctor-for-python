@@ -14,7 +14,7 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_python_version` | Python version | environment | python_env | `compare_version` | Yes | minimal, full |
 | `check_venv` | Virtual environment | environment | python_env | `any_of_exists` | No | full |
 | `check_python_executable` | Python executable | environment | python_env | `path_exists` | No | full |
-| `check_requirements_txt` | requirements.txt | dependencies | python_env | `file_exists` | Yes | minimal, full |
+| `check_requirements_txt` | requirements.txt | dependencies | python_env | `dependency_manifest` | Yes | minimal, full |
 | `check_azure_functions_library` | azure-functions package | dependencies | python_env | `package_declared` | Yes | minimal, full |
 | `check_native_dependency_risk` | Native dependency risk | dependencies | python_env | `native_dependency_risk` | No | full |
 | `check_azure_functions_worker` | azure-functions-worker not pinned | dependencies | python_env | `package_forbidden` | No | full |
