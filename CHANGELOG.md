@@ -1,5 +1,38 @@
 # Changelog
+## [0.18.0] - 2026-08-09
+
+- bump version to 0.18.0 (bc19ff268c431dbbbbf224a43fc0db8c76a168e6)
+
+- remove duplicate expected_order assignment in decorator-order check (#247) (9b664b3f3f51f848685dd743946f4b1be30115f9)
+
+- add DX-toolkit heuristic rule checks (#236) (543e4021a03e2616e390e9634516df5f177dcc80)
+
+- deprecate azure-functions and fdoctor console-script aliases (#237) (6d9d186bc437639bc2521c742fc8d6e94f38f1e1)
+
+- add decorator-order and endpoint metadata diagnostics (#233) (617234df056417a2b9d0e45bdd2a4731b0df1457)
+
+- track issue priority via priority:* labels instead of body line (#231) (4a537c8aab8a48514adde4b293b79b4e6d2c748b)
+
+- sync README canonical version string to 0.17.2 (9d97fd09c124d2c85e1861651ddf5b7afe37ea07)
+
+- rename ruleset heading and de-hardcode version reference (#219) (6fa416a08cbe5f9ef6c50411f2a43b0058770b4f)
+
+- require translation sync in the same PR as English changes (Closes #220) (#221) (4451588001b4f952f134592ce593fe67f9ac373b)
+
+- use canonical CLI command in sample output block (#217) (bc4640b92986cdf6f1376f65a3ad3b002f7c2fb3)
+
+- correct azure-functions-db description in ecosystem table (#215) (e37f3d0107a41df9cc03151a22f0797d0104ab49)
+
+- extract shared _resolve_host_json_path jsonpath helper (#213) (be02ae9e9205fa270c1417f468af3338b40376de)
+
+- add validated per-type condition models (#205) (55b090d07357ddf5d6f8056d1c1bd0d1466caa75)
+
+- replace fragile Core Tools apt install with pinned npm (#204) (2116f68869cc771d98ae358d4765003fd832f465)
+
+- sync documented version strings to 0.17.2 (#212) (bb83b6e05c1f7e445ee75d00a96c99196e06ae0d)
 ## [0.17.2] - 2026-07-18
+
+- update changelog (45c508485609e7d236cf6c19614b5c330f62570b)
 
 - bump version to 0.17.2 (03a17a0d9fbc3f2778ed94570f910842b3cbb8e4)
 
