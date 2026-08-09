@@ -666,7 +666,6 @@ class HandlerRegistry:
         # and last entries are surfaced in the fix message below, which is exact
         # for the shipped two-element pairing.
         expected_order = condition.get("decorators") or ["with_context", "validate_http"]
-        expected_order = condition.get("decorators") or ["with_context", "validate_http"]
         inverted = _collect_inverted_decorator_order(path, expected_order)
 
         if not inverted:
