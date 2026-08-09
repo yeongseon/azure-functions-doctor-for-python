@@ -125,6 +125,10 @@ aliases still work but are **deprecated** and print a warning when invoked:
 Migrate any scripts or CI pipelines to `azure-functions-doctor` before the
 v1.0.0 release removes the aliases.
 
+See the [deprecated aliases migration guide](docs/deprecated-aliases.md) for
+step-by-step examples covering shell scripts, GitHub Actions, Makefiles, and
+pre-commit hooks.
+
 ### Sample output (excerpt)
 
 ```bash
