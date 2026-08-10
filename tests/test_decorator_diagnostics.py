@@ -183,3 +183,22 @@ def test_collect_routes_missing_validate_http_custom_alias(tmp_path: Path) -> No
         encoding="utf-8",
     )
     assert helpers._collect_routes_missing_validate_http(tmp_path) == ["function_app.py:handler"]
+
+
+def test_collect_routes_missing_validate_http_excludes_spec_serving(tmp_path: Path) -> None:
+    # A spec-serving route (returns the OpenAPI document) must not be flagged for
+    # missing @validate_http, while a genuine data route still is.
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n"
+        "from azure_functions_openapi import get_openapi_json\n"
+        "fa = func.FunctionApp()\n\n"
+        "@fa.route(route='openapi.json')\n"
+        "def openapi_doc(req):\n"
+        "    return get_openapi_json()\n\n"
+        "@fa.route(route='items')\n"
+        "def items(req):\n"
+        "    return req\n",
+        encoding="utf-8",
+    )
+    assert helpers._collect_routes_missing_validate_http(tmp_path) == ["function_app.py:items"]

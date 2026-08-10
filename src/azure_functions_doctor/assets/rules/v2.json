@@ -426,7 +426,27 @@
     "description": "Warns when the OpenAPI spec is built before endpoints are scanned/registered, or when a spec is built without any endpoint scan, producing an empty or incomplete spec.",
     "type": "scan_before_spec",
     "required": false,
-    "condition": {},
+    "condition": {
+      "scan_names": [
+        "scan",
+        "scan_endpoints",
+        "scan_endpoint_metadata",
+        "discover_endpoints",
+        "register_functions",
+        "register_blueprints"
+      ],
+      "spec_names": [
+        "build_spec",
+        "build",
+        "get_openapi_spec",
+        "get_openapi_json",
+        "get_openapi_yaml",
+        "generate_openapi_spec",
+        "generate_openapi_report",
+        "generate_spec",
+        "create_spec"
+      ]
+    },
     "hint": "Scan/register endpoints before calling build_spec so the generated spec includes all routes.",
     "source_type": "heuristic",
     "why_it_matters": "Building the spec before endpoints are discovered emits an empty or partial OpenAPI document, hiding routes from consumers.",

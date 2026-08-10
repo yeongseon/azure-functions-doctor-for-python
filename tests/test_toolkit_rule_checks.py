@@ -138,6 +138,27 @@ def test_scan_before_spec_custom_names(tmp_path: Path) -> None:
     )
 
 
+def test_scan_before_spec_real_openapi_names_default_condition(tmp_path: Path) -> None:
+    # Regression (#248): the real azure-functions-openapi call names must be
+    # recognised by the DEFAULT condition (empty), so the rule actually fires.
+    _write(
+        tmp_path,
+        "app.py",
+        "get_openapi_json()\nscan_endpoint_metadata()\n",
+    )
+    assert _status("scan_before_spec", tmp_path) == "fail"
+
+
+def test_scan_before_spec_real_openapi_names_correct_order_passes(tmp_path: Path) -> None:
+    # Regression (#248): scanning before building the spec passes with defaults.
+    _write(
+        tmp_path,
+        "app.py",
+        "scan_endpoint_metadata()\ngenerate_openapi_spec()\n",
+    )
+    assert _status("scan_before_spec", tmp_path) == "pass"
+
+
 def test_scan_before_spec_skips_syntax_error(tmp_path: Path) -> None:
     _write(tmp_path, "broken.py", "def f(:\n")
     assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"}) == []
