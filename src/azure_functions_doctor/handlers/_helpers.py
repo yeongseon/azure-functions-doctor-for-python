@@ -256,6 +256,39 @@ def _project_declares_validation_dep(path: Path) -> bool:
     return canonicalize_name("azure-functions-validation") in _parse_requirements_names(content)
 
 
+_SPEC_SERVING_CALL_NAMES: frozenset[str] = frozenset(
+    {
+        "get_openapi_json",
+        "get_openapi_yaml",
+        "get_openapi_spec",
+        "generate_openapi_spec",
+        "generate_openapi_report",
+        "render_swagger_ui",
+        "get_swagger_ui_html",
+        "swagger_ui_html",
+    }
+)
+
+
+def _is_spec_serving_handler(node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+    """Return True when a route handler serves the OpenAPI document / Swagger UI.
+
+    Such handlers (e.g. returning ``get_openapi_json`` / ``get_openapi_yaml`` or
+    rendering Swagger UI) expose static spec content and intentionally carry no
+    ``@validate_http``; flagging them for missing endpoint metadata is a false
+    positive.
+    """
+    for child in ast.walk(node):
+        if not isinstance(child, ast.Call):
+            continue
+        name = _dotted_call_name(child.func)
+        if name is None:
+            continue
+        if name.rsplit(".", 1)[-1] in _SPEC_SERVING_CALL_NAMES:
+            return True
+    return False
+
+
 def _collect_routes_missing_validate_http(path: Path) -> list[str]:
     """Return "file:function" labels for HTTP route handlers that lack
     ``@validate_http`` and therefore emit no endpoint OpenAPI metadata.
@@ -285,7 +318,7 @@ def _collect_routes_missing_validate_http(path: Path) -> list[str]:
                     is_route = True
                 if _decorator_simple_name(dec) == "validate_http":
                     has_validate_http = True
-            if is_route and not has_validate_http:
+            if is_route and not has_validate_http and not _is_spec_serving_handler(node):
                 uncovered.append(f"{py_file.relative_to(path)}:{node.name}")
     return uncovered
 

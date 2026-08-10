@@ -738,6 +738,7 @@ class HandlerRegistry:
             or [
                 "scan",
                 "scan_endpoints",
+                "scan_endpoint_metadata",
                 "discover_endpoints",
                 "register_functions",
                 "register_blueprints",
@@ -749,6 +750,10 @@ class HandlerRegistry:
                 "build_spec",
                 "build",
                 "get_openapi_spec",
+                "get_openapi_json",
+                "get_openapi_yaml",
+                "generate_openapi_spec",
+                "generate_openapi_report",
                 "generate_spec",
                 "create_spec",
             ]
