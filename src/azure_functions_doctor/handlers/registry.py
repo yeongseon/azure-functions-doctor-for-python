@@ -735,29 +735,29 @@ class HandlerRegistry:
         condition = rule.get("condition", {}) or {}
         scan_names = set(
             condition.get("scan_names")
-or [
-"scan",
+            or [
+                "scan",
                 "scan_endpoints",
                 "scan_endpoint_metadata",
-"discover_endpoints",
-"register_functions",
-"register_blueprints",
-]
-)
+                "discover_endpoints",
+                "register_functions",
+                "register_blueprints",
+            ]
+        )
         spec_names = set(
             condition.get("spec_names")
-or [
-"build_spec",
-"build",
+            or [
+                "build_spec",
+                "build",
                 "get_openapi_spec",
                 "get_openapi_json",
                 "get_openapi_yaml",
                 "generate_openapi_spec",
                 "generate_openapi_report",
-"generate_spec",
-"create_spec",
-]
-)
+                "generate_spec",
+                "create_spec",
+            ]
+        )
         violations = _collect_scan_before_spec(path, scan_names, spec_names)
         if not violations:
             return _create_result("pass", "No spec-before-scan ordering issues detected")

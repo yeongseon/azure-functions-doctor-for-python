@@ -140,7 +140,8 @@ def test_scan_before_spec_custom_names(tmp_path: Path) -> None:
 
 def test_scan_before_spec_real_openapi_names_default_condition(tmp_path: Path) -> None:
     # Regression (#248): the real azure-functions-openapi call names must be
-    # recognised by the DEFAULT condition (empty), so the rule actually fires.
+    # recognised by the built-in default names baked into the handler, so the
+    # rule fires even though v2.json's condition does not re-list them.
     _write(
         tmp_path,
         "app.py",

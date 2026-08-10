@@ -447,7 +447,7 @@
         "create_spec"
       ]
     },
-    "hint": "Scan/register endpoints before calling build_spec so the generated spec includes all routes.",
+    "hint": "Scan/register endpoints before building the OpenAPI spec (e.g. build_spec, get_openapi_json, generate_openapi_spec) so the generated document includes all routes.",
     "source_type": "heuristic",
     "why_it_matters": "Building the spec before endpoints are discovered emits an empty or partial OpenAPI document, hiding routes from consumers.",
     "symptoms": "Generated OpenAPI spec missing endpoints; empty paths object.",
