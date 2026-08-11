@@ -90,18 +90,18 @@
     "category": "dependencies",
     "section": "python_env",
     "label": "requirements.txt",
-    "description": "Checks if requirements.txt exists at the project root.",
-    "type": "file_exists",
+    "description": "Checks that dependencies are declared via requirements.txt or pyproject.toml.",
+    "type": "dependency_manifest",
     "required": true,
     "condition": {
       "target": "requirements.txt"
     },
-    "hint": "Add a requirements.txt file to declare your dependencies.",
+    "hint": "Add a requirements.txt file (or declare dependencies in pyproject.toml) to install your packages.",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#managing-dependencies",
     "source_type": "ms_learn",
     "source_title": "Azure Functions Python developer guide — Managing dependencies",
     "source_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#managing-dependencies",
-    "why_it_matters": "Azure Functions reads requirements.txt to install packages at deployment time. Without it, the runtime cannot resolve dependencies and the function app will fail to start.",
+    "why_it_matters": "Azure Functions installs from requirements.txt at deployment time. Projects that manage dependencies in pyproject.toml typically generate requirements.txt during packaging, so either manifest satisfies this check.",
     "symptoms": "ModuleNotFoundError at runtime; deployment pipeline fails with missing package errors; cold start crashes.",
     "fix_command": "pip freeze > requirements.txt",
     "check_order": 4
@@ -111,7 +111,7 @@
     "category": "dependencies",
     "section": "python_env",
     "label": "azure-functions package",
-    "description": "Checks if the azure-functions package is declared in requirements.txt.",
+    "description": "Checks if the azure-functions package is declared in requirements.txt or pyproject.toml.",
     "type": "package_declared",
     "required": true,
     "condition": {

@@ -19,6 +19,11 @@ from typing import (
 from packaging.requirements import InvalidRequirement, Requirement
 from packaging.utils import canonicalize_name
 
+try:  # Python 3.11+ ships tomllib in the stdlib
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - exercised on Python 3.10
+    import tomli as tomllib
+
 from azure_functions_doctor.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -670,6 +675,63 @@ def _parse_requirements_names(content: str) -> set[str]:
             if name:
                 names.add(canonicalize_name(name))
     return names
+
+
+def _load_pyproject(path: Path) -> Optional[Dict[str, object]]:
+    """Load and parse ``pyproject.toml`` from ``path``.
+
+    Returns the parsed table, or ``None`` when the file is absent, unreadable,
+    or not valid TOML.
+    """
+    pyproject_path = path / "pyproject.toml"
+    if not pyproject_path.exists():
+        return None
+    try:
+        with pyproject_path.open("rb") as handle:
+            data: Dict[str, object] = tomllib.load(handle)
+            return data
+            return tomllib.load(handle)
+    except (OSError, ValueError) as exc:
+        logger.debug(f"Skip pyproject.toml at {pyproject_path}: {exc}")
+        return None
+
+
+def pyproject_dependency_names(path: Path) -> set[str]:
+    """Return canonicalized dependency names declared in ``pyproject.toml``.
+
+    Collects names from ``[project].dependencies`` and every
+    ``[project.optional-dependencies]`` group. Unparseable specifiers are
+    skipped. Returns an empty set when no manifest or dependencies exist.
+    """
+    data = _load_pyproject(path)
+    if not data:
+        return set()
+    project = data.get("project")
+    if not isinstance(project, dict):
+        return set()
+    specs: list[str] = []
+    deps = project.get("dependencies")
+    if isinstance(deps, list):
+        specs.extend(str(item) for item in deps)
+    optional = project.get("optional-dependencies")
+    if isinstance(optional, dict):
+        for group in optional.values():
+            if isinstance(group, list):
+                specs.extend(str(item) for item in group)
+    names: set[str] = set()
+    for spec in specs:
+        try:
+            names.add(canonicalize_name(Requirement(spec).name))
+        except InvalidRequirement:
+            continue
+    return names
+
+
+def pyproject_declares_dependencies(path: Path) -> bool:
+    """Return True when ``pyproject.toml`` declares any runtime or optional
+    dependency in the standard ``[project]`` table.
+    """
+    return bool(pyproject_dependency_names(path))
 
 
 def _detect_native_dependency_risks(content: str) -> list[tuple[str, str]]:

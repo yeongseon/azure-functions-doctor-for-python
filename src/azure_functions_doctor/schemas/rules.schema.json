@@ -50,6 +50,7 @@
         "enum": [
           "compare_version",
           "file_exists",
+          "dependency_manifest",
           "env_var_exists",
           "package_installed",
           "package_declared",

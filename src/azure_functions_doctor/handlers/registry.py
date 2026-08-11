@@ -43,6 +43,8 @@ from azure_functions_doctor.handlers._helpers import (
     parse_package,
     parse_source_code,
     parse_target,
+    pyproject_declares_dependencies,
+    pyproject_dependency_names,
 )
 from azure_functions_doctor.target_resolver import resolve_target_value
 
@@ -193,6 +195,33 @@ class HandlerRegistry:
         return _create_result("pass" if exists else "fail", detail)
 
     @_rule_handler
+    def _handle_dependency_manifest(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Pass when the project declares dependencies via requirements.txt OR
+        pyproject.toml.
+
+        Azure Functions installs from requirements.txt at deploy time, but many
+        modern projects manage dependencies in ``pyproject.toml`` and generate
+        requirements.txt during packaging. Accept either manifest so
+        pyproject-only projects are not reported as broken.
+        """
+        condition = rule.get("condition", {}) or {}
+        target = parse_target(condition) or "requirements.txt"
+        req_path = path / target
+        if req_path.is_file():
+            return _create_result("pass", f"{req_path} exists")
+        if pyproject_declares_dependencies(path):
+            return _create_result(
+                "pass",
+                f"{req_path} not found; dependencies declared in pyproject.toml",
+            )
+        detail = f"{req_path} not found and pyproject.toml declares no dependencies"
+        if not rule.get("required", True):
+            detail += " (optional)"
+        return _create_result("fail", detail)
+
+    @_rule_handler
     def _handle_package_installed(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
@@ -257,15 +286,31 @@ class HandlerRegistry:
         if params is None:
             return _create_result("fail", "Missing 'package' in condition")
         package_name, req_file = params
+        normalized_target = canonicalize_name(package_name)
         req_path = path / Path(req_file)
         if not req_path.exists():
-            return _create_result("fail", f"{req_path} not found")
+            # No requirements.txt: fall back to pyproject.toml so pyproject-only
+            # projects can still declare the package.
+            if normalized_target in pyproject_dependency_names(path):
+                return _create_result(
+                    "pass",
+                    f"Package '{package_name}' declared in pyproject.toml",
+                )
+            return _create_result(
+                "fail",
+                f"{req_path} not found and '{package_name}' not declared in pyproject.toml",
+            )
         try:
             content = req_path.read_text(encoding="utf-8")
         except Exception as exc:
             return _handle_specific_exceptions(f"reading {req_file}", exc)
         normalized = _parse_requirements_names(content)
-        declared = canonicalize_name(package_name) in normalized
+        declared = normalized_target in normalized
+        if not declared and normalized_target in pyproject_dependency_names(path):
+            return _create_result(
+                "pass",
+                f"Package '{package_name}' declared in pyproject.toml",
+            )
         return _create_result(
             "pass" if declared else "fail",
             f"Package '{package_name}' {'declared' if declared else 'not declared'} in {req_file}",
