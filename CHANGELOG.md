@@ -1,5 +1,20 @@
 # Changelog
+## [0.19.0] - 2026-08-11
+
+- bump version to 0.19.0 (456cee457e891e8b363d0abb8c0f92038d441c43)
+
+- add migration guide for deprecated azure-functions/fdoctor aliases (#245) (a83fbe077dfdbecc2a159b85eadedcae371d4f4d)
+
+- support pyproject-only projects without requirements.txt (#244) (11f776ad4a2b865d918e00181f513b64123177ef)
+
+- require cookbook dogfood verification after publish (ee6a523a63bc47ae43f8e0563ef20633b1692ff8)
+
+- fire scan_before_spec on real openapi names, exclude spec-serving routes (#250) (6df10c8bf715412f5643307e4b173159abd34b7b)
+
+- sync version strings to released 0.18.0 (#251) (1c16a91b94a4a676e093555870a25c5c25ccd4a0)
 ## [0.18.0] - 2026-08-09
+
+- update changelog (60c9cfccc59a598683eea59148665a56d9341385)
 
 - bump version to 0.18.0 (bc19ff268c431dbbbbf224a43fc0db8c76a168e6)
 
