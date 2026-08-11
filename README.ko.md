@@ -94,6 +94,9 @@ azure-functions-doctor doctor --format json
 v1.0.0 릴리스에서 별칭이 제거되기 전에 스크립트나 CI 파이프라인을
 `azure-functions-doctor`로 마이그레이션하세요.
 
+셸 스크립트, GitHub Actions, Makefile, pre-commit 훅을 다루는 단계별 예시는
+[사용 중단된 별칭 마이그레이션 가이드](docs/deprecated-aliases.md)를 참고하세요.
+
 ## Demo
 
 아래 데모는 VHS를 사용하여 [`demo/doctor-demo.tape`](demo/doctor-demo.tape)에서 생성되었습니다.

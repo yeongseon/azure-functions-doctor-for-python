@@ -93,6 +93,9 @@ azure-functions-doctor doctor --format json
 请在 v1.0.0 发布移除别名之前，将脚本或 CI 流水线迁移到
 `azure-functions-doctor`。
 
+有关涵盖 shell 脚本、GitHub Actions、Makefile 和 pre-commit 钩子的逐步示例，
+请参阅[已弃用别名迁移指南](docs/deprecated-aliases.md)。
+
 ## Demo
 
 以下演示是使用 VHS 从 [`demo/doctor-demo.tape`](demo/doctor-demo.tape) 生成的。

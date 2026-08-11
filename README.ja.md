@@ -94,6 +94,9 @@ azure-functions-doctor doctor --format json
 v1.0.0 リリースでエイリアスが削除される前に、スクリプトや CI パイプラインを
 `azure-functions-doctor` に移行してください。
 
+シェルスクリプト、GitHub Actions、Makefile、pre-commit フックをカバーする
+ステップバイステップの例は、[非推奨エイリアス移行ガイド](docs/deprecated-aliases.md)を参照してください。
+
 ## Demo
 
 以下のデモは、VHS を使用して [`demo/doctor-demo.tape`](demo/doctor-demo.tape) から生成されました。

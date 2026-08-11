@@ -21,6 +21,7 @@ nav:
       - Configuration: configuration.md
   - User Guide:
       - CLI Usage: usage.md
+      - Deprecated Aliases: deprecated-aliases.md
       - Diagnostics: diagnostics.md
       - Rules: rules.md
       - Rule Inventory: rule_inventory.md
