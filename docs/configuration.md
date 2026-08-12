@@ -16,9 +16,10 @@ Core options:
 - `--profile <minimal|full>`
 - `--format <table|json|sarif|junit>`
 - `--output <file>`
-- `--verbose`
+- `-v`, `--verbose`
 - `--debug`
 - `--rules <file>`
+- `--target-python <version>`
 
 ## Target path configuration
 
@@ -148,28 +149,17 @@ Behavior:
 
 See [Rules](rules.md) and [Examples: Custom Rules](examples/custom_rules.md).
 
-## Environment-backed config object
+## Environment variables
 
-The package includes `Config` with `FUNC_DOCTOR_*` env support.
-This is currently oriented toward internal and future runtime wiring.
+Runtime behavior is CLI-driven. The only environment variable the tool reads is
+`AZURE_FUNCTIONS_DOCTOR_LOG_LEVEL`, which sets the internal logging verbosity
+(for example `DEBUG`, `INFO`, `WARNING`).
 
-Examples of recognized keys include:
-
-- `FUNC_DOCTOR_LOG_LEVEL`
-- `FUNC_DOCTOR_LOG_FORMAT`
-- `FUNC_DOCTOR_MAX_FILE_SIZE_MB`
-- `FUNC_DOCTOR_SEARCH_TIMEOUT_SECONDS`
-- `FUNC_DOCTOR_OUTPUT_WIDTH`
-
-Programmatic access:
-
-```python
-from azure_functions_doctor.config import get_config
-
-
-def current_config() -> dict:
-    return get_config().to_dict()
+```bash
+AZURE_FUNCTIONS_DOCTOR_LOG_LEVEL=DEBUG azure-functions-doctor doctor
 ```
+
+All other configuration is expressed through the CLI options listed above.
 
 ## Recommended CI configuration
 

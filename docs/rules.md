@@ -32,21 +32,36 @@ Only required failures produce non-zero process exit code.
 
 ## Built-in rule types
 
+The built-in ruleset uses the following handler types:
+
 - `compare_version`
-- `env_var_exists`
 - `path_exists`
 - `file_exists`
-- `package_installed`
+- `dependency_manifest`
 - `package_declared`
+- `package_forbidden`
 - `native_dependency_risk`
 - `source_code_contains`
+- `blueprint_registration`
 - `conditional_exists`
 - `callable_detection`
 - `executable_exists`
 - `any_of_exists`
 - `file_glob_check`
 - `host_json_property`
-- `blueprint_registration`
+- `host_json_version`
+- `host_json_extension_bundle_version`
+- `local_settings_security`
+- `decorator_order`
+- `endpoint_metadata`
+- `openapi_version_mixing`
+- `scan_before_spec`
+- `langgraph_anonymous_auth`
+- `durable_nondeterminism`
+- `unsupported_metadata_version`
+
+For the authoritative, script-generated list of every built-in rule and its
+type, see the [Rule Inventory](rule_inventory.md).
 
 ## Rule-by-rule reference
 
@@ -101,14 +116,14 @@ Target Python: 3.12 (override) — Tool runtime: 3.13.0
 
 ## 4) `check_venv`
 
-- **What it checks:** Environment variable `VIRTUAL_ENV` exists.
+- **What it checks:** A virtual environment is activated — any of `VIRTUAL_ENV`, `CONDA_PREFIX`, or `UV_PROJECT_ENVIRONMENT` is set (venv, conda, or uv).
 - **Why it matters:** Virtual environments reduce dependency drift and environment pollution.
-- **How to fix:** Create and activate `.venv` before running diagnostics.
+- **How to fix:** Create and activate a virtual environment (`.venv`, conda, or uv) before running diagnostics.
 
 Example failing detail:
 
 ```text
-VIRTUAL_ENV is not set
+No virtual environment detected (VIRTUAL_ENV, CONDA_PREFIX, UV_PROJECT_ENVIRONMENT)
 ```
 
 ## 5) `check_python_executable`
@@ -125,19 +140,19 @@ Example detail:
 
 ## 6) `check_requirements_txt`
 
-- **What it checks:** `requirements.txt` exists at project root.
+- **What it checks:** Dependencies are declared via `requirements.txt` or `pyproject.toml` at the project root.
 - **Why it matters:** Deployability and reproducibility depend on declared dependencies.
-- **How to fix:** Add `requirements.txt` and include runtime dependencies.
+- **How to fix:** Add `requirements.txt` (or declare dependencies in `pyproject.toml`) and include runtime dependencies.
 
 Example failing detail:
 
 ```text
-/workspace/app/requirements.txt not found
+No dependency manifest found (requirements.txt or pyproject.toml)
 ```
 
 ## 7) `check_azure_functions_library`
 
-- **What it checks:** `azure-functions` appears in `requirements.txt`.
+- **What it checks:** `azure-functions` is declared in `requirements.txt` or `pyproject.toml`.
 - **Why it matters:** Function app code depends on Azure Functions Python library.
 - **How to fix:** Add `azure-functions` to dependency declarations.
 
@@ -147,7 +162,7 @@ Example failing detail:
 Package 'azure-functions' not declared in requirements.txt
 ```
 
-## 7) `check_native_dependency_risk`
+## 8) `check_native_dependency_risk`
 
 - **What it checks:** `requirements.txt` for packages with common native-extension deployment risk.
 - **Why it matters:** These packages are valid, but Azure Functions Python deployments often fail when Linux wheels or system libraries do not match the build environment.
@@ -166,7 +181,7 @@ Recommended: use remote build (`func azure functionapp publish --build remote`).
 - pillow: ensure libjpeg/zlib-compatible wheels for Linux deployment
 ```
 
-## 8) `check_host_json`
+## 9) `check_host_json`
 
 - **What it checks:** `host.json` exists at project root.
 - **Why it matters:** Azure Functions host configuration is required for valid app structure.
@@ -178,7 +193,7 @@ Example failing detail:
 /workspace/app/host.json not found
 ```
 
-## 9) `check_local_settings`
+## 10) `check_local_settings`
 
 - **What it checks:** `local.settings.json` exists.
 - **Why it matters:** Local development often needs this file for settings and connection values.
@@ -190,7 +205,7 @@ Example warning detail:
 /workspace/app/local.settings.json not found (optional)
 ```
 
-## 10) `check_func_cli`
+## 11) `check_func_cli`
 
 - **What it checks:** `func` executable is available on `PATH`.
 - **Why it matters:** Core Tools enable local hosting and rich runtime tooling.
@@ -202,7 +217,7 @@ Example warning detail:
 func not found
 ```
 
-## 11) `check_func_core_tools_version`
+## 12) `check_func_core_tools_version`
 
 - **What it checks:** Core Tools version is `>=4.0`.
 - **Why it matters:** Older versions can diverge from current host/runtime expectations.
@@ -214,7 +229,7 @@ Example warning detail:
 func 3.0.3904 (>=4.0)
 ```
 
-## 12) `check_durabletask_config`
+## 13) `check_durabletask_config`
 
 - **What it checks:** If durable usage is detected in source, `$.extensions.durableTask` exists in `host.json`.
 - **Why it matters:** Durable Functions need matching host configuration.
@@ -232,7 +247,7 @@ or
 Required host.json property '$.extensions.durableTask' not found
 ```
 
-## 13) `check_app_insights`
+## 14) `check_app_insights`
 
 - **What it checks:** At least one telemetry signal exists:
   - `APPLICATIONINSIGHTS_CONNECTION_STRING`
@@ -247,7 +262,7 @@ Example warning detail:
 Targets not found
 ```
 
-## 14) `check_extension_bundle`
+## 15) `check_extension_bundle`
 
 - **What it checks:** `$.extensionBundle` exists in `host.json`.
 - **Why it matters:** Extension bundles help ensure binding dependencies are available.
@@ -259,7 +274,7 @@ Example warning detail:
 host.json property '$.extensionBundle' not found
 ```
 
-## 15) `check_asgi_wsgi_exposure`
+## 16) `check_asgi_wsgi_exposure`
 
 - **What it checks:** Source has ASGI/WSGI exposure patterns.
 - **Why it matters:** Useful signal for framework-host integration readiness.
@@ -271,7 +286,7 @@ Example warning detail:
 No ASGI/WSGI callable detected in project source
 ```
 
-## 16) `check_unused_files`
+## 17) `check_unused_files`
 
 - **What it checks:** Presence of unwanted patterns (for example `**/*.pyc`, `**/__pycache__`, `.venv`, `tests/`).
 - **Why it matters:** Reduces deployment package clutter and risk.
@@ -282,6 +297,90 @@ Example warning detail:
 ```text
 Found unwanted files: ['tests/', '.venv']
 ```
+
+## 18) `check_azure_functions_worker`
+
+- **What it checks:** `azure-functions-worker` is **not** declared in `requirements.txt`.
+- **Why it matters:** The Azure Functions platform manages the worker runtime; pinning it can cause deployment failures.
+- **How to fix:** Remove `azure-functions-worker` from your dependency declarations.
+- **Severity:** Warning only (`required: false`).
+
+## 19) `check_host_json_version`
+
+- **What it checks:** `host.json` declares `"version": "2.0"` as required by the v2 runtime.
+- **Why it matters:** An incorrect or missing host version breaks v2 app indexing.
+- **How to fix:** Set `{ "version": "2.0" }` in `host.json`.
+- **Severity:** Required (`required: true`).
+
+## 20) `check_funcignore`
+
+- **What it checks:** A `.funcignore` file is present to control what gets deployed.
+- **Why it matters:** Without it, unnecessary files can bloat the deployment package.
+- **How to fix:** Add a `.funcignore` file excluding local-only paths.
+- **Severity:** Warning only (`required: false`).
+
+## 21) `check_local_settings_git_tracked`
+
+- **What it checks:** `local.settings.json` is **not** tracked by git.
+- **Why it matters:** Tracking it can leak secrets into version control.
+- **How to fix:** Add `local.settings.json` to `.gitignore` and untrack it.
+- **Severity:** Warning only (`required: false`).
+
+## 22) `check_extension_bundle_v4`
+
+- **What it checks:** `extensionBundle` in `host.json` uses the recommended v4 range `[4.*, 5.0.0)`.
+- **Why it matters:** Aligns binding extensions with the current supported bundle.
+- **How to fix:** Update the `extensionBundle.version` range to the v4 range.
+- **Severity:** Warning only (`required: false`).
+
+## 23) `check_decorator_order`
+
+- **What it checks:** `@validate_http` is not stacked outside `@with_context`. The correct order (top to bottom) is `@app.route` → `@with_context` → `@validate_http`.
+- **Why it matters:** Incorrect decorator order changes request handling behavior.
+- **How to fix:** Reorder decorators so `@with_context` wraps `@validate_http`.
+- **Severity:** Warning only (`required: false`).
+
+## 24) `check_endpoint_metadata`
+
+- **What it checks:** In projects depending on `azure-functions-validation`, HTTP route handlers use `@validate_http` so they emit endpoint OpenAPI metadata.
+- **Why it matters:** Handlers without it will not appear in generated OpenAPI specs.
+- **How to fix:** Apply `@validate_http` to route handlers that should emit metadata.
+- **Severity:** Warning only (`required: false`).
+
+## 25) `check_openapi_version_mixing`
+
+- **What it checks:** A project does not mix OpenAPI 3.0 signals (3.0.x version strings or the `nullable` keyword) with OpenAPI 3.1 signals (3.1.x version strings).
+- **Why it matters:** Mixing versions produces inconsistent generated specs.
+- **How to fix:** Standardize on a single OpenAPI version across the project.
+- **Severity:** Warning only (`required: false`).
+
+## 26) `check_scan_before_spec`
+
+- **What it checks:** The OpenAPI spec is not built before endpoints are scanned/registered (and not built without any endpoint scan).
+- **Why it matters:** Building the spec too early yields an empty or incomplete spec.
+- **How to fix:** Scan/register endpoints before building the spec.
+- **Severity:** Warning only (`required: false`).
+
+## 27) `check_langgraph_anonymous_auth`
+
+- **What it checks:** In projects that import `langgraph`, HTTP routes do not use `auth_level` set to `ANONYMOUS`.
+- **Why it matters:** Anonymous auth leaves graph endpoints publicly reachable.
+- **How to fix:** Set a non-anonymous `auth_level` for LangGraph HTTP routes.
+- **Severity:** Warning only (`required: false`).
+
+## 28) `check_durable_nondeterminism`
+
+- **What it checks:** Orchestration or entity trigger functions do not call nondeterministic APIs (`datetime.now`, `random`, `uuid`, `requests`, `open`, `os.getenv`).
+- **Why it matters:** Nondeterministic calls break Durable Functions replay.
+- **How to fix:** Move nondeterministic work into activity functions.
+- **Severity:** Required (`required: true`).
+
+## 29) `check_unsupported_metadata_version`
+
+- **What it checks:** `host.json` `extensionBundle.version` or a metadata file does not declare a version outside the configured supported set.
+- **Why it matters:** Unsupported metadata versions can fail at load or deploy time.
+- **How to fix:** Use a supported metadata/bundle version.
+- **Severity:** Warning only (`required: false`).
 
 ## Rule authoring template
 
