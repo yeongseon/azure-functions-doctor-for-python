@@ -7,6 +7,7 @@ DEMO_TAPE := demo/doctor-demo.tape
 DEMO_IMAGE := azure-functions-doctor-demo-vhs
 DEMO_GIF := docs/assets/doctor-demo.gif
 DEMO_FINAL_PNG := docs/assets/doctor-demo-final.png
+VERSIONED_DOCS := README.md llms.txt llms-full.txt docs/deployment.md
 
 .PHONY: bootstrap
 bootstrap:
@@ -135,7 +136,8 @@ ifndef VERSION
 	$(error VERSION is not set. Usage: make release VERSION=1.0.1)
 endif
 	@$(HATCH) version $(VERSION)
-	@git add "$(PACKAGE_INIT)" && \
+	@$(MAKE) sync-docs-version
+	@git add "$(PACKAGE_INIT)" $(VERSIONED_DOCS) && \
 	 git commit -m "build: bump version to $(VERSION)"
 	@$(MAKE) release-core VERSION=$(VERSION)
 
@@ -151,24 +153,27 @@ endif
 .PHONY: release-patch
 release-patch: ensure-hatch
 	@$(HATCH) version patch
+	@$(MAKE) sync-docs-version
 	@VERSION=$$($(HATCH) version | tail -n1); \
-	 git add "$(PACKAGE_INIT)" && \
+	 git add "$(PACKAGE_INIT)" $(VERSIONED_DOCS) && \
 	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: release-minor
 release-minor: ensure-hatch
 	@$(HATCH) version minor
+	@$(MAKE) sync-docs-version
 	@VERSION=$$($(HATCH) version | tail -n1); \
-	 git add "$(PACKAGE_INIT)" && \
+	 git add "$(PACKAGE_INIT)" $(VERSIONED_DOCS) && \
 	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
 .PHONY: release-major
 release-major: ensure-hatch
 	@$(HATCH) version major
+	@$(MAKE) sync-docs-version
 	@VERSION=$$($(HATCH) version | tail -n1); \
-	 git add "$(PACKAGE_INIT)" && \
+	 git add "$(PACKAGE_INIT)" $(VERSIONED_DOCS) && \
 	 git commit -m "build: bump version to $$VERSION" && \
 	 $(MAKE) release-core VERSION=$$VERSION
 
@@ -179,6 +184,10 @@ publish-test: ensure-hatch
 .PHONY: publish-pypi
 publish-pypi: ensure-hatch
 	@$(HATCH) publish
+
+.PHONY: sync-docs-version
+sync-docs-version: ensure-hatch
+	@$(HATCH) run python scripts/sync_docs_version.py
 
 .PHONY: version
 version: ensure-hatch

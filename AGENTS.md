@@ -76,6 +76,7 @@ When splitting a large piece of work into focused issues, keep the umbrella open
 ## Release Process
 - Version is managed via `hatch` (dynamic from `src/azure_functions_doctor/__init__.py`).
 - **Do NOT manually edit version strings.** Use the Makefile targets below. The public-API test reads `__version__` against `importlib.metadata.version(...)`, so no test changes are needed when bumping.
+- The release targets automatically run `make sync-docs-version` after the `hatch version` bump, which rewrites the canonical version strings in `README.md`, `llms.txt`, `llms-full.txt`, and `docs/deployment.md` so the `test (3.10)` docs-consistency gate stays green. The sync is idempotent and never touches the SARIF schema version (`"version": "2.1.0"`). Run `make sync-docs-version` manually if you ever hand-edit `__version__`.
 
 ### Commands
 - `make release-patch` — bump patch version, update changelog, tag, and push
