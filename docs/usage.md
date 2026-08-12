@@ -62,7 +62,7 @@ azure-functions-doctor doctor --target-python 3.12
 | `--path` | string | `.` | Target project directory. |
 | `--format` | enum | `table` | Output format: `table`, `json`, `sarif`, `junit`. |
 | `--output` | path | unset | Write output to file instead of stdout. |
-| `--verbose` | flag | `false` | Show fix hints for non-passing checks (table mode). |
+| `-v`, `--verbose` | flag | `false` | Show fix hints for non-passing checks (table mode). |
 | `--debug` | flag | `false` | Enable debug logging for troubleshooting. |
 | `--profile` | enum | `full` behavior | Rule profile: `minimal` or `full`. |
 | `--rules` | path | unset | Custom rules file path. |
@@ -169,6 +169,7 @@ Supported values:
 - `3.11`
 - `3.12`
 - `3.13`
+- `3.14`
 
 When set, the Python version rule compares the override value instead of the
 tool runtime and table output adds `Target Python: X.Y (override)` near the header.

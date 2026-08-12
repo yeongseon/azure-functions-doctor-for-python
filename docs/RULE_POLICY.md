@@ -43,13 +43,20 @@ Core rules are marked `"required": true` in `v2.json` and are always included in
 | Rule ID | Check Type | MS Learn Reference |
 |---|---|---|
 | `check_python_version` | `compare_version` | [Supported Python versions][py-versions] |
-| `check_requirements_txt` | `file_exists` | [Managing dependencies][req-txt] |
+| `check_requirements_txt` | `dependency_manifest` | [Managing dependencies][req-txt] |
 | `check_azure_functions_library` | `package_declared` | [Python developer reference][az-func-lib] |
 | `check_host_json` | `file_exists` | [host.json reference][host-json] |
 | `check_host_json_version` | `host_json_version` | [host.json reference][host-json] |
+| `check_durable_nondeterminism` | `durable_nondeterminism` | [Durable Functions code constraints][durable-determinism] |
 
 These rules detect **unambiguous misconfiguration** — a project missing any of these
 will fail to deploy or run regardless of environment.
+
+> Note: `check_durable_nondeterminism` is also shipped as required (`"required": true`)
+> because nondeterministic calls in orchestrator/entity functions reliably break Durable
+> Functions replay. Unlike the other Core rules it relies on a specialized source detector
+> (`durable_nondeterminism`) rather than a purely static file/version check, and it only
+> evaluates projects that contain Durable orchestration or entity triggers.
 
 ---
 
@@ -71,16 +78,27 @@ Extended rules are included in `--profile full` but excluded from `--profile min
 | Rule ID | Reason for Extended (not Core) tier |
 |---|---|
 | `check_programming_model_v2` | Decorator detection uses AST heuristics; false positives possible in non-standard layouts |
+| `check_blueprint_registration` | Blueprint registration is inferred from source; unusual registration patterns may be missed |
 | `check_venv` | Recommended for local development; not a deployment-time requirement |
 | `check_python_executable` | Interpreter path issues are environment-specific; not caused by project misconfiguration |
+| `check_native_dependency_risk` | Heuristic package list; native builds may still succeed depending on the build environment |
+| `check_azure_functions_worker` | Warns on a discouraged pin; not always fatal |
 | `check_local_settings` | Local development convenience; not required for deployment |
+| `check_funcignore` | Packaging hygiene recommendation; not required for deployment |
+| `check_local_settings_git_tracked` | Secret-hygiene recommendation; depends on git state |
 | `check_func_cli` | Core Tools useful locally; not required by Functions runtime |
 | `check_func_core_tools_version` | Version guidance; not a runtime deployment requirement |
 | `check_extension_bundle` | Binding support recommendation; not universally required |
+| `check_extension_bundle_v4` | Version recommendation; not a hard requirement |
 | `check_app_insights` | Observability recommendation; not required for app to run |
 | `check_durabletask_config` | Conditional on Durable usage; heuristic detection |
 | `check_asgi_wsgi_exposure` | Framework heuristic; non-standard callables may produce false positives |
-| `check_extension_bundle_v4` | Version recommendation; not a hard requirement |
+| `check_decorator_order` | Decorator-stacking heuristic; applies to specific validation/context patterns |
+| `check_endpoint_metadata` | Applies only when `azure-functions-validation` is a dependency; heuristic route detection |
+| `check_openapi_version_mixing` | Heuristic signal detection across OpenAPI 3.0/3.1 usage |
+| `check_scan_before_spec` | Call-order heuristic; naming-based detection may miss custom flows |
+| `check_langgraph_anonymous_auth` | Applies only to LangGraph projects; heuristic auth-level detection |
+| `check_unsupported_metadata_version` | Depends on a configurable supported-version set; advisory only |
 
 ---
 
@@ -123,6 +141,7 @@ Core rules must rely on **deterministic, static checks**.
 | `file_exists` | File present at project root |
 | `host_json_version` | JSON property equality |
 | `package_declared` | Package name appears in requirements.txt |
+| `dependency_manifest` | Dependency file (requirements.txt or pyproject.toml) exists |
 | `compare_version` | Version comparison against a fixed minimum |
 
 **Not allowed in Core rules:**
@@ -242,3 +261,4 @@ The guiding principle for rule design is:
 [req-txt]: https://learn.microsoft.com/azure/azure-functions/functions-reference-python#managing-dependencies
 [az-func-lib]: https://learn.microsoft.com/azure/azure-functions/functions-reference-python
 [host-json]: https://learn.microsoft.com/azure/azure-functions/functions-host-json
+[durable-determinism]: https://learn.microsoft.com/azure/azure-functions/durable/durable-functions-code-constraints

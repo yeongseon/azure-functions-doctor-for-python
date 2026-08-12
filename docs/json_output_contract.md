@@ -17,9 +17,11 @@ If `--output` is omitted, JSON is printed to stdout.
 ```json
 {
   "metadata": {
-    "tool_version": "0.15.0",
+    "tool_version": "0.19.1",
     "generated_at": "2026-03-14T10:40:20.731Z",
-    "target_path": "/absolute/path/to/project"
+    "target_path": "/absolute/path/to/project",
+    "programming_model": "v2",
+    "target_python": null
   },
   "results": [
     {
@@ -49,6 +51,8 @@ If `--output` is omitted, JSON is printed to stdout.
 | `tool_version` | string | Installed `azure-functions-doctor` version. |
 | `generated_at` | string | UTC timestamp in ISO 8601 format. |
 | `target_path` | string | Resolved absolute project path used for checks. |
+| `programming_model` | string | Detected Azure Functions programming model (`v2`, `mixed`, `unsupported_v1`, or `unknown`). |
+| `target_python` | string \| null | Target Python version requested via `--target-python`, or `null` when not set. |
 
 ### `results[]`
 
@@ -78,6 +82,8 @@ Use the following contract expectations when writing parsers.
 | `metadata.tool_version` | Stable | Safe for telemetry and compatibility checks. |
 | `metadata.generated_at` | Stable | Safe for run timestamp tracking. |
 | `metadata.target_path` | Stable | Safe for target correlation. |
+| `metadata.programming_model` | Stable | Safe for detecting v1/v2/mixed project state. |
+| `metadata.target_python` | Stable | Safe for correlating requested target Python version. |
 | `results[].category` | Stable | Prefer for machine grouping. |
 | `results[].status` | Stable | Safe for section-level logic. |
 | `results[].items[].label` | Stable | Safe for human-readable matching. |

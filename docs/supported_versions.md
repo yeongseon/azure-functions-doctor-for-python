@@ -70,7 +70,7 @@ strategy:
 ## CLI and API Compatibility Expectations
 
 - CLI command surface: `azure-functions-doctor doctor` with documented options.
-- Public API surface: `run_diagnostics(path, profile, rules_path)`.
+- Public API surface: `run_diagnostics(path, profile, rules_path, target_python)`.
 - Changes to public behavior should be reflected in tests, docs, and release notes.
 
 Programmatic compatibility check example:

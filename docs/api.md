@@ -1,7 +1,7 @@
 # API Reference
 
 The public entry point for programmatic usage is
-`azure_functions_doctor.api.run_diagnostics(path, profile, rules_path)`.
+`azure_functions_doctor.api.run_diagnostics(path, profile, rules_path, target_python)`.
 It uses the same diagnostics engine as `azure-functions-doctor doctor`, then returns
 structured results that can be consumed in scripts, CI pipelines, or custom tooling.
 
@@ -9,8 +9,8 @@ structured results that can be consumed in scripts, CI pipelines, or custom tool
 
 | API | Purpose | Typical usage |
 | --- | --- | --- |
-| `run_diagnostics(path, profile, rules_path)` | Run all checks and return section-level results. | CI validation, custom wrappers, pre-commit hooks. |
-| `Doctor(path, profile, rules_path)` | Lower-level runner with explicit lifecycle methods. | Advanced control over rule loading and execution. |
+| `run_diagnostics(path, profile, rules_path, target_python)` | Run all checks and return section-level results. | CI validation, custom wrappers, pre-commit hooks. |
+| `Doctor(path, profile, rules_path, target_python)` | Lower-level runner with explicit lifecycle methods. | Advanced control over rule loading and execution. |
 | `CheckResult` | Result object for one check item. | Output processing and custom reporting. |
 | `SectionResult` | Result object for a group of checks. | Rendering grouped summaries by category. |
 | `HandlerRegistry` | Maps rule `type` to execution handlers. | Handler extension and internal diagnostics flow. |
@@ -51,6 +51,7 @@ if __name__ == "__main__":
 | `path` | `str` | Yes | File system path to the Azure Functions app root. |
 | `profile` | `str | None` | No | `"full"` (default behavior) or `"minimal"` (required checks only). |
 | `rules_path` | `pathlib.Path | None` | No | Optional path to a custom rules file matching the rules schema. |
+| `target_python` | `str | None` | No | Override target Python runtime version (e.g. `"3.12"`). Defaults to `None` (use tool runtime). |
 
 ### Return Value
 

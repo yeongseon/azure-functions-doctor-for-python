@@ -53,9 +53,9 @@ To ensure the integrity of our codebase, we employ several automated security sc
 ### Within Scope
 - **Diagnostic Rule Integrity**: Rules must not execute arbitrary code. The core logic of the doctor is designed to evaluate state, not provide a platform for execution.
 - **Custom Rules Trust Boundary**: When a user specifies a custom `rules.json` path, that file is treated as a trusted input.
-- **Network Requests**: The tool makes outbound HTTP requests exclusively to check for updates to Azure Functions Core Tools using the `requests` library.
+- **Network Behavior**: The documented diagnostics and version checks do not make outbound network requests. The Azure Functions Core Tools version check invokes the locally installed `func` CLI via a subprocess rather than contacting a remote registry.
 - **Input Validation**: Path arguments and user-provided inputs are validated to prevent common vulnerabilities like path traversal.
-- **Dependency Security**: We monitor our five runtime dependencies (jsonschema, packaging, requests, rich, typer) for known vulnerabilities.
+- **Dependency Security**: We monitor our runtime dependencies (jsonschema, packaging, rich, typer, and `tomli` on Python < 3.11) for known vulnerabilities.
 
 ### Out of Scope
 - **Diagnosed Project Security**: The security posture of the Azure Functions projects being analyzed is the responsibility of the project owner.
@@ -64,9 +64,11 @@ To ensure the integrity of our codebase, we employ several automated security sc
 
 ## Network Behavior
 
-- **Update Checks**: The doctor makes outbound HTTP requests to official registries to compare local Azure Functions Core Tools versions with the latest available releases.
+- **No Outbound Requests**: The documented diagnostics and version checks do not contact remote servers. The Azure Functions Core Tools version check runs the locally installed `func` CLI as a subprocess and compares the reported version locally.
 - **Privacy**: No telemetry, analytics, or user data is collected or sent to any remote servers.
-- **Resilience**: Network requests are designed to fail gracefully. If a connection cannot be established, the corresponding check will show a "skip" status rather than crashing the tool.
+- **Resilience**: Checks that depend on external tooling (such as the `func` CLI) are designed to fail gracefully. If the tool is unavailable, the handler returns a `fail` result which is then surfaced as a `warn` because the rule is optional — the process does not crash.
+
+> Note: some diagnostic rules scan user project code for risky patterns such as `requests.get(...)` calls. These are string patterns detected in the analyzed project — they are not runtime dependencies or network calls made by `azure-functions-doctor` itself.
 
 ## Custom Rules Trust Model
 
@@ -84,11 +86,11 @@ To ensure the integrity of our codebase, we employ several automated security sc
 
 ## Dependency Security
 
-The project relies on a minimal set of five runtime dependencies:
+The project relies on a minimal set of runtime dependencies:
 - **jsonschema**: For validating rule files and configurations.
 - **packaging**: For handling version comparisons.
-- **requests**: For secure outbound HTTP communication.
 - **rich**: For formatted terminal output.
 - **typer**: For building the command-line interface.
+- **tomli**: For parsing `pyproject.toml` on Python < 3.11 (the standard-library `tomllib` is used on 3.11+).
 
 We use Dependabot to monitor these dependencies and provide automated updates for security vulnerabilities and version upgrades. All chosen dependencies are widely-used and actively maintained packages.
