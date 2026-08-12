@@ -20,9 +20,9 @@ Usage:
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 INIT_PY = ROOT / "src" / "azure_functions_doctor" / "__init__.py"

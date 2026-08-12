@@ -53,9 +53,7 @@ class HandlerRegistry:
     """Registry for diagnostic check handlers with individual handler methods."""
 
     def __init__(self) -> None:
-        self._handlers: Dict[
-            str, Callable[[Rule, Path, Optional[RuleContext]], HandlerResult]
-        ] = {
+        self._handlers: Dict[str, Callable[[Rule, Path, Optional[RuleContext]], HandlerResult]] = {
             check_type: getattr(self, method_name)
             for check_type, method_name in _RULE_DISPATCH.items()
         }
@@ -700,7 +698,6 @@ class HandlerRegistry:
         )
         return _create_result("fail", detail)
 
-
     @_rule_handler
     def _handle_decorator_order(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
@@ -726,7 +723,6 @@ class HandlerRegistry:
                 "Fix: reorder to @app.route -> "
                 + " -> ".join(f"@{name}" for name in expected_order)
                 + f" ({expected_order[-1]} innermost).",
-
             ]
         )
         return _create_result("fail", detail)
@@ -873,8 +869,7 @@ class HandlerRegistry:
             ]
         )
         decorator_names = set(
-            condition.get("decorator_names")
-            or ["orchestration_trigger", "entity_trigger"]
+            condition.get("decorator_names") or ["orchestration_trigger", "entity_trigger"]
         )
         flagged = _collect_orchestrator_nondeterminism(path, blocklist, decorator_names)
         if not flagged:
@@ -920,9 +915,7 @@ class HandlerRegistry:
 _registry = HandlerRegistry()
 
 
-def generic_handler(
-    rule: Rule, path: Path, context: Optional[RuleContext] = None
-) -> HandlerResult:
+def generic_handler(rule: Rule, path: Path, context: Optional[RuleContext] = None) -> HandlerResult:
     """
     Execute a diagnostic rule based on its type and condition.
 

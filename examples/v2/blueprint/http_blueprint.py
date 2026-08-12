@@ -3,6 +3,7 @@
 Import ``bp`` in ``function_app.py`` and call ``app.register_functions(bp)``
 to attach these routes to the main application.
 """
+
 import azure.functions as func
 
 bp = func.Blueprint()
