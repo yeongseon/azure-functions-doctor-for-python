@@ -1,5 +1,14 @@
 # Changelog
+## [0.19.1] - 2026-08-12
+
+- bump version to 0.19.1 (1ed286e71bc2c5bc9dd239db0921c1235851f4ea)
+
+- detect @validate_http above binding decorators (dead handler) (#252) (9ee73be508201fe65bbca23f03a783628ecbfa35)
+
+- add Branch Hygiene section to AGENTS.md (b9c0b2cfa6064d57676c2a4eb7b187fa733281c8)
 ## [0.19.0] - 2026-08-11
+
+- update changelog (bd94a0baa8445249575bed9d633565cf1f22d273)
 
 - bump version to 0.19.0 (456cee457e891e8b363d0abb8c0f92038d441c43)
 
