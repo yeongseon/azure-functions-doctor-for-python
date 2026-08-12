@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 RULES_JSON = ROOT / "src" / "azure_functions_doctor" / "assets" / "rules" / "v2.json"

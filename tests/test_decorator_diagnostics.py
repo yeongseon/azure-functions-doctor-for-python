@@ -143,9 +143,7 @@ def test_collect_inverted_decorator_order_honors_custom_order(tmp_path: Path) ->
         "@a\n@b\ndef f():\n    return None\n", encoding="utf-8"
     )
     assert helpers._collect_inverted_decorator_order(tmp_path, ["a", "b"]) == []
-    assert helpers._collect_inverted_decorator_order(tmp_path, ["b", "a"]) == [
-        "function_app.py:f"
-    ]
+    assert helpers._collect_inverted_decorator_order(tmp_path, ["b", "a"]) == ["function_app.py:f"]
 
 
 # ---------------------------------------------------------------------------
@@ -255,9 +253,7 @@ def test_collect_routes_flags_inactive_validate_http_above_route(tmp_path: Path)
         "    return req\n",
         encoding="utf-8",
     )
-    assert helpers._collect_routes_missing_validate_http(tmp_path) == [
-        "function_app.py:handler"
-    ]
+    assert helpers._collect_routes_missing_validate_http(tmp_path) == ["function_app.py:handler"]
 
 
 def test_collect_routes_passes_active_validate_http_below_route(tmp_path: Path) -> None:

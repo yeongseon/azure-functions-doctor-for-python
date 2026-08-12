@@ -5,6 +5,7 @@ Demonstrates three common trigger types in a single app:
 - Timer trigger : scheduled execution (every 5 minutes)
 - Queue trigger : event-driven processing from Azure Storage Queue
 """
+
 import json
 import logging
 

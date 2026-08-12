@@ -209,6 +209,7 @@ def _decorator_simple_name(dec: ast.expr) -> Optional[str]:
         return node.attr
     return None
 
+
 def _validate_http_above_binding(
     node: ast.FunctionDef | ast.AsyncFunctionDef, app_aliases: set[str]
 ) -> bool:
@@ -237,9 +238,7 @@ def _validate_http_above_binding(
     return any(validate_idx < binding_idx for binding_idx in binding_indices)
 
 
-def _collect_inverted_decorator_order(
-    path: Path, expected_order: list[str]
-) -> list[str]:
+def _collect_inverted_decorator_order(path: Path, expected_order: list[str]) -> list[str]:
     """Return "file:function" labels whose decorators violate *expected_order*.
 
     *expected_order* lists decorator leaf names from **outermost to innermost**
@@ -368,9 +367,7 @@ def _collect_routes_missing_validate_http(path: Path) -> list[str]:
                 if validate_idx is None and _decorator_simple_name(dec) == "validate_http":
                     validate_idx = i
             has_active_validate_http = (
-                validate_idx is not None
-                and route_idx is not None
-                and validate_idx > route_idx
+                validate_idx is not None and route_idx is not None and validate_idx > route_idx
             )
             if is_route and not has_active_validate_http and not _is_spec_serving_handler(node):
                 uncovered.append(f"{py_file.relative_to(path)}:{node.name}")
@@ -425,9 +422,7 @@ def _collect_openapi_version_mixing(path: Path) -> tuple[set[str], set[str]]:
     return v30, v31
 
 
-def _collect_scan_before_spec(
-    path: Path, scan_names: set[str], spec_names: set[str]
-) -> list[str]:
+def _collect_scan_before_spec(path: Path, scan_names: set[str], spec_names: set[str]) -> list[str]:
     """Return "file:spec_call" labels where a spec build precedes endpoint scan.
 
     For each file, records the line numbers of scan-style calls and spec-style
@@ -489,9 +484,7 @@ def _project_imports_langgraph(path: Path) -> bool:
     return False
 
 
-def _collect_anonymous_auth_routes(
-    path: Path, flag_missing_auth_level: bool = False
-) -> list[str]:
+def _collect_anonymous_auth_routes(path: Path, flag_missing_auth_level: bool = False) -> list[str]:
     """Return "file:function" labels for routes using anonymous auth.
 
     A route is flagged when a decorator keyword ``auth_level`` resolves to
@@ -571,9 +564,7 @@ def _collect_orchestrator_nondeterminism(
                     continue
                 for entry in blocklist:
                     if dotted == entry or dotted.endswith("." + entry):
-                        flagged.append(
-                            f"{py_file.relative_to(path)}:{node.name} -> {dotted}"
-                        )
+                        flagged.append(f"{py_file.relative_to(path)}:{node.name} -> {dotted}")
                         break
     return flagged
 
@@ -610,9 +601,7 @@ def _collect_unsupported_metadata_versions(
     seen: set[Path] = set()
     for pattern in files:
         for match in path.rglob(pattern):
-            if match in seen or any(
-                part in EXCLUDED_PROJECT_DIRS for part in match.parts
-            ):
+            if match in seen or any(part in EXCLUDED_PROJECT_DIRS for part in match.parts):
                 continue
             seen.add(match)
             data = _load(match)
@@ -1031,7 +1020,6 @@ def _resolve_host_json_path(data: object, jsonpath: str) -> object:
     return _resolve_host_json_pointer(data, parts)
 
 
-
 _HandlerFn = TypeVar("_HandlerFn", bound=Callable[..., "HandlerResult"])
 
 # Populated at class-definition time by the @_rule_handler decorator:
@@ -1047,6 +1035,3 @@ def _rule_handler(func: _HandlerFn) -> _HandlerFn:
     """
     _RULE_DISPATCH[func.__name__.removeprefix("_handle_")] = func.__name__
     return func
-
-
-

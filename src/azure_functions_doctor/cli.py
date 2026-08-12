@@ -428,5 +428,6 @@ def fdoctor_alias() -> None:
     _warn_deprecated_alias("fdoctor")
     cli()
 
+
 if __name__ == "__main__":
     cli()

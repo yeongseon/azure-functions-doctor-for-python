@@ -3,6 +3,7 @@
 Runs on a cron schedule (every 5 minutes). Logs whether the execution
 is running later than scheduled via the ``past_due`` flag.
 """
+
 import logging
 
 import azure.functions as func
