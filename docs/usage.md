@@ -28,7 +28,7 @@ azure-functions-doctor doctor
 Specific path:
 
 ```bash
-azure-functions-doctor doctor --path ./apps/orders-function
+azure-functions-doctor doctor ./apps/orders-function
 ```
 
 Required-only profile:
@@ -59,7 +59,7 @@ azure-functions-doctor doctor --target-python 3.12
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `--path` | string | `.` | Target project directory. |
+| *(positional)* | string | `.` | Target project directory. |
 | `--format` | enum | `table` | Output format: `table`, `json`, `sarif`, `junit`. |
 | `--output` | path | unset | Write output to file instead of stdout. |
 | `-v`, `--verbose` | flag | `false` | Show fix hints for non-passing checks (table mode). |
@@ -145,13 +145,13 @@ Each diagnostic item is represented as a test case.
 Single app repository:
 
 ```bash
-azure-functions-doctor doctor --path .
+azure-functions-doctor doctor .
 ```
 
 Monorepo app path:
 
 ```bash
-azure-functions-doctor doctor --path ./services/payments-function
+azure-functions-doctor doctor ./services/payments-function
 ```
 
 Use explicit paths in CI to avoid accidental root-level checks.
@@ -177,7 +177,7 @@ tool runtime and table output adds `Target Python: X.Y (override)` near the head
 Example:
 
 ```bash
-azure-functions-doctor doctor --path ./apps/orders-function --target-python 3.12
+azure-functions-doctor doctor ./apps/orders-function --target-python 3.12
 ```
 
 When omitted, doctor keeps checking the current interpreter and labels it as the
@@ -368,7 +368,7 @@ Use JUnit format and publish `doctor-junit.xml` as a test artifact.
 
 Symptom: CLI returns parameter error.
 
-Fix: Ensure `--path` points to an existing readable directory.
+Fix: Ensure the positional path argument points to an existing readable directory.
 
 ### Unknown profile
 
@@ -393,7 +393,7 @@ Fix: validate JSON and schema compatibility.
 - Run `minimal` as hard CI gate
 - Run `full` in local development and scheduled quality checks
 - Keep JSON artifacts for failed CI runs
-- Prefer explicit `--path` in monorepos
+- Prefer explicit path arguments in monorepos
 - Use `--verbose` for faster local remediation
 
 ## Related docs

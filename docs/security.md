@@ -66,7 +66,7 @@ To ensure the integrity of our codebase, we employ several automated security sc
 
 - **No Outbound Requests**: The documented diagnostics and version checks do not contact remote servers. The Azure Functions Core Tools version check runs the locally installed `func` CLI as a subprocess and compares the reported version locally.
 - **Privacy**: No telemetry, analytics, or user data is collected or sent to any remote servers.
-- **Resilience**: Checks that depend on external tooling (such as the `func` CLI) are designed to fail gracefully. If the tool is unavailable, the corresponding check shows a "skip" status rather than crashing.
+- **Resilience**: Checks that depend on external tooling (such as the `func` CLI) are designed to fail gracefully. If the tool is unavailable, the handler returns a `fail` result which is then surfaced as a `warn` because the rule is optional — the process does not crash.
 
 > Note: some diagnostic rules scan user project code for risky patterns such as `requests.get(...)` calls. These are string patterns detected in the analyzed project — they are not runtime dependencies or network calls made by `azure-functions-doctor` itself.
 

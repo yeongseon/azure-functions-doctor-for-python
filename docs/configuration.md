@@ -12,7 +12,7 @@ azure-functions-doctor doctor [OPTIONS]
 
 Core options:
 
-- `--path <directory>`
+- `<path>` (positional, default `.`)
 - `--profile <minimal|full>`
 - `--format <table|json|sarif|junit>`
 - `--output <file>`
@@ -32,7 +32,7 @@ azure-functions-doctor doctor
 To check another project:
 
 ```bash
-azure-functions-doctor doctor --path ./apps/orders-function
+azure-functions-doctor doctor ./apps/orders-function
 ```
 
 Path validation behavior:

@@ -123,7 +123,7 @@ Target Python: 3.12 (override) — Tool runtime: 3.13.0
 Example failing detail:
 
 ```text
-No virtual environment detected (VIRTUAL_ENV, CONDA_PREFIX, UV_PROJECT_ENVIRONMENT)
+Targets not found
 ```
 
 ## 5) `check_python_executable`
@@ -147,7 +147,7 @@ Example detail:
 Example failing detail:
 
 ```text
-No dependency manifest found (requirements.txt or pyproject.toml)
+<path>/requirements.txt not found and pyproject.toml declares no dependencies
 ```
 
 ## 7) `check_azure_functions_library`
