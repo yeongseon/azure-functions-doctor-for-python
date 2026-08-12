@@ -739,7 +739,6 @@ def _load_pyproject(path: Path) -> Optional[Dict[str, object]]:
         with pyproject_path.open("rb") as handle:
             data: Dict[str, object] = tomllib.load(handle)
             return data
-            return tomllib.load(handle)
     except (OSError, ValueError) as exc:
         logger.debug(f"Skip pyproject.toml at {pyproject_path}: {exc}")
         return None
