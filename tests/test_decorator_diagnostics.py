@@ -202,3 +202,73 @@ def test_collect_routes_missing_validate_http_excludes_spec_serving(tmp_path: Pa
         encoding="utf-8",
     )
     assert helpers._collect_routes_missing_validate_http(tmp_path) == ["function_app.py:items"]
+
+
+# ---------------------------------------------------------------------------
+# Regression: @validate_http above a binding decorator (dead handler)
+# ---------------------------------------------------------------------------
+
+
+def test_collect_inverted_flags_validate_http_above_binding(tmp_path: Path) -> None:
+    # @validate_http above @app.durable_client_input (no @with_context present):
+    # validation receives a FunctionBuilder and is silently inactive.
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n"
+        "app = func.FunctionApp()\n\n"
+        "@validate_http\n"
+        "@app.durable_client_input(client_name='client')\n"
+        "def handler(req, client):\n"
+        "    return req\n",
+        encoding="utf-8",
+    )
+    assert helpers._collect_inverted_decorator_order(tmp_path, _ORDER) == [
+        "function_app.py:handler"
+    ]
+
+
+def test_collect_inverted_ignores_validate_http_below_binding(tmp_path: Path) -> None:
+    # Correct order: @app.route outermost, @validate_http innermost -> active.
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n"
+        "app = func.FunctionApp()\n\n"
+        "@app.route(route='x')\n"
+        "@validate_http\n"
+        "def handler(req):\n"
+        "    return req\n",
+        encoding="utf-8",
+    )
+    assert helpers._collect_inverted_decorator_order(tmp_path, _ORDER) == []
+
+
+def test_collect_routes_flags_inactive_validate_http_above_route(tmp_path: Path) -> None:
+    # @validate_http declared but placed ABOVE @app.route -> inactive, so the
+    # route emits no endpoint metadata even though the name is present.
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n"
+        "app = func.FunctionApp()\n\n"
+        "@validate_http\n"
+        "@app.route(route='x')\n"
+        "def handler(req):\n"
+        "    return req\n",
+        encoding="utf-8",
+    )
+    assert helpers._collect_routes_missing_validate_http(tmp_path) == [
+        "function_app.py:handler"
+    ]
+
+
+def test_collect_routes_passes_active_validate_http_below_route(tmp_path: Path) -> None:
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n"
+        "app = func.FunctionApp()\n\n"
+        "@app.route(route='x')\n"
+        "@validate_http\n"
+        "def handler(req):\n"
+        "    return req\n",
+        encoding="utf-8",
+    )
+    assert helpers._collect_routes_missing_validate_http(tmp_path) == []

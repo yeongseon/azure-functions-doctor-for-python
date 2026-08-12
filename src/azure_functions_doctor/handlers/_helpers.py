@@ -209,6 +209,33 @@ def _decorator_simple_name(dec: ast.expr) -> Optional[str]:
         return node.attr
     return None
 
+def _validate_http_above_binding(
+    node: ast.FunctionDef | ast.AsyncFunctionDef, app_aliases: set[str]
+) -> bool:
+    """Return True when ``@validate_http`` sits above an ``@app.<binding>`` decorator.
+
+    ``decorator_list`` index 0 is the topmost/outermost decorator. When
+    ``@validate_http`` has a lower index than any Azure Functions binding
+    decorator (an ``@<app>.<name>`` attribute call on a discovered FunctionApp
+    alias), it wraps the SDK ``FunctionBuilder`` instead of the handler and is
+    therefore inactive.
+    """
+    validate_idx: Optional[int] = None
+    binding_indices: list[int] = []
+    for i, dec in enumerate(node.decorator_list):
+        if validate_idx is None and _decorator_simple_name(dec) == "validate_http":
+            validate_idx = i
+        inner: ast.expr = dec.func if isinstance(dec, ast.Call) else dec
+        if (
+            isinstance(inner, ast.Attribute)
+            and isinstance(inner.value, ast.Name)
+            and inner.value.id in app_aliases
+        ):
+            binding_indices.append(i)
+    if validate_idx is None or not binding_indices:
+        return False
+    return any(validate_idx < binding_idx for binding_idx in binding_indices)
+
 
 def _collect_inverted_decorator_order(
     path: Path, expected_order: list[str]
@@ -222,6 +249,11 @@ def _collect_inverted_decorator_order(
     decorator, so the expected names must appear in the same relative order. A
     function is flagged when two or more of the expected decorators are present
     but their actual relative order does not match *expected_order*.
+    A function is also flagged when ``@validate_http`` appears *above* (outer to)
+    any Azure Functions binding decorator (e.g. ``@app.route``,
+    ``@app.durable_client_input``). In that order ``@validate_http`` receives an
+    SDK ``FunctionBuilder`` instead of the handler, so validation is inactive and
+    no endpoint metadata is emitted -- a silent "dead handler".
     """
     inverted: list[str] = []
     for py_file, content in _iter_project_py_contents(path):
@@ -229,6 +261,7 @@ def _collect_inverted_decorator_order(
             tree = ast.parse(content)
         except SyntaxError:
             continue
+        app_aliases = _discover_functionapp_aliases(content)
         for node in ast.walk(tree):
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
@@ -240,11 +273,14 @@ def _collect_inverted_decorator_order(
                 if name in expected_order and name not in positions:
                     positions[name] = i
             present = [name for name in expected_order if name in positions]
-            if len(present) < 2:
-                continue
-            actual = sorted(present, key=lambda name: positions[name])
-            if actual != present:
-                inverted.append(f"{py_file.relative_to(path)}:{node.name}")
+            label = f"{py_file.relative_to(path)}:{node.name}"
+            if len(present) >= 2:
+                actual = sorted(present, key=lambda name: positions[name])
+                if actual != present:
+                    inverted.append(label)
+                    continue
+            if _validate_http_above_binding(node, app_aliases):
+                inverted.append(label)
     return inverted
 
 
@@ -295,8 +331,13 @@ def _is_spec_serving_handler(node: ast.FunctionDef | ast.AsyncFunctionDef) -> bo
 
 
 def _collect_routes_missing_validate_http(path: Path) -> list[str]:
-    """Return "file:function" labels for HTTP route handlers that lack
-    ``@validate_http`` and therefore emit no endpoint OpenAPI metadata.
+    """Return "file:function" labels for HTTP route handlers that lack an
+    *active* ``@validate_http`` and therefore emit no endpoint OpenAPI metadata.
+
+    ``@validate_http`` only covers a handler when it is applied *below* (inner to)
+    the ``@app.route`` decorator. When it appears above the route decorator it
+    wraps the SDK ``FunctionBuilder``, so validation and endpoint metadata are
+    inactive even though the decorator name is present.
     """
     uncovered: list[str] = []
     for py_file, content in _iter_project_py_contents(path):
@@ -311,8 +352,9 @@ def _collect_routes_missing_validate_http(path: Path) -> list[str]:
             if not node.decorator_list:
                 continue
             is_route = False
-            has_validate_http = False
-            for dec in node.decorator_list:
+            route_idx: Optional[int] = None
+            validate_idx: Optional[int] = None
+            for i, dec in enumerate(node.decorator_list):
                 inner: ast.expr = dec.func if isinstance(dec, ast.Call) else dec
                 if (
                     isinstance(inner, ast.Attribute)
@@ -321,9 +363,16 @@ def _collect_routes_missing_validate_http(path: Path) -> list[str]:
                     and inner.value.id in app_aliases
                 ):
                     is_route = True
-                if _decorator_simple_name(dec) == "validate_http":
-                    has_validate_http = True
-            if is_route and not has_validate_http and not _is_spec_serving_handler(node):
+                    if route_idx is None:
+                        route_idx = i
+                if validate_idx is None and _decorator_simple_name(dec) == "validate_http":
+                    validate_idx = i
+            has_active_validate_http = (
+                validate_idx is not None
+                and route_idx is not None
+                and validate_idx > route_idx
+            )
+            if is_route and not has_active_validate_http and not _is_spec_serving_handler(node):
                 uncovered.append(f"{py_file.relative_to(path)}:{node.name}")
     return uncovered
 
