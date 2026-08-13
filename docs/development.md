@@ -36,7 +36,7 @@ make check-all
 - `src/azure_functions_doctor/api.py`: stable programmatic API (`run_diagnostics`)
 - `src/azure_functions_doctor/cli.py`: Typer-based CLI (`azure-functions-doctor doctor`)
 - `src/azure_functions_doctor/doctor.py`: orchestration, rule loading, section aggregation
-- `src/azure_functions_doctor/handlers.py`: handler implementations and registry dispatch
+- `src/azure_functions_doctor/handlers/`: handler implementations (`registry.py`) and shared helpers/types (`_helpers.py`)
 - `src/azure_functions_doctor/assets/rules/v2.json`: built-in diagnostics rules
 - `src/azure_functions_doctor/schemas/rules.schema.json`: schema for rule validation
 - `tests/`: unit tests, CLI tests, rule/schema tests, integration-style checks
@@ -79,7 +79,7 @@ When adding or modifying a built-in check, keep the rule-first flow:
 
 1. Edit `src/azure_functions_doctor/assets/rules/v2.json`.
 2. Ensure the rule object satisfies `rules.schema.json`.
-3. If needed, extend handler behavior in `handlers.py`.
+3. If needed, extend handler behavior in the `handlers/` package (`registry.py`).
 4. Add tests for both pass and non-pass outcomes.
 5. Update docs (`diagnostics.md`, `rule_inventory.md`, and this guide if needed).
 
@@ -99,24 +99,31 @@ When adding or modifying a built-in check, keep the rule-first flow:
 
 Use this process to introduce a new rule type:
 
-1. Add the new literal to `Rule["type"]` in `handlers.py`.
-2. Implement `_handle_<name>(self, rule, path)`.
-3. Register the handler in `HandlerRegistry.__init__`.
+1. Add the new literal to the `Rule["type"]` definition in `handlers/_helpers.py`.
+2. Implement `_handle_<name>(self, rule, path, context=None)` in `handlers/registry.py`.
+3. Register the type-to-method mapping in `_RULE_DISPATCH` (`handlers/_helpers.py`); `HandlerRegistry.__init__` binds it automatically.
 4. Extend `rules.schema.json` so the new type is schema-valid.
 5. Add tests in `tests/test_handler.py` and registry tests if needed.
 
 ### Minimal handler example
 
+Add the method inside `HandlerRegistry` (`handlers/registry.py`), decorated with
+`@_rule_handler` so it is registered in `_RULE_DISPATCH`:
+
 ```python
 from pathlib import Path
 
 
-def _handle_sample(self, rule: dict, path: Path) -> dict[str, str]:
-    _ = rule
-    marker = path / ".doctor-marker"
-    if marker.exists():
-        return {"status": "pass", "detail": "Marker exists"}
-    return {"status": "fail", "detail": "Marker missing"}
+class HandlerRegistry:
+    # ... existing handlers ...
+
+    @_rule_handler
+    def _handle_sample(self, rule: dict, path: Path, context=None) -> dict[str, str]:
+        _ = (rule, context)
+        marker = path / ".doctor-marker"
+        if marker.exists():
+            return {"status": "pass", "detail": "Marker exists"}
+        return {"status": "fail", "detail": "Marker missing"}
 ```
 
 ## Debugging Tips

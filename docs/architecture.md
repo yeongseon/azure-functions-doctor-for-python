@@ -18,7 +18,7 @@ Core modules and responsibilities:
 - `__init__.py`: public exports and version string.
 - `cli.py`: Typer-based CLI entrypoint; maps flags to `Doctor` options.
 - `doctor.py`: `Doctor` runner — loads rules, executes handlers, aggregates results.
-- `handlers.py`: `Rule` type, `generic_handler`, type-based rule dispatch via `HandlerRegistry`.
+- `handlers/` package: `Rule` type and shared helpers (`_helpers.py`), plus `generic_handler` and type-based rule dispatch via `HandlerRegistry` (`registry.py`).
 - `config.py`: configuration management (reserved for future use; not yet in the runtime path).
 - `target_resolver.py`: resolves runtime values (Python version, Core Tools version) for version-comparison checks.
 - `logging_config.py`: internal logging setup.
@@ -41,7 +41,7 @@ CLI is the primary consumer. Python import use is for programmatic embedding onl
 flowchart TD
     CLI["cli.py<br/>Typer CLI"]
     DOC["doctor.py<br/>Doctor runner"]
-    HDLR["handlers.py<br/>Rule dispatch + generic_handler"]
+    HDLR["handlers/<br/>Rule dispatch + generic_handler"]
     TR["target_resolver.py<br/>Version resolution"]
     RULES[("assets/<br/>Rule inventory")]
     SCHEMAS[("schemas/<br/>JSON schemas")]
@@ -75,7 +75,7 @@ sequenceDiagram
     participant CLI as cli.py
     participant DOC as Doctor
     participant RULES as assets/v2.json
-    participant HDLR as handlers.py
+    participant HDLR as handlers/
     participant TR as target_resolver.py
 
     Dev->>CLI: azure-functions-doctor doctor --path ./my-project
@@ -132,7 +132,7 @@ Every diagnostic check is defined as a JSON object in the rule inventory (`asset
 
 ### 2. HandlerRegistry type-based dispatch
 
-`handlers.py` maintains a `HandlerRegistry` that maps rule `type` strings to handler functions. The `Doctor` runner dispatches each rule to its handler by type, enabling extensibility without modifying dispatch logic.
+The `handlers/` package (`registry.py`) maintains a `HandlerRegistry` that maps rule `type` strings to handler functions. The `Doctor` runner dispatches each rule to its handler by type, enabling extensibility without modifying dispatch logic.
 
 ### 3. Exit code contract
 

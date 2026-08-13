@@ -140,7 +140,7 @@ Core rules must rely on **deterministic, static checks**.
 |---|---|
 | `file_exists` | File present at project root |
 | `host_json_version` | JSON property equality |
-| `package_declared` | Package name appears in requirements.txt |
+| `package_declared` | Package name appears in requirements.txt (falls back to pyproject.toml) |
 | `dependency_manifest` | Dependency file (requirements.txt or pyproject.toml) exists |
 | `compare_version` | Version comparison against a fixed minimum |
 
@@ -216,7 +216,7 @@ They are **not currently enforced** by the schema or handler runtime.
 | `source_url` | URI | Direct link to the authoritative reference |
 | `tier` | `core`, `extended`, `experimental` | Explicit tier classification |
 
-To adopt these fields, update `rules.schema.json`, the `Rule` TypedDict in `handlers.py`,
+To adopt these fields, update `rules.schema.json`, the `Rule` TypedDict in `handlers/_helpers.py`,
 and all entries in `v2.json`.
 
 ---

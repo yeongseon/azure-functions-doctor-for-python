@@ -74,16 +74,18 @@ These checks run in both `full` and `minimal` profiles.
 | `azure-functions` package | Ensure the Functions library is declared. |
 | `host.json` | Ensure the project includes host configuration. |
 | `host.json` version | Ensure host.json declares `"version": "2.0"`. |
+| Orchestrator determinism | Ensure orchestrator/entity functions avoid nondeterministic APIs. |
 
 ### Required Check Details
 
 | Label | Rule ID | Handler Type | Fails When |
 | --- | --- | --- | --- |
 | Python version | `check_python_version` | `compare_version` | Current interpreter is lower than `3.10`. |
-| `requirements.txt` | `check_requirements_txt` | `file_exists` | `requirements.txt` is missing at project root. |
-| `azure-functions` package | `check_azure_functions_library` | `package_declared` | `azure-functions` is not declared in `requirements.txt`. |
+| `requirements.txt` | `check_requirements_txt` | `dependency_manifest` | No dependency manifest found (`requirements.txt` or `pyproject.toml` dependency declarations). |
+| `azure-functions` package | `check_azure_functions_library` | `package_declared` | `azure-functions` is not declared in `requirements.txt` or `pyproject.toml`. |
 | `host.json` | `check_host_json` | `file_exists` | `host.json` is missing at project root. |
 | `host.json` version | `check_host_json_version` | `host_json_version` | `host.json` does not declare `"version": "2.0"`. |
+| Orchestrator determinism | `check_durable_nondeterminism` | `durable_nondeterminism` | An orchestration/entity function calls a nondeterministic API (`datetime.now`, `random`, `uuid`, `requests`, `open`, `os.getenv`). |
 
 ## Optional Checks
 
@@ -111,7 +113,7 @@ These checks run only after the repository has been classified as a supported `v
 | --- | --- | --- | --- |
 | Programming model v2 | `check_programming_model_v2` | `source_code_contains` | Project source does not expose `@app.` decorators in AST mode. |
 | Blueprint registration | `check_blueprint_registration` | `blueprint_registration` | A `func.Blueprint()` alias is used in decorators but never appears in `register_functions(...)` anywhere in the project. |
-| Virtual environment | `check_venv` | `env_var_exists` | `VIRTUAL_ENV` is not set. |
+| Virtual environment | `check_venv` | `any_of_exists` | None of `VIRTUAL_ENV`, `CONDA_PREFIX`, or `UV_PROJECT_ENVIRONMENT` is set. |
 | Python executable | `check_python_executable` | `path_exists` | `sys.executable` is empty or points to a missing path. |
 | azure-functions-worker not pinned | `check_azure_functions_worker` | `package_forbidden` | `azure-functions-worker` is declared in `requirements.txt`. |
 | `local.settings.json` | `check_local_settings` | `file_exists` | Local settings file is absent for local execution scenarios. |
