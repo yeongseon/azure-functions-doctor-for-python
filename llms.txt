@@ -8,7 +8,7 @@
 - Version: 0.19.1
 - Python: >=3.10, <3.15
 - License: MIT
-- Docs: https://yeongseon.github.io/azure-functions-doctor/
+- Docs: https://yeongseon.dev/azure-functions-python/doctor/
 - Repository: https://github.com/yeongseon/azure-functions-doctor
 
 ## What It Does
@@ -86,11 +86,11 @@ Rules support two profiles:
 
 ## Documentation
 
-- [Getting Started](https://yeongseon.github.io/azure-functions-doctor/getting-started/)
-- [API Reference](https://yeongseon.github.io/azure-functions-doctor/api/)
-- [Rules Reference](https://yeongseon.github.io/azure-functions-doctor/rules/)
-- [CI Integration](https://yeongseon.github.io/azure-functions-doctor/examples/ci_integration/)
-- [Custom Rules](https://yeongseon.github.io/azure-functions-doctor/custom-rules/)
+- [Getting Started](https://yeongseon.dev/azure-functions-python/doctor/getting-started/)
+- [API Reference](https://yeongseon.dev/azure-functions-python/doctor/api/)
+- [Rules Reference](https://yeongseon.dev/azure-functions-python/doctor/rules/)
+- [CI Integration](https://yeongseon.dev/azure-functions-python/doctor/examples/ci_integration/)
+- [Custom Rules](https://yeongseon.dev/azure-functions-python/doctor/rules/#guidance-for-custom-rules)
 
 ## Ecosystem
 
