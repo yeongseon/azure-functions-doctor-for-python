@@ -90,8 +90,11 @@ Project Structure
 [PASS] host.json: found
 [PASS] host.json version: "2.0"
 
+Durable
+[PASS] Orchestrator determinism: No nondeterministic calls detected in orchestrators
+
 Doctor summary (to see all details, run azure-functions-doctor doctor -v):
-  0 fails, 0 warnings, 5 passed
+  0 fails, 0 warnings, 6 passed
 Exit code: 0
 ```
 
@@ -116,8 +119,11 @@ Project Structure
 [FAIL] host.json: file not found (fail)
 [FAIL] host.json version: host.json missing or invalid (fail)
 
+Durable
+[PASS] Orchestrator determinism: No nondeterministic calls detected in orchestrators
+
 Doctor summary (to see all details, run azure-functions-doctor doctor -v):
-  2 fails, 0 warnings, 3 passed
+  2 fails, 0 warnings, 4 passed
 Exit code: 1
 ```
 
@@ -186,7 +192,7 @@ Representative JUnit output (`doctor-report.xml`):
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<testsuite name="func-doctor" tests="5" failures="0" skipped="0" time="0.021">
+<testsuite name="func-doctor" tests="6" failures="0" skipped="0" time="0.021">
   <testcase classname="Python Env" name="Python version" />
   <testcase classname="Project Structure" name="host.json" />
 </testsuite>
@@ -195,7 +201,7 @@ Representative JUnit output (`doctor-report.xml`):
 Representative summary sidecar content:
 
 ```json
-{"passed":5,"warned":0,"failed":0}
+{"passed":6,"warned":0,"failed":0}
 ```
 
 When checks fail, doctor exits with code `1`. Use that exit code to block deployment.

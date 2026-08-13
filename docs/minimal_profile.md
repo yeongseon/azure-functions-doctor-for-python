@@ -26,13 +26,14 @@ This means `minimal` behavior adapts to your custom rules file if you provide on
 
 ## Built-in minimal rule set (current)
 
-With built-in `v2.json`, minimal includes these 5 checks:
+With built-in `v2.json`, minimal includes these 6 checks:
 
 1. `check_python_version`
 2. `check_requirements_txt`
 3. `check_azure_functions_library`
 4. `check_host_json`
 5. `check_host_json_version`
+6. `check_durable_nondeterminism`
 
 These represent the minimum structural requirements for a valid Azure Functions Python v2 project.
 
@@ -41,10 +42,7 @@ These represent the minimum structural requirements for a valid Azure Functions 
 | Dimension | `full` profile | `minimal` profile |
 | --- | --- | --- |
 | Rule scope | Required + optional | Required only |
-| Built-in count | 20 rules | 5 rules |
-| Warning volume | Higher | Lower |
-| CI suitability | Useful for report artifacts | Best for hard gating |
-| Local guidance depth | High | Baseline only |
+| Built-in count | 29 rules | 6 rules |
 | Warning volume | Higher | Lower |
 | CI suitability | Useful for report artifacts | Best for hard gating |
 | Local guidance depth | High | Baseline only |
