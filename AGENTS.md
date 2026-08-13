@@ -20,9 +20,9 @@
 - Preserve Python 3.10+ compatibility declared in `pyproject.toml`.
 
 ### Documentation & Translations
-- When a change touches `README.md` or any English documentation, update the translated READMEs (`README.ko.md`, `README.ja.md`, `README.zh-CN.md`) **in the same PR** so translations never drift from the English source.
-- This applies to any code change that alters documented behavior, CLI output, or the ecosystem/package table — not just direct edits to prose.
-- If a full translation cannot land in the same PR, add a short "translation pending" note to the affected translated file and open a tracking issue before merging.
+- English (`README.md`) is the **canonical** source of truth for all documentation. Translated READMEs (`README.ko.md`, `README.ja.md`, `README.zh-CN.md`) are **best-effort**, community-maintained, and may lag the English source.
+- Translation sync is **not** required in the same PR as an English change, and a PR is **never** blocked by translation drift. Update translations opportunistically; when you do, keep them faithful to the current English source.
+- Each translated README carries a staleness banner linking back to the canonical English README. Keep that banner in place so readers always know the translation may be out of date.
 
 ### Action Pinning
 - All external `uses:` references in `.github/workflows/` must be SHA-pinned per `CONTRIBUTING.md` § "GitHub Actions Pinning". The PyPA publish action, local composite actions (`uses: ./...`), and the end-user `azure-functions-preflight.yml` template are the only documented exceptions and must carry an inline comment at the call site.
