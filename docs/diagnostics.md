@@ -82,7 +82,7 @@ These checks run in both `full` and `minimal` profiles.
 | --- | --- | --- | --- |
 | Python version | `check_python_version` | `compare_version` | Current interpreter is lower than `3.10`. |
 | `requirements.txt` | `check_requirements_txt` | `dependency_manifest` | No dependency manifest found (`requirements.txt` or `pyproject.toml` dependency declarations). |
-| `azure-functions` package | `check_azure_functions_library` | `package_declared` | `azure-functions` is not declared in `requirements.txt`. |
+| `azure-functions` package | `check_azure_functions_library` | `package_declared` | `azure-functions` is not declared in `requirements.txt` or `pyproject.toml`. |
 | `host.json` | `check_host_json` | `file_exists` | `host.json` is missing at project root. |
 | `host.json` version | `check_host_json_version` | `host_json_version` | `host.json` does not declare `"version": "2.0"`. |
 | Orchestrator determinism | `check_durable_nondeterminism` | `durable_nondeterminism` | An orchestration/entity function calls a nondeterministic API (`datetime.now`, `random`, `uuid`, `requests`, `open`, `os.getenv`). |
