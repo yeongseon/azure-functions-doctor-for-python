@@ -505,5 +505,22 @@
     "symptoms": "Extensions or bindings fail to load; runtime rejects host configuration.",
     "tags": ["metadata", "version", "extensions"],
     "check_order": 40
+  },
+  {
+    "id": "check_otel_trace_context_activation",
+    "category": "configuration",
+    "section": "observability",
+    "label": "OTel trace-context activation",
+    "description": "Warns when a project opts into azure-functions-logging trace-context activation (activate_trace_context=True or set_default_trace_context_activation) but does not declare an opentelemetry dependency, so activation silently no-ops at runtime.",
+    "type": "otel_activation",
+    "required": false,
+    "condition": {},
+    "hint": "Install the azure-functions-logging[otel] extra (or an opentelemetry-* package), or disable activate_trace_context.",
+    "hint_url": "https://github.com/yeongseon/azure-functions-logging-python/blob/main/README.md#opentelemetry-trace-context",
+    "source_type": "heuristic",
+    "why_it_matters": "azure-functions-logging degrades trace-context activation to a no-op when OpenTelemetry is unavailable, so requested distributed tracing is silently dropped without any runtime error.",
+    "symptoms": "Trace context never attaches to logs; spans missing from telemetry despite activation being enabled.",
+    "tags": ["logging", "opentelemetry", "observability", "tracing"],
+    "check_order": 41
   }
 ]

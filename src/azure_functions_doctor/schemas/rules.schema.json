@@ -74,7 +74,8 @@
           "scan_before_spec",
           "langgraph_anonymous_auth",
           "durable_nondeterminism",
-          "unsupported_metadata_version"
+          "unsupported_metadata_version",
+          "otel_activation"
         ]
       },
       "required": {

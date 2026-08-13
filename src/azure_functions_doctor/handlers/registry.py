@@ -31,6 +31,8 @@ from azure_functions_doctor.handlers._helpers import (
     _handle_specific_exceptions,
     _iter_project_py_contents,
     _parse_requirements_names,
+    _project_activates_trace_context,
+    _project_declares_opentelemetry,
     _project_declares_validation_dep,
     _project_imports_langgraph,
     _read_project_python_file,
@@ -906,6 +908,36 @@ class HandlerRegistry:
                 *[f"- {src} = {ver}" for src, ver in found[:10]],
                 "",
                 f"Fix: use a supported version ({', '.join(supported) or 'see docs'}).",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_otel_activation(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when the project opts into logging OTel trace-context activation but
+        does not declare an ``opentelemetry`` distribution.
+
+        ``azure-functions-logging`` stays silent at runtime when activation is
+        requested without OpenTelemetry installed, so doctor surfaces the mismatch.
+        """
+        activations = _project_activates_trace_context(path)
+        if not activations:
+            return _create_result(
+                "pass", "No OTel trace-context activation requested; check skipped"
+            )
+        if _project_declares_opentelemetry(path):
+            return _create_result(
+                "pass", "Trace-context activation requested and opentelemetry is declared"
+            )
+        detail = "\n".join(
+            [
+                "Trace-context activation requested without an opentelemetry dependency:",
+                *[f"- {loc}" for loc in activations[:10]],
+                "",
+                "Fix: install the azure-functions-logging[otel] extra (or an "
+                "opentelemetry-* package), or disable activate_trace_context.",
             ]
         )
         return _create_result("fail", detail)

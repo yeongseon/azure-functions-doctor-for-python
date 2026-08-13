@@ -18,6 +18,8 @@ from azure_functions_doctor.handlers._helpers import (
     _collect_scan_before_spec,
     _collect_unsupported_metadata_versions,
     _dotted_call_name,
+    _project_activates_trace_context,
+    _project_declares_opentelemetry,
     _project_imports_langgraph,
 )
 from azure_functions_doctor.handlers.registry import HandlerRegistry
@@ -411,5 +413,90 @@ def test_new_rules_present_in_doctor_output(tmp_path: Path) -> None:
         "LangGraph route authentication",
         "Orchestrator determinism",
         "Supported metadata version",
+        "OTel trace-context activation",
     ):
         assert label in labels
+
+
+# ---------------------------------------------------------------------------
+# otel_activation
+# ---------------------------------------------------------------------------
+
+
+def test_project_activates_trace_context_keyword(tmp_path: Path) -> None:
+    _write(
+        tmp_path,
+        "a.py",
+        "from azure_functions_logging import setup_logging\n"
+        "setup_logging(activate_trace_context=True)\n",
+    )
+    assert _project_activates_trace_context(tmp_path)
+
+
+def test_project_activates_trace_context_setter_call(tmp_path: Path) -> None:
+    _write(
+        tmp_path,
+        "a.py",
+        "from azure_functions_logging import set_default_trace_context_activation\n"
+        "set_default_trace_context_activation(True)\n",
+    )
+    assert _project_activates_trace_context(tmp_path)
+
+
+def test_project_activates_trace_context_setter_bare_call(tmp_path: Path) -> None:
+    _write(tmp_path, "a.py", "set_default_trace_context_activation()\n")
+    assert _project_activates_trace_context(tmp_path)
+
+
+def test_project_activates_trace_context_setter_enabled_keyword(tmp_path: Path) -> None:
+    _write(tmp_path, "a.py", "set_default_trace_context_activation(enabled=True)\n")
+    assert _project_activates_trace_context(tmp_path)
+
+
+def test_project_activates_trace_context_false_ignored(tmp_path: Path) -> None:
+    _write(tmp_path, "a.py", "setup_logging(activate_trace_context=False)\n")
+    assert not _project_activates_trace_context(tmp_path)
+    _write(tmp_path, "b.py", "set_default_trace_context_activation(False)\n")
+    assert not _project_activates_trace_context(tmp_path)
+
+
+def test_project_activates_trace_context_skips_syntax_error(tmp_path: Path) -> None:
+    _write(tmp_path, "a.py", "def broken(:\n")
+    assert not _project_activates_trace_context(tmp_path)
+
+
+def test_project_declares_opentelemetry_requirements(tmp_path: Path) -> None:
+    _write(tmp_path, "requirements.txt", "opentelemetry-api>=1.24\n")
+    assert _project_declares_opentelemetry(tmp_path)
+
+
+def test_project_declares_opentelemetry_pyproject(tmp_path: Path) -> None:
+    _write(
+        tmp_path,
+        "pyproject.toml",
+        '[project]\nname = "x"\nversion = "0"\n'
+        'dependencies = ["opentelemetry-sdk>=1.24"]\n',
+    )
+    assert _project_declares_opentelemetry(tmp_path)
+
+
+def test_project_declares_opentelemetry_absent(tmp_path: Path) -> None:
+    _write(tmp_path, "requirements.txt", "azure-functions\n")
+    assert not _project_declares_opentelemetry(tmp_path)
+
+
+def test_otel_activation_without_dependency_fails(tmp_path: Path) -> None:
+    _write(tmp_path, "a.py", "setup_logging(activate_trace_context=True)\n")
+    _write(tmp_path, "requirements.txt", "azure-functions\n")
+    assert _status("otel_activation", tmp_path) == "fail"
+
+
+def test_otel_activation_with_dependency_passes(tmp_path: Path) -> None:
+    _write(tmp_path, "a.py", "setup_logging(activate_trace_context=True)\n")
+    _write(tmp_path, "requirements.txt", "azure-functions\nopentelemetry-api>=1.24\n")
+    assert _status("otel_activation", tmp_path) == "pass"
+
+
+def test_otel_activation_no_activation_passes(tmp_path: Path) -> None:
+    _write(tmp_path, "a.py", "import os\n")
+    assert _status("otel_activation", tmp_path) == "pass"

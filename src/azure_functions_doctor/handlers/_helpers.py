@@ -534,6 +534,75 @@ def _collect_anonymous_auth_routes(path: Path, flag_missing_auth_level: bool = F
     return flagged
 
 
+def _project_activates_trace_context(path: Path) -> list[str]:
+    """Return "file:location" labels where the project explicitly opts into
+    ``azure-functions-logging`` OTel trace-context activation.
+
+    Two activation signals are detected:
+
+    * a keyword ``activate_trace_context=True`` on any call (e.g.
+      ``setup_logging(activate_trace_context=True)`` or
+      ``logging_context(..., activate_trace_context=True)``); and
+    * a call to ``set_default_trace_context_activation(True)`` (matched by the
+      dotted-call leaf name, with a truthy first positional or keyword arg).
+    """
+    activations: list[str] = []
+    for py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        label_base = str(py_file.relative_to(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            for kw in node.keywords:
+                if (
+                    kw.arg == "activate_trace_context"
+                    and isinstance(kw.value, ast.Constant)
+                    and kw.value.value is True
+                ):
+                    activations.append(f"{label_base}:{node.lineno}")
+                    break
+            leaf = _dotted_call_name(node.func)
+            if leaf is not None and leaf.rsplit(".", 1)[-1] == (
+                "set_default_trace_context_activation"
+            ):
+                enabled = _first_call_arg_is_true(node)
+                if enabled:
+                    activations.append(f"{label_base}:{node.lineno}")
+    return activations
+
+
+def _first_call_arg_is_true(node: ast.Call) -> bool:
+    """Return True when a call's first positional (or ``enabled`` keyword) arg is the
+    literal ``True``. A bare call with no args is treated as enabling activation.
+    """
+    if node.args:
+        first = node.args[0]
+        return isinstance(first, ast.Constant) and first.value is True
+    for kw in node.keywords:
+        if kw.arg == "enabled":
+            return isinstance(kw.value, ast.Constant) and kw.value.value is True
+    return not node.keywords
+
+
+def _project_declares_opentelemetry(path: Path) -> bool:
+    """Return True when the project declares any ``opentelemetry`` distribution in
+    ``requirements.txt`` or ``pyproject.toml`` (runtime or optional dependencies).
+
+    The ``azure-functions-logging[otel]`` extra pulls in ``opentelemetry-api``, so
+    any declared ``opentelemetry-*`` package satisfies the activation requirement.
+    """
+    declared: set[str] = set(pyproject_dependency_names(path))
+    req_path = path / "requirements.txt"
+    if req_path.exists():
+        content = _read_project_python_file(req_path)
+        if content is not None:
+            declared |= _parse_requirements_names(content)
+    return any(name.startswith("opentelemetry") for name in declared)
+
+
 def _collect_orchestrator_nondeterminism(
     path: Path, blocklist: set[str], decorator_names: set[str]
 ) -> list[str]:

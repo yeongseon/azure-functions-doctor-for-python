@@ -59,6 +59,7 @@ The built-in ruleset uses the following handler types:
 - `langgraph_anonymous_auth`
 - `durable_nondeterminism`
 - `unsupported_metadata_version`
+- `otel_activation`
 
 For the authoritative, script-generated list of every built-in rule and its
 type, see the [Rule Inventory](rule_inventory.md).
@@ -381,6 +382,14 @@ Found unwanted files: ['tests/', '.venv']
 - **Why it matters:** Unsupported metadata versions can fail at load or deploy time.
 - **How to fix:** Use a supported metadata/bundle version.
 - **Severity:** Warning only (`required: false`).
+
+## 30) `check_otel_trace_context_activation`
+
+- **What it checks:** In projects that opt into `azure-functions-logging` trace-context activation (`activate_trace_context=True` or `set_default_trace_context_activation`), an `opentelemetry` distribution is declared in `requirements.txt` or `pyproject.toml`.
+- **Why it matters:** `azure-functions-logging` silently degrades activation to a no-op when OpenTelemetry is unavailable, so requested trace context is dropped without any runtime error.
+- **How to fix:** Install the `azure-functions-logging[otel]` extra (or an `opentelemetry-*` package), or disable `activate_trace_context`.
+- **Severity:** Warning only (`required: false`).
+
 
 ## Rule authoring template
 
