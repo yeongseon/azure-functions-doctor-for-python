@@ -140,7 +140,7 @@ Core rules must rely on **deterministic, static checks**.
 |---|---|
 | `file_exists` | File present at project root |
 | `host_json_version` | JSON property equality |
-| `package_declared` | Package name appears in requirements.txt |
+| `package_declared` | Package name appears in requirements.txt (falls back to pyproject.toml) |
 | `dependency_manifest` | Dependency file (requirements.txt or pyproject.toml) exists |
 | `compare_version` | Version comparison against a fixed minimum |
 
