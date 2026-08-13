@@ -240,8 +240,8 @@ class ExtendedRegistry(HandlerRegistry):
         super().__init__()
         self._handlers["always_pass"] = self._handle_always_pass
 
-    def _handle_always_pass(self, rule: dict, path: Path) -> dict[str, str]:
-        _ = (rule, path)
+    def _handle_always_pass(self, rule: dict, path: Path, context=None) -> dict[str, str]:
+        _ = (rule, path, context)
         return {"status": "pass", "detail": "Custom handler executed"}
 
 
@@ -259,7 +259,7 @@ def run_custom_rule(project_path: str) -> dict[str, str]:
 
 When adding a new handler:
 
-1. Extend the `Rule["type"]` literal
-2. Register the handler in `HandlerRegistry`
+1. Extend the `Rule["type"]` literal in `handlers/_helpers.py`
+2. Implement `_handle_<name>(self, rule, path, context=None)` in `handlers/registry.py`, decorated with `@_rule_handler` (which registers it in `_RULE_DISPATCH`; `HandlerRegistry.__init__` binds it automatically)
 3. Update `rules.schema.json`
 4. Add tests in `tests/test_handler.py`

@@ -107,16 +107,23 @@ Use this process to introduce a new rule type:
 
 ### Minimal handler example
 
+Add the method inside `HandlerRegistry` (`handlers/registry.py`), decorated with
+`@_rule_handler` so it is registered in `_RULE_DISPATCH`:
+
 ```python
 from pathlib import Path
 
 
-def _handle_sample(self, rule: dict, path: Path) -> dict[str, str]:
-    _ = rule
-    marker = path / ".doctor-marker"
-    if marker.exists():
-        return {"status": "pass", "detail": "Marker exists"}
-    return {"status": "fail", "detail": "Marker missing"}
+class HandlerRegistry:
+    # ... existing handlers ...
+
+    @_rule_handler
+    def _handle_sample(self, rule: dict, path: Path, context=None) -> dict[str, str]:
+        _ = (rule, context)
+        marker = path / ".doctor-marker"
+        if marker.exists():
+            return {"status": "pass", "detail": "Marker exists"}
+        return {"status": "fail", "detail": "Marker missing"}
 ```
 
 ## Debugging Tips
