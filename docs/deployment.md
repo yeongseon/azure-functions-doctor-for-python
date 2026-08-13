@@ -72,7 +72,7 @@ This is the core workflow for this repository: diagnose first, deploy second.
 Healthy project check:
 
 ```bash
-azure-functions-doctor doctor examples/v2/http-trigger --profile minimal
+azure-functions-doctor doctor --path examples/v2/http-trigger --profile minimal
 ```
 
 Representative text output:
@@ -98,7 +98,7 @@ Exit code: 0
 Broken project detection (missing `host.json`):
 
 ```bash
-azure-functions-doctor doctor examples/v2/broken-missing-host-json --profile minimal
+azure-functions-doctor doctor --path examples/v2/broken-missing-host-json --profile minimal
 ```
 
 Representative text output:
@@ -125,16 +125,16 @@ Machine-readable output formats:
 
 ```bash
 # JSON
-azure-functions-doctor doctor examples/v2/http-trigger --profile minimal --format json --output doctor-report.json
+azure-functions-doctor doctor --path examples/v2/http-trigger --profile minimal --format json --output doctor-report.json
 
 # SARIF (for code scanning / security tooling)
-azure-functions-doctor doctor examples/v2/http-trigger --profile minimal --format sarif --output doctor-report.sarif
+azure-functions-doctor doctor --path examples/v2/http-trigger --profile minimal --format sarif --output doctor-report.sarif
 
 # JUnit (for CI test dashboards)
-azure-functions-doctor doctor examples/v2/http-trigger --profile minimal --format junit --output doctor-report.xml
+azure-functions-doctor doctor --path examples/v2/http-trigger --profile minimal --format junit --output doctor-report.xml
 
 # Summary JSON sidecar (quick pass/fail counts)
-azure-functions-doctor doctor examples/v2/http-trigger --profile minimal --summary-json doctor-summary.json
+azure-functions-doctor doctor --path examples/v2/http-trigger --profile minimal --summary-json doctor-summary.json
 ```
 
 Representative JSON output (`doctor-report.json`):
@@ -230,7 +230,7 @@ az functionapp list-flexconsumption-locations -o table
 ### Step 4 — Re-run doctor on the healthy sample (deployment gate)
 
 ```bash
-azure-functions-doctor doctor examples/v2/http-trigger --profile minimal
+azure-functions-doctor doctor --path examples/v2/http-trigger --profile minimal
 ```
 
 Proceed only if the command exits with `0`.
@@ -314,19 +314,19 @@ jobs:
           pip install azure-functions-doctor
 
       - name: Run doctor (text)
-        run: azure-functions-doctor doctor . --profile minimal
+        run: azure-functions-doctor doctor --profile minimal
 
       - name: Run doctor (JSON)
-        run: azure-functions-doctor doctor . --profile minimal --format json --output doctor-report.json
+        run: azure-functions-doctor doctor --profile minimal --format json --output doctor-report.json
 
       - name: Run doctor (SARIF)
-        run: azure-functions-doctor doctor . --profile minimal --format sarif --output doctor-report.sarif
+        run: azure-functions-doctor doctor --profile minimal --format sarif --output doctor-report.sarif
 
       - name: Run doctor (JUnit)
-        run: azure-functions-doctor doctor . --profile minimal --format junit --output doctor-report.xml
+        run: azure-functions-doctor doctor --profile minimal --format junit --output doctor-report.xml
 
       - name: Run doctor (summary sidecar)
-        run: azure-functions-doctor doctor . --profile minimal --summary-json doctor-summary.json
+        run: azure-functions-doctor doctor --profile minimal --summary-json doctor-summary.json
 
       - name: Publish
         if: success()
@@ -367,7 +367,7 @@ python3 --version
 az --version
 func --version
 pip show azure-functions-doctor
-azure-functions-doctor doctor . --profile minimal -v
+azure-functions-doctor doctor --profile minimal -v
 ```
 
 ### Before opening an issue
@@ -388,7 +388,7 @@ python --version
 pip show azure-functions-doctor
 
 # 5. Doctor output on your project
-azure-functions-doctor doctor . -v
+azure-functions-doctor doctor -v
 
 # 6. Function App status (if deployed)
 az functionapp show \

@@ -78,7 +78,7 @@ sequenceDiagram
     participant HDLR as handlers.py
     participant TR as target_resolver.py
 
-    Dev->>CLI: fdoctor doctor ./my-project
+    Dev->>CLI: azure-functions-doctor doctor --path ./my-project
     CLI->>DOC: Doctor(path, profile, rules_path)
     DOC->>RULES: load + schema-validate rules
     DOC->>DOC: apply profile filter
