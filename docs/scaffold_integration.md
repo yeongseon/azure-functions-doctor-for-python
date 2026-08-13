@@ -54,7 +54,7 @@ func new --name HttpTrigger --template "HTTP trigger"
 azure-functions-doctor doctor --profile minimal
 ```
 
-A freshly scaffolded project should pass all five required checks:
+A freshly scaffolded project should pass all six required checks:
 
 | Check | What it confirms |
 | --- | --- |
@@ -63,6 +63,7 @@ A freshly scaffolded project should pass all five required checks:
 | `azure-functions` package | SDK is declared |
 | `host.json` | Host config file exists |
 | `host.json` version | `"version": "2.0"` is set |
+| Orchestrator determinism | No nondeterministic calls in orchestrator/entity functions |
 
 **3. Fix any failures before proceeding:**
 

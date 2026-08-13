@@ -3,7 +3,9 @@
 Handlers execute rule definitions from `src/azure_functions_doctor/assets/rules/v2.json`.
 
 Each rule has a `type`, and `HandlerRegistry` routes the rule to the corresponding
-handler implementation in `src/azure_functions_doctor/handlers.py`.
+handler implementation in the `src/azure_functions_doctor/handlers/` package
+(dispatch class in `registry.py`, shared helpers in `_helpers.py`). The public
+import path `azure_functions_doctor.handlers` is preserved.
 
 ## Contract
 
@@ -57,11 +59,14 @@ Dispatch flow:
 ## Built-in Handlers
 
 - `compare_version`
-- `file_exists`
 - `env_var_exists`
 - `path_exists`
+- `file_exists`
+- `dependency_manifest`
 - `package_installed`
 - `package_declared`
+- `package_forbidden`
+- `native_dependency_risk`
 - `source_code_contains`
 - `conditional_exists`
 - `callable_detection`
@@ -69,6 +74,20 @@ Dispatch flow:
 - `any_of_exists`
 - `file_glob_check`
 - `host_json_property`
+- `host_json_version`
+- `host_json_extension_bundle_version`
+- `local_settings_security`
+- `blueprint_registration`
+- `decorator_order`
+- `endpoint_metadata`
+- `openapi_version_mixing`
+- `scan_before_spec`
+- `langgraph_anonymous_auth`
+- `durable_nondeterminism`
+- `unsupported_metadata_version`
+
+The authoritative dispatch map is `_RULE_DISPATCH` in
+`src/azure_functions_doctor/handlers/_helpers.py`.
 
 ### Handler Reference
 
@@ -78,15 +97,29 @@ Dispatch flow:
 | `env_var_exists` | `target` | Environment variable presence checks. |
 | `path_exists` | `target` | Check concrete paths or `sys.executable`. |
 | `file_exists` | `target` | Required project files (`host.json`, `requirements.txt`). |
+| `dependency_manifest` | optional `target` | Pass when dependencies are declared via `requirements.txt` **or** `pyproject.toml`. |
 | `package_installed` | `target` | Validate importable module availability. |
-| `package_declared` | `package`, optional `file` | Confirm package declaration in dependency file. |
-| `source_code_contains` | `keyword`, optional `mode` | Detect decorators or source signals. |
+| `package_declared` | `package`, optional `file` | Confirm package declaration in dependency file (falls back to `pyproject.toml`). |
+| `package_forbidden` | `package`, optional `file` | Warn when a platform-managed package (e.g. `azure-functions-worker`) is pinned. |
+| `native_dependency_risk` | optional `file` | Warn when packages with native-extension deployment risk are declared. |
+| `source_code_contains` | `keyword`, optional `mode` | Detect decorators or source signals (string or `ast` mode). |
 | `conditional_exists` | `jsonpath` | Conditional host checks (for example Durable settings). |
 | `callable_detection` | none | Detect ASGI/WSGI callable exposure patterns. |
 | `executable_exists` | `target` | Ensure local binaries exist on `PATH`. |
 | `any_of_exists` | `targets` | Pass when any env/file/host signal is present. |
 | `file_glob_check` | `patterns` | Detect junk files and deployment artifacts. |
 | `host_json_property` | `jsonpath` | Validate specific host.json properties. |
+| `host_json_version` | none | Validate `host.json` declares `"version": "2.0"`. |
+| `host_json_extension_bundle_version` | none | Validate `extensionBundle` uses the recommended v4 range. |
+| `local_settings_security` | none | Warn when `local.settings.json` is tracked by git. |
+| `blueprint_registration` | none | Warn when decorated Blueprint aliases are never registered. |
+| `decorator_order` | optional `decorators` | Warn when `@validate_http` is stacked outside `@with_context`. |
+| `endpoint_metadata` | none | Warn when route handlers lack `@validate_http` in a validation-enabled project. |
+| `openapi_version_mixing` | none | Warn when OpenAPI 3.0 and 3.1 signals both appear. |
+| `scan_before_spec` | optional `scan_names`, `spec_names` | Warn when the OpenAPI spec is built before endpoints are scanned. |
+| `langgraph_anonymous_auth` | optional `flag_missing_auth_level` | Warn when a LangGraph project exposes anonymous-auth routes. |
+| `durable_nondeterminism` | optional `blocklist`, `decorator_names` | Fail when orchestrator/entity functions call nondeterministic APIs. |
+| `unsupported_metadata_version` | optional `files`, `fields`, `supported_versions` | Warn when metadata declares an unsupported version. |
 
 ## Example Rule JSON by Handler Type
 
@@ -170,7 +203,7 @@ Dispatch flow:
 
 - `source_code_contains` supports a simple string mode and an AST-based mode.
 - `conditional_exists` is used for checks that only matter when a related feature is detected.
-- Handler implementations live in `src/azure_functions_doctor/handlers.py`.
+- Handler implementations live in the `src/azure_functions_doctor/handlers/` package (`registry.py`).
 
 ## Programmatic Usage Examples
 

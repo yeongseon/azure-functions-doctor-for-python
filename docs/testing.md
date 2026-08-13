@@ -1,7 +1,7 @@
 # Testing
 
 ## Overview
-Azure Functions Doctor uses pytest as its primary testing framework. The test suite consists of 15 files with approximately 1,830 lines of code. These tests provide coverage for the CLI, diagnostic handlers, rule registration, configuration management, and error handling.
+Azure Functions Doctor uses pytest as its primary testing framework. The suite spans 20+ test modules covering the CLI, diagnostic handlers, rule registration, configuration management, and error handling.
 
 ## Running Tests
 You can execute the tests using the provided Makefile or by calling pytest directly.
@@ -15,22 +15,31 @@ python -m pytest tests/test_handler.py -v  # Run a specific test file
 ## Test Structure
 The codebase follows a modular test structure to ensure specific components are isolated and verified correctly.
 
-| File | Lines | Description |
-|------|-------|-------------|
-| test_handler.py | 377 | Individual check handler implementations |
-| test_error_handling.py | 244 | Error handling and edge cases |
-| test_handler_registry.py | 214 | Handler dispatch and registration |
-| test_config.py | 155 | Configuration loading and validation |
-| test_programming_model_detection.py | 137 | v1 vs v2 model detection |
-| test_doctor.py | 130 | Core diagnostic engine |
-| test_rule_loading.py | 121 | Rule JSON loading and validation |
-| test_logging_config.py | 106 | Logging configuration |
-| test_cli.py | 104 | CLI command tests |
-| test_rules_schema.py | 77 | Rules schema consistency |
-| test_target_resolver.py | 77 | Version resolution utilities |
-| test_api.py | 40 | Public API surface |
-| test_examples.py | 29 | Example project smoke tests |
-| test_utils.py | 19 | Utility function tests |
+| File | Description |
+|------|-------------|
+| test_handler_registry.py | Handler dispatch and per-type handler behavior |
+| test_handler_registry_extended.py | Extended handler-registry coverage and edge cases |
+| test_handler.py | Individual check handler implementations |
+| test_toolkit_rule_checks.py | DX Toolkit rule handlers (decorator order, endpoint metadata, OpenAPI, LangGraph, durable, metadata version) |
+| test_bugfix_issues.py | Regression tests for previously fixed issues |
+| test_cli.py | CLI command behavior, flags, and exit codes |
+| test_decorator_diagnostics.py | Decorator-order and related diagnostics |
+| test_programming_model_detection.py | v1 vs v2 programming-model detection |
+| test_error_handling.py | Error handling and edge cases |
+| test_doctor.py | Core diagnostic engine (Doctor runner) |
+| test_pyproject_dependency_manifest.py | pyproject.toml dependency-manifest handling |
+| test_blueprint_registration.py | Blueprint registration detection |
+| test_logging_config.py | Logging configuration |
+| test_examples.py | Example project smoke tests |
+| test_rule_loading.py | Rule JSON loading and validation |
+| test_condition_params.py | Condition parameter parsing |
+| test_native_dependency_risk.py | Native dependency risk detection |
+| test_release_workflow_pins.py | Release workflow SHA-pin verification |
+| test_target_resolver.py | Version resolution utilities |
+| test_rules_schema.py | Rules schema consistency |
+| test_api.py | Public API surface (`run_diagnostics`) |
+| test_public_api.py | Public API and version exports |
+| test_utils.py | Utility function tests |
 
 ## Test Patterns
 
@@ -50,7 +59,7 @@ Specific handlers tested include:
 CLI tests use Typer's CliRunner to invoke commands and verify output. They ensure the `doctor` subcommand behaves correctly with different flags such as `--format json`, `--profile minimal`, and `--path`. Exit codes are verified to be 0 for successful checks and 1 when failures occur.
 
 ### Rules Tests
-- **test_rule_loading.py**: Validates the loading of v1.json and v2.json rule files.
+- **test_rule_loading.py**: Validates the loading of the built-in `v2.json` ruleset (and custom rule files).
 - **test_rules_schema.py**: Ensures rule JSON files adhere to the defined schema.
 - Custom rules: Verifies that the `--rules` flag correctly loads external rule files.
 
@@ -65,7 +74,7 @@ Coverage settings are defined in `pyproject.toml`.
 - **Source**: src/azure_functions_doctor
 - **Branch coverage**: Enabled
 - **Reports**: Terminal (missing lines), HTML, and XML
-- **pytest options**: `--cov=src/azure_functions_doctor --cov-report=xml --cov-report=term-missing -ra -q`
+- **pytest options**: `--cov=src/azure_functions_doctor --cov-report=xml --cov-report=term-missing -ra -q -m 'not e2e'`
 
 ## Writing New Tests
 When contributing new features or bug fixes, follow these guidelines:

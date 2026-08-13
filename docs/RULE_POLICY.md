@@ -216,7 +216,7 @@ They are **not currently enforced** by the schema or handler runtime.
 | `source_url` | URI | Direct link to the authoritative reference |
 | `tier` | `core`, `extended`, `experimental` | Explicit tier classification |
 
-To adopt these fields, update `rules.schema.json`, the `Rule` TypedDict in `handlers.py`,
+To adopt these fields, update `rules.schema.json`, the `Rule` TypedDict in `handlers/_helpers.py`,
 and all entries in `v2.json`.
 
 ---

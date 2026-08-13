@@ -83,8 +83,8 @@ Use these commands to manage your development environment:
 To add a new diagnostic rule to the doctor:
 
 1. Define the rule metadata in `src/azure_functions_doctor/assets/rules/v2.json`.
-2. Implement the logic for the rule as a handler function in `src/azure_functions_doctor/handlers.py`.
-3. Register the handler type within the `generic_handler` dispatcher.
+2. Implement the logic for the rule as a handler method in `src/azure_functions_doctor/handlers/registry.py`.
+3. Register the handler type in the `_RULE_DISPATCH` map (`src/azure_functions_doctor/handlers/_helpers.py`).
 4. Add unit tests for the new handler in `tests/test_handler.py`.
 5. Update any relevant documentation if the behavior changes user expectations.
 
