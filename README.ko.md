@@ -13,6 +13,8 @@
 
 다른 언어: [English](README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md)
 
+> ℹ️ 이 번역은 커뮤니티가 관리하는 참고용 문서로, 최신 [English README](README.md)보다 뒤처질 수 있습니다. 정확한 최신 정보는 영어 원문을 기준으로 하세요.
+
 Azure Functions Doctor는 **Azure Functions Python v2 프로그래밍 모델**로 구축된 프로젝트를 위한 진단 CLI 도구입니다.
 
 이 도구는 로컬 프로젝트에서 다음과 같은 일반적인 문제들을 점검합니다:
