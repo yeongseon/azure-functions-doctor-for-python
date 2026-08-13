@@ -8,7 +8,7 @@
 - Version: 0.19.1
 - Python: >=3.10, <3.15
 - License: MIT
-- Docs: https://yeongseon.github.io/azure-functions-doctor/
+- Docs: https://yeongseon.dev/azure-functions-python/doctor/
 - Repository: https://github.com/yeongseon/azure-functions-doctor
 - Azure Functions programming model: v2 decorator-based
 
@@ -489,6 +489,6 @@ With `--debug`: +20–50ms overhead for structured logging.
 
 ## Support
 
-- Documentation: https://yeongseon.github.io/azure-functions-doctor/
+- Documentation: https://yeongseon.dev/azure-functions-python/doctor/
 - GitHub Issues: https://github.com/yeongseon/azure-functions-doctor/issues
 - GitHub Discussions: https://github.com/yeongseon/azure-functions-doctor/discussions

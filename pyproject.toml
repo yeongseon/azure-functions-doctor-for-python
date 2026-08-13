@@ -32,8 +32,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://yeongseon.github.io/azure-functions-doctor-python/"
-Documentation = "https://yeongseon.github.io/azure-functions-doctor-python/"
+Homepage = "https://yeongseon.dev/azure-functions-python/doctor/"
+Documentation = "https://yeongseon.dev/azure-functions-python/doctor/"
 Repository = "https://github.com/yeongseon/azure-functions-doctor-python"
 Issues = "https://github.com/yeongseon/azure-functions-doctor-python/issues"
 

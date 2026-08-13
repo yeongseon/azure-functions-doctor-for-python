@@ -5,22 +5,22 @@
 Part of the **Azure Functions Python DX Toolkit**. A CLI that diagnoses common configuration, environment, and project-structure issues in Azure Functions Python v2 apps, emitting a machine-readable JSON contract for CI. Install from PyPI with `pip install azure-functions-doctor`.
 
 ## Getting Started
-- [Installation](https://yeongseon.github.io/azure-functions-doctor-python/installation/): Install the CLI.
-- [Quickstart](https://yeongseon.github.io/azure-functions-doctor-python/getting-started/): Run your first diagnostic.
-- [Configuration](https://yeongseon.github.io/azure-functions-doctor-python/configuration/): Configure checks and profiles.
+- [Installation](https://yeongseon.dev/azure-functions-python/doctor/installation/): Install the CLI.
+- [Quickstart](https://yeongseon.dev/azure-functions-python/doctor/getting-started/): Run your first diagnostic.
+- [Configuration](https://yeongseon.dev/azure-functions-python/doctor/configuration/): Configure checks and profiles.
 
 ## User Guide
-- [CLI Usage](https://yeongseon.github.io/azure-functions-doctor-python/usage/): Command reference.
-- [Diagnostics](https://yeongseon.github.io/azure-functions-doctor-python/diagnostics/): What gets checked and why.
-- [Rules](https://yeongseon.github.io/azure-functions-doctor-python/rules/): Rule model and inventory.
-- [JSON Output Contract](https://yeongseon.github.io/azure-functions-doctor-python/json_output_contract/): Machine-readable output for CI.
+- [CLI Usage](https://yeongseon.dev/azure-functions-python/doctor/usage/): Command reference.
+- [Diagnostics](https://yeongseon.dev/azure-functions-python/doctor/diagnostics/): What gets checked and why.
+- [Rules](https://yeongseon.dev/azure-functions-python/doctor/rules/): Rule model and inventory.
+- [JSON Output Contract](https://yeongseon.dev/azure-functions-python/doctor/json_output_contract/): Machine-readable output for CI.
 
 ## Reference
-- [API Reference](https://yeongseon.github.io/azure-functions-doctor-python/api/): Public API surface.
-- [Architecture](https://yeongseon.github.io/azure-functions-doctor-python/architecture/): How the rule engine works.
-- [FAQ](https://yeongseon.github.io/azure-functions-doctor-python/faq/): Frequently asked questions.
-- [Troubleshooting](https://yeongseon.github.io/azure-functions-doctor-python/troubleshooting/): Common issues and fixes.
+- [API Reference](https://yeongseon.dev/azure-functions-python/doctor/api/): Public API surface.
+- [Architecture](https://yeongseon.dev/azure-functions-python/doctor/architecture/): How the rule engine works.
+- [FAQ](https://yeongseon.dev/azure-functions-python/doctor/faq/): Frequently asked questions.
+- [Troubleshooting](https://yeongseon.dev/azure-functions-python/doctor/troubleshooting/): Common issues and fixes.
 
 ## Optional
-- [CI Integration](https://yeongseon.github.io/azure-functions-doctor-python/examples/ci_integration/): Use in pipelines.
-- [Changelog](https://yeongseon.github.io/azure-functions-doctor-python/changelog/): Release history.
+- [CI Integration](https://yeongseon.dev/azure-functions-python/doctor/examples/ci_integration/): Use in pipelines.
+- [Changelog](https://yeongseon.dev/azure-functions-python/doctor/changelog/): Release history.
