@@ -244,4 +244,4 @@ jobs:
         # consume this action via the `release/v1` channel rather than a commit
         # SHA, so trusted-publisher token issuance keeps working across patch
         # releases. See CONTRIBUTING.md § "GitHub Actions Pinning" for details.
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@release/v1 # pin-exempt: PyPA official publisher (trusted-publisher OIDC); tracks release/v1 by design
