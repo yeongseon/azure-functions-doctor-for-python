@@ -1,5 +1,48 @@
 # Changelog
+## [0.19.2] - 2026-08-14
+
+- bump version to 0.19.2 (d3bc7cd4d819e760e03a045731b87eefc084b87f)
+
+- stop auto-deploying docs to GitHub Pages (#284) (7397e50d60ce0b2323b9afbecaa8e629d2161858)
+
+- add OTel trace-context activation diagnostic rule (#282) (b7425c3a529d57b1da9d7221ec37baeb651d8c18)
+
+- extend semver_policy with a behavior-escalation CHANGELOG rule (#280) (e37eeb3ba463db2fd83a60395a6efb678b865b22)
+
+- consolidate official documentation URL onto yeongseon.dev (#281) (6cf30bab9635fb81aa2da6861cd70e234b8a3333)
+
+- adopt Renovate for GitHub Actions bumps (#278) (eda411ea79a95ea8cfdfae15fb570e738998ef8a)
+
+- normalize action version-comment labels (#276) (8be2c6c9ab1657f9c09ed6e58b5e09145d4ff11a)
+
+- correct built-in rule count 15 -> 29 in semver policy (#274) (27bdac6908bf4c4670af4fbcf2021559e03ecf77)
+
+- sync diagnostics/handlers/testing to current rule set and handlers package (#273) (22435c905033473b65295aabcbb487ac72cf2251)
+
+- add workflow pin-hygiene lint (#271) (4194a5ea4a34cc8306bbb3b52a5c840b68709d16)
+
+- sync minimal-profile check count to 6 after durable rule (#272) (776216722ca227e83371b085aa6dd816cacbac8e)
+
+- fix invalid positional path in CLI examples (#269) (e0dc3873a2625da247e1c34c9f380079ea803792)
+
+- adopt best-effort translation policy with staleness banners (#268) (3b88d39a63da2da553604974959d61914a9ed545)
+
+- add release-gate workflow drift lint (#265) (c81ae6b4b1323efce2a7dd2e21f921d5cf4ddf00)
+
+- normalize release-gate action pins to canonical SHAs (#264) (45aabc9ca107f77e4fa001a5d4a8a125d4a39933)
+
+- add tiered pre-publish runtime gate with real-Azure certification (#256) (dddeb8cfe5282f09f9eca55f53470c80c7dee492)
+
+- bump ruff to 0.16.2 and repair pre-commit hooks (#255) (94b413c098eca9508ebd1918c689505a9acfd37c)
+
+- sync documentation with v0.19.1 source (#260) (1522a26f82bd95f238661aeed4c4bc74473fd4b9)
+
+- remove unreachable return in _load_pyproject (#254) (180f0fa1c39cc2b61b6ce8d616c635a377ce2188)
+
+- auto-sync doc version strings on release + ignore agent state (#253) (188bb28c9992ecc0d1cad056dc711b3d992e7c64)
 ## [0.19.1] - 2026-08-12
+
+- update changelog (d10b4c6df5c12f4ca1a293b1f1834971ee2ebb5c)
 
 - bump version to 0.19.1 (1ed286e71bc2c5bc9dd239db0921c1235851f4ea)
 
@@ -110,6 +153,7 @@ chore(deps): bump mypy from 1.20.2 to 2.0.0 (de86a742dca99b2299ca318e9f566d957af
 - fix cross-repo links and README title (fa2509179ebea3aa415f28ce172260a1f9dc9ba6)
 
 - Add DX Toolkit hub link to README (073b16155d39da8e9b37fa4b08c17e8472b62fdb)
+## [0.17.0] - 2026-04-26
 
 - update changelog (9f5ce2cda749c5808d5c55239eec22c50cf9b3c8)
 
@@ -218,7 +262,6 @@ chore: release v0.16.2 (2878efb29f2b80fe6bc512cd4e7aaa2546ad0601)
 - resolve 6 confirmed bugs (#95–#100) (#101) (e6d1957d0487c79d3dd956759a27beb5f792f19c)
 
 - use standard pypi environment name for Trusted Publisher (64f4af308b1f7646c9223d75dae40e7ac17a4c84)
-## [0.17.0] - 2026-03-22
 
 - update README with Azure Functions Python DX Toolkit branding (96c95bfb668fe4abc0abf21700e9eaf974df8026)
 
@@ -715,7 +758,6 @@ Add SARIF and JUnit output (fe04a752bdfeeadaf08c22bf3dfa36ad6334fc17)
 ## [0.2.0] - 2025-08-30
 
 - align local version with PyPI release (0.2.0) (68a011cfc517751eda20de5b19d9a1f378296187)
-## [0.1.11] - 2025-08-30
 
 - update changelog (afdf7359dafaf8ff444552b08152a5d9cd25271b)
 
@@ -742,6 +784,7 @@ Add SARIF and JUnit output (fe04a752bdfeeadaf08c22bf3dfa36ad6334fc17)
 - add SARIF and JUnit output (b1b674ef96fa2d757e5376586496b7988dd6b004)
 
 - allow custom rules file (ee260411fca40d350d265477f993a195cb5dad49)
+## [0.1.11] - 2025-06-22
 
 - update changelog (67f7d2ea5e2eed122f41f527659e650f12f6614d)
 
