@@ -41,7 +41,7 @@ def test_detect_native_dependency_risks_handles_comments_and_extras() -> None:
 def test_native_dependency_risk_handler_skips_missing_requirements(tmp_path: Path) -> None:
     rule: Rule = {"type": "native_dependency_risk", "condition": {"file": "requirements.txt"}}
     result = generic_handler(rule, tmp_path)
-    assert result["status"] == "pass"
+    assert result["status"] == "skip"
 
 
 def test_native_dependency_risk_handler_passes_for_pure_python_requirements(tmp_path: Path) -> None:

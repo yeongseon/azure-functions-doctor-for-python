@@ -7,6 +7,7 @@ STATUS_ICONS: dict[str, str] = {  # nosec B105
     "pass": "✓",
     "warn": "!",
     "fail": "✗",
+    "skip": "–",
 }
 
 # Status to styled Text (for section headers)
@@ -14,6 +15,7 @@ STATUS_STYLES: dict[str, Style] = {
     "pass": Style(color="green", bold=True),
     "fail": Style(color="red", bold=True),
     "warn": Style(color="yellow", bold=True),
+    "skip": Style(color="bright_black", bold=True),
 }
 
 # Status to plain color strings (for result details)
@@ -21,6 +23,7 @@ DETAIL_COLOR_MAP: dict[str, str] = {  # nosec B105
     "pass": "green",
     "fail": "red",
     "warn": "yellow",
+    "skip": "bright_black",
 }
 
 
@@ -29,7 +32,7 @@ def format_status_icon(status: str) -> str:
     Return a simple icon character based on status.
 
     Args:
-        status: Diagnostic status ("pass", "fail", "warn").
+        status: Diagnostic status ("pass", "fail", "warn", "skip").
 
     Returns:
     A string icon such as ✓, !, or ✗.
@@ -42,7 +45,7 @@ def format_result(status: str) -> Text:
     Return a styled icon Text element based on status.
 
     Args:
-        status: Diagnostic status ("pass", "fail", "warn").
+        status: Diagnostic status ("pass", "fail", "warn", "skip").
 
     Returns:
         A Rich Text object with icon and style for headers.
@@ -57,7 +60,7 @@ def format_detail(status: str, value: str) -> Text:
     Return a colored Text element based on status and value.
 
     Args:
-        status: Diagnostic status ("pass", "fail", "warn").
+        status: Diagnostic status ("pass", "fail", "warn", "skip").
         value: Text to display, typically a description.
 
     Returns:

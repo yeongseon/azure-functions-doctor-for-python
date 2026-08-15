@@ -38,7 +38,7 @@ def test_rule_typed_literal_includes_package_declared() -> None:
 
 
 def test_summary_json_writes_counts_file(tmp_path: Path) -> None:
-    """Issue #95: --summary-json writes passed/warned/failed keys."""
+    """Issue #95: --summary-json writes passed/warned/failed/skipped keys."""
     runner = CliRunner()
     summary_path = tmp_path / "summary.json"
 
@@ -50,7 +50,7 @@ def test_summary_json_writes_counts_file(tmp_path: Path) -> None:
     assert result.exit_code in (0, 1)
     assert summary_path.exists()
     payload = json.loads(summary_path.read_text(encoding="utf-8"))
-    assert set(payload.keys()) == {"passed", "warned", "failed"}
+    assert set(payload.keys()) == {"passed", "warned", "failed", "skipped"}
 
 
 def test_summary_json_sidecar_created_with_json_format(tmp_path: Path) -> None:

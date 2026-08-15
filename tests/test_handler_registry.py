@@ -894,7 +894,7 @@ def test_local_settings_security_no_file() -> None:
             "condition": {},
         }
         result = registry.handle(rule, tmp_path)
-        assert result["status"] == "pass"
+        assert result["status"] == "skip"
         assert "not present" in result["detail"]
 
 
@@ -1548,7 +1548,7 @@ def test_conditional_exists_no_durable_detected() -> None:
             },
         }
         result = registry.handle(rule, tmp_path)
-        assert result["status"] == "pass"
+        assert result["status"] == "skip"
         assert "No Durable Functions" in result["detail"]
 
 

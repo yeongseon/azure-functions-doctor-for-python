@@ -189,6 +189,7 @@ def doctor(
     passed_count = 0
     warning_count = 0  # explicit 'warn' statuses
     fail_count = 0  # explicit 'fail' statuses
+    skipped_count = 0  # explicit 'skip' statuses (check not applicable / prerequisite absent)
     for section in results:
         for item in section["items"]:
             s = item.get("status")
@@ -198,6 +199,8 @@ def doctor(
                 warning_count += 1
             elif s == "fail":
                 fail_count += 1
+            elif s == "skip":
+                skipped_count += 1
             else:
                 warning_count += 1  # unknown treated as warning
 
@@ -207,6 +210,7 @@ def doctor(
             "passed": passed_count,
             "warned": warning_count,
             "failed": fail_count,
+            "skipped": skipped_count,
         }
         try:
             summary_json.parent.mkdir(parents=True, exist_ok=True)
@@ -256,7 +260,9 @@ def doctor(
         for section in results:
             for item in section["items"]:
                 status = item.get("status")
-                if status == "pass":
+                # Skipped checks are not findings; exclude them from SARIF output.
+                if status in ("pass", "skip"):
+                    continue
                     continue
                 label = item.get("label", "")
                 matched_rule = label_to_rule.get(label)
@@ -328,7 +334,7 @@ def doctor(
                     failures += 1
                     failure = ET.SubElement(case, "failure", message=item.get("value", ""))
                     failure.text = item.get("hint", "")
-                elif status == "warn":
+                elif status in ("warn", "skip"):
                     skipped += 1
                     skipped_el = ET.SubElement(case, "skipped", message=item.get("value", ""))
                     skipped_el.text = item.get("hint", "")
@@ -391,6 +397,8 @@ def doctor(
     f_label = "fail" if fail_count == 1 else "fails"
     # 'passed' label remains same for singular/plural in current design
     console.print(f"  {fail_count} {f_label}, {warning_count} {w_label}, {passed_count} passed")
+    if skipped_count:
+        console.print(f"  {skipped_count} skipped")
     exit_code = 1 if fail_count > 0 else 0
     console.print(f"Exit code: {exit_code}")
     if exit_code != 0:

@@ -310,7 +310,7 @@ def test_conditional_exists_no_durable_usage_pass() -> None:
             "condition": {"jsonpath": "$.extensions.durableTask"},
         }
         result = generic_handler(rule, Path(tmpdir))
-        assert result["status"] == "pass"
+        assert result["status"] == "skip"
 
 
 def test_conditional_exists_durable_missing_host_fail() -> None:
@@ -501,7 +501,7 @@ def test_local_settings_security_not_present(tmp_path: Path) -> None:
     """Test local_settings_security passes when local.settings.json does not exist."""
     rule = _make_rule("local_settings_security", {})
     res = generic_handler(rule, tmp_path)
-    assert res["status"] == "pass"
+    assert res["status"] == "skip"
     assert "not present" in res.get("detail", "").lower()
 
 
@@ -562,7 +562,7 @@ def test_local_settings_security_git_not_available(
     monkeypatch.setattr(_subprocess, "run", fake_run)
     rule = _make_rule("local_settings_security", {})
     res = generic_handler(rule, tmp_path)
-    assert res["status"] == "pass"
+    assert res["status"] == "skip"
     assert "skipped" in res.get("detail", "").lower()
 
 
