@@ -22,7 +22,7 @@ from azure_functions_doctor.handlers._helpers import (
     _collect_inverted_decorator_order,
     _collect_openapi_version_mixing,
     _collect_orchestrator_nondeterminism,
-    _collect_routes_missing_validate_http,
+    _collect_routes_missing_validate_http_locations,
     _collect_scan_before_spec,
     _collect_unregistered_blueprint_aliases,
     _collect_unsupported_metadata_versions,
@@ -194,11 +194,12 @@ class HandlerRegistry:
         if not target:
             return _create_result("fail", "Missing file path")
         file_path = path / target
+        rel_target = target.replace("\\", "/")
         exists = file_path.is_file()
         detail = f"{file_path} {'exists' if exists else 'not found'}"
         if not exists and not rule.get("required", True):
             detail += " (optional)"
-        return _create_result("pass" if exists else "fail", detail)
+        return _create_result("pass" if exists else "fail", detail, file=rel_target)
 
     @_rule_handler
     def _handle_dependency_manifest(
@@ -744,18 +745,27 @@ class HandlerRegistry:
             return _create_result(
                 "skip", "azure-functions-validation not declared; endpoint metadata check skipped"
             )
-        uncovered = _collect_routes_missing_validate_http(path)
+        uncovered = _collect_routes_missing_validate_http_locations(path)
         if not uncovered:
             return _create_result("pass", "All route handlers expose endpoint metadata")
         detail = "\n".join(
             [
                 "Route handlers missing @validate_http (no endpoint metadata):",
-                *[f"- {fn}" for fn in uncovered[:10]],
+                *[f"- {label}" for label, _ln, _end, _col in uncovered[:10]],
                 "",
                 "Fix: add @validate_http so the route emits OpenAPI endpoint metadata.",
             ]
         )
-        return _create_result("fail", detail)
+        first_label, first_line, first_end_line, first_column = uncovered[0]
+        first_file = first_label.rsplit(":", 1)[0]
+        return _create_result(
+            "fail",
+            detail,
+            file=first_file,
+            line=first_line,
+            end_line=first_end_line,
+            column=first_column,
+        )
 
     @_rule_handler
     def _handle_openapi_version_mixing(

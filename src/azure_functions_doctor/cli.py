@@ -264,25 +264,43 @@ def doctor(
                 # Skipped checks are not findings; exclude them from SARIF output.
                 if status in ("pass", "skip"):
                     continue
-                    continue
                 label = item.get("label", "")
                 matched_rule = label_to_rule.get(label)
                 rule_id = matched_rule.get("id", label) if matched_rule else label
                 level = "error" if status == "fail" else "warning"
+                loc_file = item.get("file")
+                if loc_file:
+                    artifact_uri = str(loc_file).replace("\\", "/")
+                    if artifact_uri.startswith("./"):
+                        artifact_uri = artifact_uri[2:]
+                    physical_location: dict[str, object] = {
+                        "artifactLocation": {
+                            "uri": artifact_uri,
+                            "uriBaseId": "%SRCROOT%",
+                        }
+                    }
+                    loc_line = item.get("line")
+                    if isinstance(loc_line, int) and loc_line > 0:
+                        region: dict[str, object] = {"startLine": loc_line}
+                        loc_end_line = item.get("end_line")
+                        if isinstance(loc_end_line, int) and loc_end_line > 0:
+                            region["endLine"] = loc_end_line
+                        loc_column = item.get("column")
+                        if isinstance(loc_column, int) and loc_column > 0:
+                            region["startColumn"] = loc_column
+                        physical_location["region"] = region
+                else:
+                    physical_location = {
+                        "artifactLocation": {
+                            "uri": path.replace("\\", "/").rstrip("/") + "/",
+                            "uriBaseId": "%SRCROOT%",
+                        }
+                    }
                 sarif_result: dict[str, object] = {
                     "ruleId": rule_id,
                     "message": {"text": item.get("value", "")},
                     "level": level,
-                    "locations": [
-                        {
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": path.replace("\\", "/").rstrip("/") + "/",
-                                    "uriBaseId": "%SRCROOT%",
-                                }
-                            }
-                        }
-                    ],
+                    "locations": [{"physicalLocation": physical_location}],
                 }
                 if item.get("hint"):
                     sarif_result["properties"] = {"hint": item.get("hint", "")}
