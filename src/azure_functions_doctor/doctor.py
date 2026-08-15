@@ -280,15 +280,18 @@ class Doctor:
                 )
 
                 # Simplified canonical mapping:
-                # pass stays pass, otherwise required -> fail and optional -> warn.
+                # pass stays pass, skip stays skip (regardless of required),
+                # otherwise required -> fail and optional -> warn.
                 required = rule.get("required", True)
                 if handler_status == "pass":
                     canonical = "pass"
+                elif handler_status == "skip":
+                    canonical = "skip"
                 else:
                     canonical = "fail" if required else "warn"
 
                 detail = result.get("detail", "")
-                if canonical != "pass" and not required:
+                if canonical == "warn":
                     detail += " (optional)"
 
                 item: CheckResult = {

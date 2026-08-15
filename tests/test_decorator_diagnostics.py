@@ -45,7 +45,7 @@ def test_endpoint_metadata_missing_warns() -> None:
 
 def test_endpoint_metadata_no_dep_passes() -> None:
     item_map = _item_status_by_label(FIXTURES_DIR / "endpoint_metadata_no_dep")
-    assert item_map["Endpoint metadata coverage"] == "pass"
+    assert item_map["Endpoint metadata coverage"] == "skip"
 
 
 # ---------------------------------------------------------------------------

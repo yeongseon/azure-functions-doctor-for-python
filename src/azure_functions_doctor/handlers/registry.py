@@ -353,7 +353,7 @@ class HandlerRegistry:
         req_file = str(req_file_obj)
         req_path = path / Path(req_file)
         if not req_path.exists():
-            return _create_result("pass", f"{req_file} not found; check skipped")
+            return _create_result("skip", f"{req_file} not found; check skipped")
         try:
             content = req_path.read_text(encoding="utf-8")
         except Exception as exc:
@@ -401,7 +401,7 @@ class HandlerRegistry:
             return _handle_specific_exceptions("scanning for durable usage", exc)
 
         if not uses_durable:
-            return _create_result("pass", "No Durable Functions usage detected; check skipped")
+            return _create_result("skip", "No Durable Functions usage detected; check skipped")
 
         condition = rule.get("condition", {}) or {}
         jsonpath = condition.get("jsonpath")
@@ -590,7 +590,7 @@ class HandlerRegistry:
 
         settings_path = path / "local.settings.json"
         if not settings_path.exists():
-            return _create_result("pass", "local.settings.json not present; check skipped")
+            return _create_result("skip", "local.settings.json not present; check skipped")
 
         # Check if the file is tracked by git
         try:
@@ -603,7 +603,7 @@ class HandlerRegistry:
         except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
             # git not available or not a git repo — skip check
             return _create_result(
-                "pass",
+                "skip",
                 "git not available; local.settings.json git-tracking check skipped",
             )
 
@@ -736,7 +736,7 @@ class HandlerRegistry:
         """Warn when route handlers lack @validate_http in a validation-enabled project."""
         if not _project_declares_validation_dep(path):
             return _create_result(
-                "pass", "azure-functions-validation not declared; endpoint metadata check skipped"
+                "skip", "azure-functions-validation not declared; endpoint metadata check skipped"
             )
         uncovered = _collect_routes_missing_validate_http(path)
         if not uncovered:
@@ -820,7 +820,7 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Detect when a LangGraph project exposes routes with anonymous auth."""
         if not _project_imports_langgraph(path):
-            return _create_result("pass", "langgraph not imported; anonymous auth check skipped")
+            return _create_result("skip", "langgraph not imported; anonymous auth check skipped")
         condition = rule.get("condition", {}) or {}
         flag_missing = bool(condition.get("flag_missing_auth_level", False))
         flagged = _collect_anonymous_auth_routes(path, flag_missing)
@@ -897,7 +897,7 @@ class HandlerRegistry:
         supported = list(condition.get("supported_versions") or [])
         if not supported:
             return _create_result(
-                "pass", "No supported_versions configured; metadata version check skipped"
+                "skip", "No supported_versions configured; metadata version check skipped"
             )
         found = _collect_unsupported_metadata_versions(path, files, fields, supported)
         if not found:
@@ -925,7 +925,7 @@ class HandlerRegistry:
         activations = _project_activates_trace_context(path)
         if not activations:
             return _create_result(
-                "pass", "No OTel trace-context activation requested; check skipped"
+                "skip", "No OTel trace-context activation requested; check skipped"
             )
         if _project_declares_opentelemetry(path):
             return _create_result(

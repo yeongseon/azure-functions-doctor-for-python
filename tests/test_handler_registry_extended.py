@@ -679,7 +679,7 @@ def test_local_settings_security_no_file() -> None:
             "condition": {},
         }
         result = registry.handle(rule, tmp_path)
-        assert result["status"] == "pass"
+        assert result["status"] == "skip"
         assert "not present" in result["detail"]
 
 

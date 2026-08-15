@@ -247,7 +247,7 @@ def test_langgraph_anonymous_auth_skipped_without_langgraph(tmp_path: Path) -> N
         "def handler(req):\n"
         "    return req\n",
     )
-    assert _status("langgraph_anonymous_auth", tmp_path) == "pass"
+    assert _status("langgraph_anonymous_auth", tmp_path) == "skip"
 
 
 def test_langgraph_anonymous_auth_flag_missing(tmp_path: Path) -> None:
@@ -367,7 +367,7 @@ def test_unsupported_metadata_version_supported_passes(tmp_path: Path) -> None:
 def test_unsupported_metadata_version_no_config_skipped(tmp_path: Path) -> None:
     _write(tmp_path, "host.json", '{"extensionBundle": {"version": "9.9"}}')
     # empty supported_versions -> check is skipped (pass)
-    assert _status("unsupported_metadata_version", tmp_path) == "pass"
+    assert _status("unsupported_metadata_version", tmp_path) == "skip"
 
 
 def test_unsupported_metadata_version_malformed_json_skipped(tmp_path: Path) -> None:
@@ -499,4 +499,4 @@ def test_otel_activation_with_dependency_passes(tmp_path: Path) -> None:
 
 def test_otel_activation_no_activation_passes(tmp_path: Path) -> None:
     _write(tmp_path, "a.py", "import os\n")
-    assert _status("otel_activation", tmp_path) == "pass"
+    assert _status("otel_activation", tmp_path) == "skip"
