@@ -474,8 +474,7 @@ def test_project_declares_opentelemetry_pyproject(tmp_path: Path) -> None:
     _write(
         tmp_path,
         "pyproject.toml",
-        '[project]\nname = "x"\nversion = "0"\n'
-        'dependencies = ["opentelemetry-sdk>=1.24"]\n',
+        '[project]\nname = "x"\nversion = "0"\ndependencies = ["opentelemetry-sdk>=1.24"]\n',
     )
     assert _project_declares_opentelemetry(tmp_path)
 

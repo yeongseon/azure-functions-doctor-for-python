@@ -48,7 +48,7 @@ from azure_functions_doctor.handlers._helpers import (
     pyproject_declares_dependencies,
     pyproject_dependency_names,
 )
-from azure_functions_doctor.target_resolver import resolve_target_value
+from azure_functions_doctor.target_resolver import resolve_python_target, resolve_target_value
 
 
 class HandlerRegistry:
@@ -90,7 +90,7 @@ class HandlerRegistry:
 
         if target == "python":
             target_python = context.get("target_python") if context is not None else None
-            current_version = resolve_target_value("python", override=target_python)
+            current_version, source = resolve_python_target(path, override=target_python)
             tool_runtime = (
                 f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
             )
@@ -103,11 +103,17 @@ class HandlerRegistry:
                 ">": current > expected,
                 "<": current < expected,
             }.get(operator, False)
-            detail = (
-                f"Target Python: {current_version} (override) — Tool runtime: {tool_runtime}"
-                if target_python is not None
-                else f"Python {current_version} (tool runtime, {operator}{value})"
-            )
+            if source == "override":
+                detail = (
+                    f"Target Python: {current_version} (override) — Tool runtime: {tool_runtime}"
+                )
+            elif source == "tool-runtime":
+                detail = f"Python {current_version} (tool runtime, {operator}{value})"
+            else:
+                detail = (
+                    f"Target Python: {current_version} ({source}, {operator}{value}) "
+                    f"— Tool runtime: {tool_runtime}"
+                )
             return _create_result(
                 "pass" if passed else "fail",
                 detail,
