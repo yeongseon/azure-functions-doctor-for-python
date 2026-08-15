@@ -317,7 +317,7 @@ def doctor(
         skipped = 0
         suite = ET.Element(
             "testsuite",
-            name="func-doctor",
+            name="azure-functions-doctor",
             tests="0",
             failures="0",
             skipped="0",

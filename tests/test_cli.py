@@ -103,7 +103,7 @@ def test_cli_junit_output() -> None:
     assert result.output.startswith("<?xml")
     root = ET.fromstring(result.output)
     assert root.tag == "testsuite"
-    assert root.attrib.get("name") == "func-doctor"
+    assert root.attrib.get("name") == "azure-functions-doctor"
     tests = int(root.attrib.get("tests", "0"))
     failures = int(root.attrib.get("failures", "0"))
     skipped = int(root.attrib.get("skipped", "0"))
