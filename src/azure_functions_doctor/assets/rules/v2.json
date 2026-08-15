@@ -66,7 +66,7 @@
         "UV_PROJECT_ENVIRONMENT"
       ]
     },
-    "hint": "Activate a virtual environment using: 'source venv/bin/activate'.",
+    "hint": "Create and activate a virtual environment (e.g. 'python -m venv .venv' then 'source .venv/bin/activate'). Both '.venv' and 'venv' directories are recognized and excluded from project scans.",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-best-practices?tabs=python#use-virtual-environments",
     "check_order": 2
   },

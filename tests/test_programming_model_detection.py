@@ -248,3 +248,49 @@ x = 1
                 ],
             }
         ]
+
+    def test_venv_function_json_does_not_trigger_v1_or_mixed(self) -> None:
+        """A function.json inside a virtualenv must not create false v1/mixed signals."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+
+            # Valid v2 project at the root.
+            (temp_path / "function_app.py").write_text(
+                """
+import azure.functions as func
+
+app = func.FunctionApp()
+
+@app.route(route=\"test\", auth_level=func.AuthLevel.Anonymous)
+def test_function(req: func.HttpRequest) -> func.HttpResponse:
+    return func.HttpResponse(\"Hello\")
+"""
+            )
+
+            # A stray legacy function.json vendored inside a non-dot ``venv`` dir.
+            venv_func = temp_path / "venv" / "lib" / "legacy"
+            venv_func.mkdir(parents=True)
+            (venv_func / "function.json").write_text('{"bindings": []}')
+
+            doctor = Doctor(str(temp_path))
+            # venv-hosted function.json must be ignored: no v1 signal, no mixed model.
+            assert doctor._has_v1_signals() is False
+            assert doctor.programming_model == "v2"
+
+    def test_excluded_dirs_cover_common_venv_and_cache_names(self) -> None:
+        """Guard the exclusion set against regressions for common vendor/cache dirs."""
+        from azure_functions_doctor.handlers._helpers import EXCLUDED_PROJECT_DIRS
+
+        expected = {
+            ".venv",
+            "venv",
+            "env",
+            "site-packages",
+            "node_modules",
+            ".tox",
+            ".nox",
+            ".mypy_cache",
+            ".ruff_cache",
+            ".git",
+        }
+        assert expected <= EXCLUDED_PROJECT_DIRS
