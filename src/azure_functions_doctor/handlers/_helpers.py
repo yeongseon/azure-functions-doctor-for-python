@@ -58,6 +58,10 @@ class HandlerResult(TypedDict, total=False):
     status: str
     detail: str
     internal_error: str
+    file: str
+    line: int
+    end_line: int
+    column: int
 
 
 class RuleContext(TypedDict, total=False):
@@ -352,16 +356,21 @@ def _is_spec_serving_handler(node: ast.FunctionDef | ast.AsyncFunctionDef) -> bo
     return False
 
 
-def _collect_routes_missing_validate_http(path: Path) -> list[str]:
-    """Return "file:function" labels for HTTP route handlers that lack an
+def _collect_routes_missing_validate_http_locations(
+    path: Path,
+) -> list[tuple[str, int, Optional[int], int]]:
+    """Return ``(label, lineno)`` pairs for HTTP route handlers that lack an
     *active* ``@validate_http`` and therefore emit no endpoint OpenAPI metadata.
+
+    ``label`` is ``"file:function"`` and ``lineno`` is the 1-based source line of
+    the offending function definition.
 
     ``@validate_http`` only covers a handler when it is applied *below* (inner to)
     the ``@app.route`` decorator. When it appears above the route decorator it
     wraps the SDK ``FunctionBuilder``, so validation and endpoint metadata are
     inactive even though the decorator name is present.
     """
-    uncovered: list[str] = []
+    uncovered: list[tuple[str, int, Optional[int], int]] = []
     for py_file, content in _iter_project_py_contents(path):
         try:
             tree = ast.parse(content)
@@ -393,8 +402,25 @@ def _collect_routes_missing_validate_http(path: Path) -> list[str]:
                 validate_idx is not None and route_idx is not None and validate_idx > route_idx
             )
             if is_route and not has_active_validate_http and not _is_spec_serving_handler(node):
-                uncovered.append(f"{py_file.relative_to(path)}:{node.name}")
+                uncovered.append(
+                    (
+                        f"{py_file.relative_to(path)}:{node.name}",
+                        node.lineno,
+                        node.end_lineno,
+                        node.col_offset + 1,
+                    )
+                )
     return uncovered
+
+
+def _collect_routes_missing_validate_http(path: Path) -> list[str]:
+    """Return "file:function" labels for HTTP route handlers that lack an
+    *active* ``@validate_http`` and therefore emit no endpoint OpenAPI metadata.
+
+    Thin string-only wrapper over
+    :func:`_collect_routes_missing_validate_http_locations`.
+    """
+    return [lbl for lbl, _ln, _end, _col in _collect_routes_missing_validate_http_locations(path)]
 
 
 def _dotted_call_name(func: ast.expr) -> Optional[str]:
@@ -905,11 +931,27 @@ def _detect_native_dependency_risks(content: str) -> list[tuple[str, str]]:
     return matches
 
 
-def _create_result(status: str, detail: str, internal_error: bool = False) -> HandlerResult:
+def _create_result(
+    status: str,
+    detail: str,
+    internal_error: bool = False,
+    file: Optional[str] = None,
+    line: Optional[int] = None,
+    end_line: Optional[int] = None,
+    column: Optional[int] = None,
+) -> HandlerResult:
     """Create a standardized result dictionary (status limited to 'pass'/'fail')."""
     res: HandlerResult = {"status": status, "detail": detail}
     if internal_error:
         res["internal_error"] = "true"
+    if file is not None:
+        res["file"] = file
+    if line is not None:
+        res["line"] = line
+    if end_line is not None:
+        res["end_line"] = end_line
+    if column is not None:
+        res["column"] = column
     return res
 
 

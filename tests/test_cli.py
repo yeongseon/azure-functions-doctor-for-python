@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import re
+from typing import Any
 from unittest.mock import Mock
 import xml.etree.ElementTree as ET
 
@@ -307,3 +308,74 @@ def test_fdoctor_alias_warns_and_delegates(
     err = capsys.readouterr().err
     assert "deprecated" in err
     assert "v1.0.0" in err
+
+
+def _write_sarif_location_fixture(root: Path) -> int:
+    """Create a v2 project that triggers a file-based failure (missing host.json)
+    and an AST-based failure (route missing an active @validate_http).
+
+    Returns the 1-based source line of the offending ``handler`` definition.
+    """
+    (root / "requirements.txt").write_text(
+        "azure-functions\nazure-functions-validation\n", encoding="utf-8"
+    )
+    # @validate_http placed ABOVE @app.route is inactive, so the route emits no
+    # endpoint metadata and is flagged by the endpoint_metadata rule.
+    source = (
+        "import azure.functions as func\n"
+        "\n"
+        "app = func.FunctionApp()\n"
+        "\n"
+        "\n"
+        "@validate_http\n"
+        "@app.route(route='x')\n"
+        "def handler(req):\n"
+        "    return req\n"
+    )
+    (root / "function_app.py").write_text(source, encoding="utf-8")
+    # 1-based line of `def handler` within the source above.
+    return source.splitlines().index("def handler(req):") + 1
+
+
+def test_cli_sarif_output_emits_per_file_and_per_line_locations(tmp_path: Path) -> None:
+    """SARIF results carry per-file locations for a file-based rule and per-line
+    locations (with region) for an AST-based rule."""
+    handler_line = _write_sarif_location_fixture(tmp_path)
+
+    result = runner.invoke(app, ["doctor", "--path", str(tmp_path), "--format", "sarif"])
+    data = json.loads(result.output)
+    sarif_results = data["runs"][0]["results"]
+
+    def _uri(res: Any) -> str:
+        return str(res["locations"][0]["physicalLocation"]["artifactLocation"]["uri"])
+
+    # File-based rule: missing host.json is reported against the offending file.
+    host_json_results = [r for r in sarif_results if _uri(r) == "host.json"]
+    assert host_json_results, "expected a SARIF result located at host.json"
+    assert "region" not in host_json_results[0]["locations"][0]["physicalLocation"]
+
+    # AST-based rule: the flagged route carries a per-line region.
+    ast_results = [r for r in sarif_results if _uri(r) == "function_app.py"]
+    assert ast_results, "expected a SARIF result located at function_app.py"
+    region = next(
+        r["locations"][0]["physicalLocation"]["region"]
+        for r in ast_results
+        if "region" in r["locations"][0]["physicalLocation"]
+    )
+    assert region["startLine"] == handler_line
+    assert region["endLine"] >= region["startLine"]
+    assert region["startColumn"] >= 1
+
+
+def test_create_result_populates_optional_location_fields() -> None:
+    """_create_result threads optional file/line/end_line/column when provided."""
+    from azure_functions_doctor.handlers._helpers import _create_result
+
+    res = _create_result("fail", "detail", file="function_app.py", line=8, end_line=9, column=1)
+    assert res["file"] == "function_app.py"
+    assert res["line"] == 8
+    assert res["end_line"] == 9
+    assert res["column"] == 1
+
+    bare = _create_result("pass", "ok")
+    assert "file" not in bare and "line" not in bare

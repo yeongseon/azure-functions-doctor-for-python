@@ -30,6 +30,10 @@ class CheckResult(TypedDict, total=False):
     status: str
     hint: str
     hint_url: str
+    file: str
+    line: int
+    end_line: int
+    column: int
 
 
 class SectionResult(TypedDict):
@@ -308,6 +312,15 @@ class Doctor:
 
                 if "hint_url" in rule and rule["hint_url"]:
                     item["hint_url"] = rule["hint_url"]
+
+                if "file" in result:
+                    item["file"] = result["file"]
+                if "line" in result:
+                    item["line"] = result["line"]
+                if "end_line" in result:
+                    item["end_line"] = result["end_line"]
+                if "column" in result:
+                    item["column"] = result["column"]
 
                 section_result["items"].append(item)
 
