@@ -1,3 +1,4 @@
+from pathlib import Path
 import subprocess
 import sys
 from typing import Optional
@@ -81,3 +82,57 @@ def test_resolve_func_core_tools_called_process_error(monkeypatch: pytest.Monkey
     monkeypatch.setattr(subprocess, "check_output", mock_check_output)
     result = target_resolver.resolve_target_value("func_core_tools")
     assert result == "error_2"
+
+
+def test_resolve_python_target_override_short_circuits(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nrequires-python = ">=3.10"\n', encoding="utf-8"
+    )
+    version, source = target_resolver.resolve_python_target(tmp_path, override="3.12")
+    assert (version, source) == ("3.12", "override")
+
+
+def test_resolve_python_target_from_pyproject_floor(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "x"\nrequires-python = ">=3.11,<3.15"\n', encoding="utf-8"
+    )
+    version, source = target_resolver.resolve_python_target(tmp_path)
+    assert (version, source) == ("3.11", "pyproject:requires-python")
+
+
+def test_resolve_python_target_from_python_version_file(tmp_path: Path) -> None:
+    (tmp_path / ".python-version").write_text("3.12.4\n", encoding="utf-8")
+    version, source = target_resolver.resolve_python_target(tmp_path)
+    assert (version, source) == ("3.12.4", ".python-version")
+
+
+def test_resolve_python_target_pyproject_precedes_python_version(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nrequires-python = ">=3.10"\n', encoding="utf-8"
+    )
+    (tmp_path / ".python-version").write_text("3.13\n", encoding="utf-8")
+    version, source = target_resolver.resolve_python_target(tmp_path)
+    assert (version, source) == ("3.10", "pyproject:requires-python")
+
+
+def test_resolve_python_target_pyproject_without_requires_python(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "x"\n', encoding="utf-8")
+    (tmp_path / ".python-version").write_text("3.13\n", encoding="utf-8")
+    version, source = target_resolver.resolve_python_target(tmp_path)
+    assert (version, source) == ("3.13", ".python-version")
+
+
+def test_resolve_python_target_ignores_unparseable_python_version(tmp_path: Path) -> None:
+    (tmp_path / ".python-version").write_text("not-a-version\n", encoding="utf-8")
+    version, source = target_resolver.resolve_python_target(tmp_path)
+    assert (version, source) == (sys.version.split()[0], "tool-runtime")
+
+
+def test_resolve_python_target_falls_back_to_tool_runtime(tmp_path: Path) -> None:
+    version, source = target_resolver.resolve_python_target(tmp_path)
+    assert (version, source) == (sys.version.split()[0], "tool-runtime")
+
+
+def test_resolve_python_target_no_project_path(tmp_path: Path) -> None:
+    version, source = target_resolver.resolve_python_target(None)
+    assert (version, source) == (sys.version.split()[0], "tool-runtime")

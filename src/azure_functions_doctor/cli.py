@@ -17,6 +17,7 @@ from azure_functions_doctor.logging_config import (
     log_diagnostic_start,
     setup_logging,
 )
+from azure_functions_doctor.target_resolver import resolve_python_target
 from azure_functions_doctor.utils import format_detail, format_status_icon
 
 cli = typer.Typer()
@@ -356,6 +357,10 @@ def doctor(
     console.print(f"Path: {resolved_path}")
     if target_python is not None:
         console.print(f"Target Python: {target_python} (override)")
+    else:
+        resolved_target, target_source = resolve_python_target(resolved_path)
+        if target_source != "tool-runtime":
+            console.print(f"Target Python: {resolved_target} ({target_source})")
 
     # Print each section with simple title and items
     for section in results:

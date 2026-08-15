@@ -47,7 +47,7 @@ def test_handler_registry_unknown_type() -> None:
     assert "Unknown check type" in result["detail"]
 
 
-def test_handler_registry_compare_version() -> None:
+def test_handler_registry_compare_version(tmp_path: Path) -> None:
     """Test version comparison through registry."""
     registry = HandlerRegistry()
 
@@ -61,7 +61,7 @@ def test_handler_registry_compare_version() -> None:
         },
     }
 
-    result = registry.handle(rule, Path("."))
+    result = registry.handle(rule, tmp_path)
 
     assert result["status"] == "pass"
     # Detail now clarifies that the local interpreter is the tool runtime.
@@ -1710,7 +1710,7 @@ def test_compare_version_python_fail() -> None:
     assert result["status"] == "fail"
 
 
-def test_compare_version_python_equal() -> None:
+def test_compare_version_python_equal(tmp_path: Path) -> None:
     """Test _handle_compare_version with Python version == operator."""
     registry = HandlerRegistry()
     rule: Rule = {
@@ -1722,7 +1722,7 @@ def test_compare_version_python_equal() -> None:
             "value": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
         },
     }
-    result = registry.handle(rule, Path("."))
+    result = registry.handle(rule, tmp_path)
     assert result["status"] == "pass"
 
 

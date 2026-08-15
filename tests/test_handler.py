@@ -19,7 +19,7 @@ from azure_functions_doctor.handlers import (
 )
 
 
-def test_compare_python_version_pass() -> None:
+def test_compare_python_version_pass(tmp_path: Path) -> None:
     """Test that the Python version check passes for the current version."""
     rule: Rule = {
         "type": "compare_version",
@@ -29,7 +29,7 @@ def test_compare_python_version_pass() -> None:
             "value": f"{sys.version_info.major}.{sys.version_info.minor}",
         },
     }
-    result = generic_handler(rule, Path("."))
+    result = generic_handler(rule, tmp_path)
     assert result["status"] == "pass"
     assert "tool runtime" in result["detail"]
 
@@ -76,6 +76,25 @@ def test_compare_python_version_override_fail() -> None:
     result = generic_handler(rule, Path("."), {"target_python": "3.10"})
     assert result["status"] == "fail"
     assert "Tool runtime:" in result["detail"]
+
+
+def test_compare_python_version_uses_pyproject_target(tmp_path: Path) -> None:
+    """A project's requires-python floor drives the comparison, not the runtime."""
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nrequires-python = ">=3.11"\n', encoding="utf-8"
+    )
+    rule: Rule = {
+        "type": "compare_version",
+        "condition": {
+            "target": "python",
+            "operator": ">=",
+            "value": "3.12",
+        },
+    }
+    result = generic_handler(rule, tmp_path)
+    assert result["status"] == "fail"
+    assert "pyproject:requires-python" in result["detail"]
+    assert "Target Python: 3.11" in result["detail"]
 
 
 def test_compare_func_core_tools_version_pass(monkeypatch: MonkeyPatch) -> None:
