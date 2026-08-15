@@ -28,7 +28,30 @@ from azure_functions_doctor.logging_config import get_logger
 
 logger = get_logger(__name__)
 
-EXCLUDED_PROJECT_DIRS = {".venv", "node_modules", "build", "dist", ".pytest_cache", "__pycache__"}
+EXCLUDED_PROJECT_DIRS = {
+    # Python virtual environments
+    ".venv",
+    "venv",
+    "env",
+    ".env",
+    # Installed packages / vendored dependencies
+    "site-packages",
+    "node_modules",
+    # Build / packaging output
+    "build",
+    "dist",
+    # Tooling caches
+    ".pytest_cache",
+    "__pycache__",
+    ".tox",
+    ".nox",
+    ".mypy_cache",
+    ".ruff_cache",
+    # Version control metadata
+    ".git",
+    ".hg",
+    ".svn",
+}
 
 
 class HandlerResult(TypedDict, total=False):
