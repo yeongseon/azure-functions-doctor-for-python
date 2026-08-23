@@ -23,12 +23,17 @@ def _write(path: Path, name: str, content: str) -> None:
     (path / name).write_text(content, encoding="utf-8")
 
 
-def _status(rule_type: str, path: Path, condition: dict[str, Any] | None = None) -> str:
+def _status(
+    rule_type: str,
+    path: Path,
+    condition: dict[str, Any] | None = None,
+    context: dict[str, Any] | None = None,
+) -> str:
     rule = cast(
         Rule,
         {"type": rule_type, "required": True, "condition": condition or {}},
     )
-    return registry.handle(rule, path)["status"]
+    return registry.handle(rule, path, cast(Any, context))["status"]
 
 
 _PYPROJECT_WITH_DEPS = """\
@@ -105,8 +110,29 @@ def test_dependency_manifest_pass_with_requirements(tmp_path: Path) -> None:
     assert _status("dependency_manifest", tmp_path) == "pass"
 
 
-def test_dependency_manifest_pass_with_pyproject_only(tmp_path: Path) -> None:
+def test_dependency_manifest_fail_pyproject_only_remote_build(tmp_path: Path) -> None:
+    """Under the default remote build, pyproject-only is flagged (no requirements.txt)."""
     _write(tmp_path, "pyproject.toml", _PYPROJECT_WITH_DEPS)
+    assert _status("dependency_manifest", tmp_path) == "fail"
+
+
+def test_dependency_manifest_pass_pyproject_only_local_mode(tmp_path: Path) -> None:
+    """A declared local/prebuilt deployment accepts pyproject-only."""
+    _write(tmp_path, "pyproject.toml", _PYPROJECT_WITH_DEPS)
+    assert (
+        _status(
+            "dependency_manifest",
+            tmp_path,
+            context={"deployment_mode": "local"},
+        )
+        == "pass"
+    )
+
+
+def test_dependency_manifest_pass_pyproject_only_vendored_packages(tmp_path: Path) -> None:
+    """Vendored .python_packages implies a prebuilt deployment."""
+    _write(tmp_path, "pyproject.toml", _PYPROJECT_WITH_DEPS)
+    (tmp_path / ".python_packages").mkdir()
     assert _status("dependency_manifest", tmp_path) == "pass"
 
 
@@ -141,17 +167,46 @@ def test_package_declared_requirements_still_wins(tmp_path: Path) -> None:
     assert _status("package_declared", tmp_path, _PKG_CONDITION) == "pass"
 
 
-def test_package_declared_pyproject_fallback_no_requirements(tmp_path: Path) -> None:
+def test_package_declared_pyproject_only_fail_remote_build(tmp_path: Path) -> None:
     _write(tmp_path, "pyproject.toml", _PYPROJECT_WITH_DEPS)
-    assert _status("package_declared", tmp_path, _PKG_CONDITION) == "pass"
+    assert _status("package_declared", tmp_path, _PKG_CONDITION) == "fail"
 
 
-def test_package_declared_pyproject_fallback_when_requirements_lacks_it(
+def test_package_declared_pyproject_only_pass_local_mode(tmp_path: Path) -> None:
+    _write(tmp_path, "pyproject.toml", _PYPROJECT_WITH_DEPS)
+    assert (
+        _status(
+            "package_declared",
+            tmp_path,
+            _PKG_CONDITION,
+            context={"deployment_mode": "local"},
+        )
+        == "pass"
+    )
+
+
+def test_package_declared_requirements_lacks_it_fail_remote_build(
     tmp_path: Path,
 ) -> None:
     _write(tmp_path, "requirements.txt", "rich\n")
     _write(tmp_path, "pyproject.toml", _PYPROJECT_WITH_DEPS)
-    assert _status("package_declared", tmp_path, _PKG_CONDITION) == "pass"
+    assert _status("package_declared", tmp_path, _PKG_CONDITION) == "fail"
+
+
+def test_package_declared_requirements_lacks_it_pass_local_mode(
+    tmp_path: Path,
+) -> None:
+    _write(tmp_path, "requirements.txt", "rich\n")
+    _write(tmp_path, "pyproject.toml", _PYPROJECT_WITH_DEPS)
+    assert (
+        _status(
+            "package_declared",
+            tmp_path,
+            _PKG_CONDITION,
+            context={"deployment_mode": "local"},
+        )
+        == "pass"
+    )
 
 
 def test_package_declared_fail_when_missing_everywhere(tmp_path: Path) -> None:

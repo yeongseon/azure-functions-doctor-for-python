@@ -67,6 +67,7 @@ azure-functions-doctor doctor --target-python 3.12
 | `--profile` | enum | `full` behavior | Rule profile: `minimal` or `full`. |
 | `--rules` | path | unset | Custom rules file path. |
 | `--target-python` | string | unset | Override the Azure Functions target Python runtime: `3.10`, `3.11`, `3.12`, `3.13`, `3.14` (Preview). On the Linux Consumption plan, the maximum supported version is `3.12`. |
+| `--deployment-mode` | enum | `remote-build` | Deployment mode for dependency checks: `remote-build` (Azure installs from `requirements.txt`) or `local` (dependencies prebuilt/vendored locally, e.g. `.python_packages`). |
 
 !!! note
     Supported output formats are currently `table`, `json`, `sarif`, and `junit`.
@@ -115,7 +116,7 @@ azure-functions-doctor doctor --format json --output doctor.json
 
 JSON includes:
 
-- `metadata` (`tool_version`, `generated_at`, `target_path`, `programming_model`, `target_python`)
+- `metadata` (`tool_version`, `generated_at`, `target_path`, `programming_model`, `target_python`, `deployment_mode`)
 - `results` (section + item diagnostics)
 
 Contract details: [JSON Output Contract](json_output_contract.md)

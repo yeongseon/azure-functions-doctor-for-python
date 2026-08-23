@@ -197,6 +197,32 @@ def test_cli_target_python_invalid_value() -> None:
         assert version in result.output
 
 
+def test_cli_invalid_deployment_mode() -> None:
+    """Unsupported deployment modes fail with the supported values listed."""
+    result = runner.invoke(app, ["doctor", "--deployment-mode", "bogus"])
+    assert result.exit_code != 0
+    assert "Invalid deployment mode: bogus" in result.output
+    assert "remote-build" in result.output
+    assert "local" in result.output
+
+
+def test_cli_deployment_mode_local_end_to_end() -> None:
+    """A local deployment mode is accepted and recorded in JSON metadata."""
+    result = runner.invoke(
+        app,
+        [
+            "doctor",
+            "--path",
+            V2_FIXTURE_PATH,
+            "--format",
+            "json",
+            "--deployment-mode",
+            "local",
+        ],
+    )
+    data = json.loads(result.output)
+    assert data["metadata"]["deployment_mode"] == "local"
+
 def test_cli_json_output_includes_target_python_override() -> None:
     """Test JSON metadata includes target_python override."""
     result = runner.invoke(
@@ -234,6 +260,7 @@ def test_cli_sarif_output_includes_target_python_override() -> None:
     assert data["runs"][0]["properties"] == {
         "programming_model": "v2",
         "target_python": "3.11",
+        "deployment_mode": "remote-build",
     }
 
 

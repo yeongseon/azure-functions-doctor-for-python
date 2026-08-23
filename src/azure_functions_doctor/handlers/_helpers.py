@@ -66,6 +66,7 @@ class HandlerResult(TypedDict, total=False):
 
 class RuleContext(TypedDict, total=False):
     target_python: Optional[str]
+    deployment_mode: Optional[str]
 
 
 # Platform-aware candidates for executables (for symmetric fallback)
@@ -888,6 +889,19 @@ def pyproject_declares_dependencies(path: Path) -> bool:
     """
     return bool(pyproject_dependency_names(path))
 
+
+def is_local_prebuilt_deployment(path: Path, context: Optional["RuleContext"] = None) -> bool:
+    """Return True when the project targets a local/prebuilt deployment.
+
+    Azure Functions performs a *remote build* by default, installing
+    dependencies from ``requirements.txt`` on the server. A local/prebuilt
+    deployment is assumed when the caller explicitly selects
+    ``deployment_mode='local'`` or when dependencies are vendored into a
+    ``.python_packages`` directory (as produced by a local/prebuilt build).
+    """
+    if context is not None and context.get("deployment_mode") == "local":
+        return True
+    return (path / ".python_packages").is_dir()
 
 def _detect_native_dependency_risks(content: str) -> list[tuple[str, str]]:
     """Return matching native-dependency packages in requirements order."""
