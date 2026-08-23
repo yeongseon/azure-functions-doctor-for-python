@@ -336,7 +336,7 @@ Found unwanted files: ['tests/', '.venv']
 
 ## 22) `check_extension_bundle_v4`
 
-- **What it checks:** `extensionBundle` in `host.json` uses the recommended v4 range `[4.*, 5.0.0)`.
+- **What it checks:** `extensionBundle` in `host.json` uses a documented v4 range. The range is parsed as an interval (not a string prefix): the lower bound must be an inclusive major 4 (`[4.0.0` or `[4.*`) and the upper bound must be an exclusive `5.0.0)`. Over-broad ranges such as `[4.0.0, 6.0.0)` are rejected. The bundle id must be `Microsoft.Azure.Functions.ExtensionBundle`.
 - **Why it matters:** Aligns binding extensions with the current supported bundle.
 - **How to fix:** Update the `extensionBundle.version` range to the v4 range.
 - **Severity:** Warning only (`required: false`).

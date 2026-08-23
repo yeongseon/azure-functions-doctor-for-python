@@ -879,7 +879,71 @@ def test_host_json_extension_bundle_v4_success() -> None:
         }
         result = registry.handle(rule, tmp_path)
         assert result["status"] == "pass"
-        assert "v4" in result["detail"]
+
+
+def _bundle_host(version: str) -> str:
+    return (
+        '{"extensionBundle": {"id": "Microsoft.Azure.Functions.ExtensionBundle",'
+        f' "version": "{version}"}}}}'
+    )
+
+
+def test_extension_bundle_v4_wildcard_passes() -> None:
+    """[4.*, 5.0.0) is a documented v4 range and should pass."""
+    registry = HandlerRegistry()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        (tmp_path / "host.json").write_text(_bundle_host("[4.*, 5.0.0)"))
+        rule: Rule = {"type": "host_json_extension_bundle_version", "condition": {}}
+        result = registry.handle(rule, tmp_path)
+        assert result["status"] == "pass"
+
+
+def test_extension_bundle_overbroad_upper_fails() -> None:
+    """[4.0.0, 6.0.0) is over-broad (wrong upper bound) and must fail."""
+    registry = HandlerRegistry()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        (tmp_path / "host.json").write_text(_bundle_host("[4.0.0, 6.0.0)"))
+        rule: Rule = {"type": "host_json_extension_bundle_version", "condition": {}}
+        result = registry.handle(rule, tmp_path)
+        assert result["status"] == "fail"
+        assert "does not match" in result["detail"]
+
+def test_extension_bundle_nonzero_upper_minor_fails() -> None:
+    """[4.0.0, 5.1.0) widens past the exclusive 5.0.0 bound and must fail."""
+    registry = HandlerRegistry()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        (tmp_path / "host.json").write_text(_bundle_host("[4.0.0, 5.1.0)"))
+        rule: Rule = {"type": "host_json_extension_bundle_version", "condition": {}}
+        result = registry.handle(rule, tmp_path)
+        assert result["status"] == "fail"
+        assert "does not match" in result["detail"]
+
+
+def test_extension_bundle_inclusive_upper_fails() -> None:
+    """[4.0.0, 5.0.0] with an inclusive upper bound must fail."""
+    registry = HandlerRegistry()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        (tmp_path / "host.json").write_text(_bundle_host("[4.0.0, 5.0.0]"))
+        rule: Rule = {"type": "host_json_extension_bundle_version", "condition": {}}
+        result = registry.handle(rule, tmp_path)
+        assert result["status"] == "fail"
+
+
+def test_extension_bundle_malformed_range_fails() -> None:
+    """A non-range version string must fail as invalid."""
+    registry = HandlerRegistry()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        (tmp_path / "host.json").write_text(_bundle_host("4.0.0"))
+        rule: Rule = {"type": "host_json_extension_bundle_version", "condition": {}}
+        result = registry.handle(rule, tmp_path)
+        assert result["status"] == "fail"
+        assert "not a valid range" in result["detail"]
+
 
 
 def test_local_settings_security_no_file() -> None:
