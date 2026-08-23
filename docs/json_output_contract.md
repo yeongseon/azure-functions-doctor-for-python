@@ -33,7 +33,7 @@ If `--output` is omitted, JSON is printed to stdout.
           "label": "Python version",
           "value": "Python 3.9.18 (>=3.10)",
           "status": "fail",
-          "hint": "Use Python 3.10 or higher to match Azure Functions Doctor support.",
+          "hint": "Target a Python version supported by Azure Functions: 3.10, 3.11, 3.12, 3.13, or 3.14.",
           "hint_url": "https://learn.microsoft.com/..."
         }
       ]

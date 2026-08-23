@@ -17,14 +17,17 @@ from azure_functions_doctor.logging_config import (
     log_diagnostic_start,
     setup_logging,
 )
-from azure_functions_doctor.target_resolver import resolve_python_target
+from azure_functions_doctor.target_resolver import (
+    SUPPORTED_PYTHON_VERSIONS,
+    resolve_python_target,
+)
 from azure_functions_doctor.utils import format_detail, format_status_icon
 
 cli = typer.Typer()
 console = Console()
 logger = get_logger(__name__)
 
-SUPPORTED_TARGET_PYTHON_VERSIONS = ("3.10", "3.11", "3.12", "3.13", "3.14")
+SUPPORTED_TARGET_PYTHON_VERSIONS = SUPPORTED_PYTHON_VERSIONS
 
 
 def _validate_inputs(

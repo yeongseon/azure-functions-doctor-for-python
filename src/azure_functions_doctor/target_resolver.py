@@ -9,6 +9,35 @@ from azure_functions_doctor.logging_config import get_logger
 
 logger = get_logger(__name__)
 
+# Python versions supported by Azure Functions (2026). Anything outside this
+# inclusive major.minor set is unsupported and should fail diagnostics.
+SUPPORTED_PYTHON_VERSIONS: Tuple[str, ...] = ("3.10", "3.11", "3.12", "3.13", "3.14")
+
+
+def _major_minor(version: str) -> Optional[Tuple[int, int]]:
+    """Return the ``(major, minor)`` pair for a version string, or ``None``."""
+    match = _PYTHON_VERSION_RE.search(version)
+    if not match:
+        return None
+    parts = match.group(1).split(".")
+    try:
+        return int(parts[0]), int(parts[1])
+    except (IndexError, ValueError):
+        return None
+
+
+def is_supported_python_target(version: str) -> bool:
+    """Return ``True`` when ``version``'s major.minor is a supported Azure target.
+
+    Only the major and minor components are considered, so patch releases such
+    as ``"3.14.2"`` are supported while ``"3.15.0"`` and ``"3.9.1"`` are not.
+    """
+    parsed = _major_minor(version)
+    if parsed is None:
+        return False
+    supported = {_major_minor(v) for v in SUPPORTED_PYTHON_VERSIONS}
+    return parsed in supported
+
 
 def _resolve_python(override: Optional[str] = None) -> str:
     """Resolve the running Python interpreter version."""
@@ -16,19 +45,6 @@ def _resolve_python(override: Optional[str] = None) -> str:
 
 
 _PYTHON_VERSION_RE = re.compile(r"(\d+\.\d+(?:\.\d+)?)")
-
-
-def _requires_python_floor(pyproject: Path) -> Optional[str]:
-    """Extract the lower version bound from ``[project] requires-python``."""
-    try:
-        text = pyproject.read_text(encoding="utf-8")
-    except OSError:
-        return None
-    match = re.search(r'requires-python\s*=\s*["\']([^"\']+)["\']', text)
-    if not match:
-        return None
-    version_match = _PYTHON_VERSION_RE.search(match.group(1))
-    return version_match.group(1) if version_match else None
 
 
 def resolve_python_target(
@@ -39,10 +55,13 @@ def resolve_python_target(
     Precedence (first match wins):
 
     1. Explicit ``override`` (e.g. ``--target-python``) -> source ``"override"``.
-    2. ``pyproject.toml`` ``[project] requires-python`` floor ->
-       source ``"pyproject:requires-python"``.
-    3. ``.python-version`` file -> source ``".python-version"``.
-    4. The running interpreter -> source ``"tool-runtime"`` (always resolves).
+    2. ``.python-version`` file -> source ``".python-version"``.
+    3. The running interpreter -> source ``"tool-runtime"`` (always resolves).
+
+    The ``[project] requires-python`` value in ``pyproject.toml`` is deliberately
+    NOT used as the target: it declares a compatibility *floor*, not the
+    interpreter the app will actually be deployed against, so treating it as the
+    target masks unsupported runtimes.
 
     Args:
         project_path: Root of the project under diagnosis. When ``None`` or when
@@ -56,12 +75,6 @@ def resolve_python_target(
         return override, "override"
 
     if project_path is not None:
-        pyproject = project_path / "pyproject.toml"
-        if pyproject.is_file():
-            version = _requires_python_floor(pyproject)
-            if version is not None:
-                return version, "pyproject:requires-python"
-
         python_version_file = project_path / ".python-version"
         if python_version_file.is_file():
             try:
