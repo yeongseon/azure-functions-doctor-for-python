@@ -915,6 +915,7 @@ def is_local_prebuilt_deployment(path: Path, context: Optional["RuleContext"] = 
         return True
     return (path / ".python_packages").is_dir()
 
+
 def _detect_native_dependency_risks(content: str) -> list[tuple[str, str]]:
     """Return matching native-dependency packages in requirements order."""
     matches: list[tuple[str, str]] = []
