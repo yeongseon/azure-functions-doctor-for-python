@@ -280,14 +280,18 @@ host.json property '$.extensionBundle' not found
 
 ## 16) `check_asgi_wsgi_exposure`
 
-- **What it checks:** Source has ASGI/WSGI exposure patterns.
-- **Why it matters:** Useful signal for framework-host integration readiness.
-- **How to fix:** Ensure framework callable exposure follows expected patterns.
+- **What it checks:** Whether an ASGI/WSGI framework (FastAPI/Flask/Starlette/Quart)
+  is wired into Azure Functions via `AsgiFunctionApp`/`WsgiFunctionApp` (or
+  `AsgiMiddleware`/`WsgiMiddleware`).
+- **Why it matters:** A plain decorator-based `FunctionApp` has no ASGI/WSGI app,
+  so the check **skips** to avoid noise. A detected framework that is not exposed
+  is a real wiring gap.
+- **How to fix:** Expose the framework callable with `AsgiFunctionApp`/`WsgiFunctionApp`.
 
 Example warning detail:
 
 ```text
-No ASGI/WSGI callable detected in project source
+ASGI/WSGI framework detected but no callable is exposed via AsgiFunctionApp/WsgiFunctionApp (or AsgiMiddleware/WsgiMiddleware); wire it into Azure Functions: ['main.py:\bFastAPI\s*\('] (optional)
 ```
 
 ## 17) `check_unused_files`

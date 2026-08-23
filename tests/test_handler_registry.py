@@ -1365,12 +1365,10 @@ def test_callable_detection_found() -> None:
         tmp_path = Path(tmpdir)
         py_file = tmp_path / "main.py"
         py_file.write_text(
-            """from fastapi import FastAPI
-app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+            """import azure.functions as func
+from fastapi import FastAPI
+fastapi_app = FastAPI()
+app = func.AsgiFunctionApp(app=fastapi_app)
 """
         )
 
@@ -1398,7 +1396,7 @@ def test_callable_detection_not_found() -> None:
             "condition": {},
         }
         result = registry.handle(rule, tmp_path)
-        assert result["status"] == "fail"
+        assert result["status"] == "skip"
         assert "No ASGI/WSGI" in result["detail"]
 
 
@@ -2288,7 +2286,7 @@ def test_callable_detection_finds_fastapi() -> None:
             "condition": {},
         }
         result = registry.handle(rule, tmp_path)
-        assert result["status"] == "pass"  # Finding callable is good
+        assert result["status"] == "fail"  # framework present but callable not exposed
 
 
 def test_local_settings_json_exists() -> None:
@@ -2307,8 +2305,8 @@ def test_local_settings_json_exists() -> None:
         assert result["status"] in ("pass", "fail")  # pass if not git-tracked or git unavailable
 
 
-def test_executable_detection() -> None:
-    """Test _handle_callable_detection doesn't find executable pattern."""
+def test_callable_detection_skip_without_framework() -> None:
+    """callable_detection returns skip when no framework signal is present."""
     registry = HandlerRegistry()
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
@@ -2320,7 +2318,7 @@ def test_executable_detection() -> None:
             "condition": {},
         }
         result = registry.handle(rule, tmp_path)
-        assert result["status"] == "fail"  # No callable found is bad
+        assert result["status"] == "skip"  # No framework => plain FunctionApp, skip
 
 
 # Tests for exception branches in package handlers

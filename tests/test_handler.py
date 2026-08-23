@@ -429,18 +429,28 @@ def test_conditional_exists_durable_present_pass() -> None:
         assert result["status"] == "pass"
 
 
-def test_callable_detection_pass_and_fail() -> None:
+def test_callable_detection_skip_fail_pass() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
-        # No ASGI/WSGI files => fail
+        # No ASGI/WSGI framework => skip (plain FunctionApp)
         rule: Rule = {"type": "callable_detection"}
         result = generic_handler(rule, Path(tmpdir))
-        assert result["status"] == "fail"
+        assert result["status"] == "skip"
 
-        # Add a FastAPI example => pass
+        # FastAPI present but no exposure => warn (fail)
         file_path = Path(tmpdir) / "app.py"
         file_path.write_text("from fastapi import FastAPI\napp = FastAPI()")
         result2 = generic_handler(rule, Path(tmpdir))
-        assert result2["status"] == "pass"
+        assert result2["status"] == "fail"
+
+        # Exposed via AsgiFunctionApp => pass
+        file_path.write_text(
+            "import azure.functions as func\n"
+            "from fastapi import FastAPI\n"
+            "fastapi_app = FastAPI()\n"
+            "app = func.AsgiFunctionApp(app=fastapi_app)\n"
+        )
+        result3 = generic_handler(rule, Path(tmpdir))
+        assert result3["status"] == "pass"
 
 
 def _make_rule(rule_type: str, condition: Condition) -> Rule:
