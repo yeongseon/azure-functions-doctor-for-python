@@ -910,6 +910,17 @@ def test_extension_bundle_overbroad_upper_fails() -> None:
         assert result["status"] == "fail"
         assert "does not match" in result["detail"]
 
+def test_extension_bundle_nonzero_upper_minor_fails() -> None:
+    """[4.0.0, 5.1.0) widens past the exclusive 5.0.0 bound and must fail."""
+    registry = HandlerRegistry()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        (tmp_path / "host.json").write_text(_bundle_host("[4.0.0, 5.1.0)"))
+        rule: Rule = {"type": "host_json_extension_bundle_version", "condition": {}}
+        result = registry.handle(rule, tmp_path)
+        assert result["status"] == "fail"
+        assert "does not match" in result["detail"]
+
 
 def test_extension_bundle_inclusive_upper_fails() -> None:
     """[4.0.0, 5.0.0] with an inclusive upper bound must fail."""

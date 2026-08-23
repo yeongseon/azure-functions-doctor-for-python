@@ -822,6 +822,8 @@ class HandlerRegistry:
         lower_bracket = range_match.group(1)
         lower_major = int(range_match.group(2))
         upper_major = int(range_match.group(5))
+        upper_minor_raw = range_match.group(6)
+        upper_patch_raw = range_match.group(7)
         upper_bracket = range_match.group(8)
 
         if lower_major < 4:
@@ -833,10 +835,17 @@ class HandlerRegistry:
 
         # Valid v4: lower bound inclusive starting at major 4, upper bound
         # exclusive at exactly major 5 (i.e. [4.x, 5.0.0)).
+        # The exclusive upper bound must be exactly 5.0.0. An absent minor/patch
+        # component defaults to 0; a wildcard ('*') or non-zero component (e.g.
+        # 5.1.0) widens the range beyond the recommended bound and must fail.
+        upper_minor_zero = upper_minor_raw in (None, "0")
+        upper_patch_zero = upper_patch_raw in (None, "0")
         is_valid_v4 = (
             lower_bracket == "["
             and lower_major == 4
             and upper_major == 5
+            and upper_minor_zero
+            and upper_patch_zero
             and upper_bracket == ")"
         )
         if is_valid_v4:
