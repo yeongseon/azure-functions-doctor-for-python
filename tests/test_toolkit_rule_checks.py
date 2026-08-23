@@ -428,7 +428,6 @@ def test_new_rules_present_in_doctor_output(tmp_path: Path) -> None:
         "Endpoint scan before spec build",
         "LangGraph route authentication",
         "Orchestrator determinism",
-        "Supported metadata version",
         "OTel trace-context activation",
     ):
         assert label in labels

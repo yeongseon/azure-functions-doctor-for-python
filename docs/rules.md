@@ -383,14 +383,7 @@ Found unwanted files: ['tests/', '.venv']
 - **How to fix:** Move nondeterministic work into activity functions.
 - **Severity:** Required (`required: true`).
 
-## 29) `check_unsupported_metadata_version`
-
-- **What it checks:** `host.json` `extensionBundle.version` or a metadata file does not declare a version outside the configured supported set.
-- **Why it matters:** Unsupported metadata versions can fail at load or deploy time.
-- **How to fix:** Use a supported metadata/bundle version.
-- **Severity:** Warning only (`required: false`).
-
-## 30) `check_otel_trace_context_activation`
+## 29) `check_otel_trace_context_activation`
 
 - **What it checks:** In projects that opt into `azure-functions-logging` trace-context activation (`activate_trace_context=True` or `set_default_trace_context_activation`), an `opentelemetry` distribution is declared in `requirements.txt` or `pyproject.toml`.
 - **Why it matters:** `azure-functions-logging` silently degrades activation to a no-op when OpenTelemetry is unavailable, so requested trace context is dropped without any runtime error.

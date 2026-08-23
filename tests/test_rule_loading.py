@@ -47,6 +47,9 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             assert "check_programming_model_v2" in rule_ids
             assert "check_http_trigger_bindings" not in rule_ids
             assert "check_timer_cron" not in rule_ids
+            # Removed in #311: shipped as a permanent no-op
+            # (empty supported_versions) with no authoritative version set.
+            assert "check_unsupported_metadata_version" not in rule_ids
 
     def test_rule_loading_uses_v2_rules_only(self) -> None:
         """Test that rule loading no longer branches on legacy programming models."""

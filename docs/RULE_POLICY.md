@@ -98,7 +98,6 @@ Extended rules are included in `--profile full` but excluded from `--profile min
 | `check_openapi_version_mixing` | Heuristic signal detection across OpenAPI 3.0/3.1 usage |
 | `check_scan_before_spec` | Call-order heuristic; naming-based detection may miss custom flows |
 | `check_langgraph_anonymous_auth` | Applies only to LangGraph projects; heuristic auth-level detection |
-| `check_unsupported_metadata_version` | Depends on a configurable supported-version set; advisory only |
 
 ---
 

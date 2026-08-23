@@ -481,26 +481,6 @@
     "check_order": 39
   },
   {
-    "id": "check_unsupported_metadata_version",
-    "category": "configuration",
-    "section": "extensions",
-    "label": "Supported metadata version",
-    "description": "Warns when host.json extensionBundle.version or a metadata file declares a version outside the configured supported set.",
-    "type": "unsupported_metadata_version",
-    "required": false,
-    "condition": {
-      "files": ["*.meta.json", "extensions.json"],
-      "fields": ["metadataVersion", "metadata_version"],
-      "supported_versions": []
-    },
-    "hint": "Use a metadata/extension-bundle version supported by the current toolkit.",
-    "source_type": "heuristic",
-    "why_it_matters": "Unsupported metadata versions can be silently ignored or rejected by the runtime, causing bindings or extensions to fail to load.",
-    "symptoms": "Extensions or bindings fail to load; runtime rejects host configuration.",
-    "tags": ["metadata", "version", "extensions"],
-    "check_order": 40
-  },
-  {
     "id": "check_otel_trace_context_activation",
     "category": "configuration",
     "section": "observability",
