@@ -122,7 +122,7 @@ These checks run only after the repository has been classified as a supported `v
 | Durable Functions configuration | `check_durabletask_config` | `conditional_exists` | Durable usage detected but `$.extensions.durableTask` is missing. |
 | Application Insights configuration | `check_app_insights` | `app_insights_connection` | No connection string set, or only a legacy instrumentation key is configured. |
 | `extensionBundle` | `check_extension_bundle` | `host_json_property` | `$.extensionBundle` key is not present in `host.json`. |
-| ASGI/WSGI compatibility | `check_asgi_wsgi_exposure` | `callable_detection` | No ASGI/WSGI app exposure patterns are detected. |
+| ASGI/WSGI compatibility | `check_asgi_wsgi_exposure` | `callable_detection` | Framework detected but no callable exposed (skips when no framework is present). |
 | Unwanted files | `check_unused_files` | `file_glob_check` | Common deploy-time junk patterns are found. |
 | Decorator order | `check_decorator_order` | `decorator_order` | A handler stacks `@validate_http` outside (above) `@with_context`, so validation/OpenAPI metadata is discarded. |
 | Endpoint metadata coverage | `check_endpoint_metadata` | `endpoint_metadata` | The project depends on `azure-functions-validation` but an HTTP route handler lacks `@validate_http`, so it emits no endpoint OpenAPI metadata. |

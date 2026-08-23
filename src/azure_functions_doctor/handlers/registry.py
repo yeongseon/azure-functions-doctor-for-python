@@ -486,31 +486,63 @@ class HandlerRegistry:
     def _handle_callable_detection(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
-        """Detect ASGI/WSGI callable exposure in source files (basic heuristics)."""
-        patterns = [
-            r"\bAsgiMiddleware\s*\(|\bWsgiMiddleware\s*\(",
-            r"\bAsgiFunctionApp\s*\(|\bWsgiFunctionApp\s*\(",
+        """Detect ASGI/WSGI callable exposure in source files (basic heuristics).
+
+        A plain decorator-based ``FunctionApp`` project has no ASGI/WSGI app and
+        should not be warned, so the check **skips** when there is no framework
+        signal at all. When a framework is present but its callable is not wired
+        into Azure Functions it warns; a correctly exposed callable passes.
+        """
+        # Azure Functions wiring that actually exposes an ASGI/WSGI callable.
+        exposure_patterns = [
+            r"\bAsgiFunctionApp\s*\(",
+            r"\bWsgiFunctionApp\s*\(",
+            r"\bAsgiMiddleware\s*\(",
+            r"\bWsgiMiddleware\s*\(",
+        ]
+        # Presence of an ASGI/WSGI framework (import or instantiation).
+        framework_patterns = [
             r"\bFastAPI\s*\(|\bStarlette\s*\(|\bFlask\s*\(|\bQuart\s*\(",
+            r"\b(?:import|from)\s+(?:fastapi|starlette|flask|quart)\b",
             r"ASGIApp|WSGIApp|asgi_app|wsgi_app",
         ]
 
-        found_items: List[str] = []
+        exposure_hits: List[str] = []
+        framework_hits: List[str] = []
         try:
             for py_file in path.rglob("*.py"):
                 content = _read_project_python_file(py_file)
                 if content is None:
                     continue
-                for pat in patterns:
+                rel = py_file.relative_to(path)
+                for pat in exposure_patterns:
                     if re.search(pat, content):
-                        found_items.append(f"{py_file.relative_to(path)}:{pat}")
+                        exposure_hits.append(f"{rel}:{pat}")
+                        break
+                for pat in framework_patterns:
+                    if re.search(pat, content):
+                        framework_hits.append(f"{rel}:{pat}")
                         break
         except Exception as exc:
             return _handle_specific_exceptions("scanning for ASGI/WSGI callables", exc)
 
-        if found_items:
-            return _create_result("pass", f"Detected ASGI/WSGI-related patterns: {found_items[:3]}")
+        if exposure_hits:
+            return _create_result(
+                "pass", f"Detected ASGI/WSGI callable exposure: {exposure_hits[:3]}"
+            )
 
-        return _create_result("fail", "No ASGI/WSGI callable detected in project source")
+        if framework_hits:
+            return _create_result(
+                "fail",
+                "ASGI/WSGI framework detected but no callable is exposed via "
+                "AsgiFunctionApp/WsgiFunctionApp (or AsgiMiddleware/WsgiMiddleware); "
+                f"wire it into Azure Functions: {framework_hits[:3]}",
+            )
+
+        return _create_result(
+            "skip",
+            "No ASGI/WSGI framework detected; plain FunctionApp project.",
+        )
 
     # --- adapters / additional handlers ---
 

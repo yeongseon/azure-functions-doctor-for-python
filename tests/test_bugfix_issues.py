@@ -104,7 +104,7 @@ def test_callable_detection_no_false_positive_for_functionapp_only() -> None:
 
         result = generic_handler(rule, tmp_path)
 
-        assert result["status"] == "fail"
+        assert result["status"] == "skip"
 
 
 def test_callable_detection_asgi_middleware_passes(tmp_path: Path) -> None:
@@ -138,7 +138,7 @@ def test_callable_detection_asgi_function_app_passes(tmp_path: Path) -> None:
 
 
 def test_callable_detection_fastapi_passes(tmp_path: Path) -> None:
-    """Issue #97: FastAPI usage triggers callable detection pass."""
+    """#307: FastAPI present but no exposure => warn (fail)."""
     (tmp_path / "main.py").write_text(
         "from fastapi import FastAPI\napp = FastAPI()\n",
         encoding="utf-8",
@@ -147,11 +147,11 @@ def test_callable_detection_fastapi_passes(tmp_path: Path) -> None:
 
     result = generic_handler(rule, tmp_path)
 
-    assert result["status"] == "pass"
+    assert result["status"] == "fail"
 
 
 def test_callable_detection_flask_passes(tmp_path: Path) -> None:
-    """Issue #97: Flask usage triggers callable detection pass."""
+    """#307: Flask present but no exposure => warn (fail)."""
     (tmp_path / "main.py").write_text(
         "from flask import Flask\napp = Flask(__name__)\n",
         encoding="utf-8",
@@ -160,7 +160,7 @@ def test_callable_detection_flask_passes(tmp_path: Path) -> None:
 
     result = generic_handler(rule, tmp_path)
 
-    assert result["status"] == "pass"
+    assert result["status"] == "fail"
 
 
 def test_setup_logging_reinvocation_updates_log_level() -> None:
