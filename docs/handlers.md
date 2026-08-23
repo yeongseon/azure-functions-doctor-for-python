@@ -107,6 +107,7 @@ The authoritative dispatch map is `_RULE_DISPATCH` in
 | `callable_detection` | none | Detect ASGI/WSGI callable exposure patterns. |
 | `executable_exists` | `target` | Ensure local binaries exist on `PATH`. |
 | `any_of_exists` | `targets` | Pass when any env/file/host signal is present. |
+| `app_insights_connection` | none | Require an Application Insights connection string; flag legacy instrumentation keys. |
 | `file_glob_check` | `patterns` | Detect junk files and deployment artifacts. |
 | `host_json_property` | `jsonpath` | Validate specific host.json properties. |
 | `host_json_version` | none | Validate `host.json` declares `"version": "2.0"`. |

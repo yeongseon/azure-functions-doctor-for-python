@@ -250,17 +250,20 @@ Required host.json property '$.extensions.durableTask' not found
 
 ## 14) `check_app_insights`
 
-- **What it checks:** At least one telemetry signal exists:
-  - `APPLICATIONINSIGHTS_CONNECTION_STRING`
-  - `APPINSIGHTS_INSTRUMENTATIONKEY`
-  - `host.json:instrumentationKey`
-- **Why it matters:** Telemetry is critical for production diagnostics.
-- **How to fix:** Configure one supported telemetry source.
+- **What it checks:** Application Insights uses a **connection string**
+  (`APPLICATIONINSIGHTS_CONNECTION_STRING`). A legacy instrumentation key
+  (`APPINSIGHTS_INSTRUMENTATIONKEY` or `host.json:instrumentationKey`) is
+  treated as stale, and `APPLICATIONINSIGHTS_AUTHENTICATION_STRING` is
+  recognised for Entra (AAD) authentication.
+- **Why it matters:** Instrumentation-key ingestion ended 2025-03-31, so a
+  connection string is required for telemetry to reach Application Insights.
+- **How to fix:** Set `APPLICATIONINSIGHTS_CONNECTION_STRING` and remove any
+  legacy instrumentation key.
 
 Example warning detail:
 
 ```text
-Targets not found
+Application Insights is not configured; set APPLICATIONINSIGHTS_CONNECTION_STRING to enable telemetry. (optional)
 ```
 
 ## 15) `check_extension_bundle`

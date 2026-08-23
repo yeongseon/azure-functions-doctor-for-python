@@ -120,7 +120,7 @@ These checks run only after the repository has been classified as a supported `v
 | Azure Functions Core Tools | `check_func_cli` | `executable_exists` | `func` executable is not available on `PATH`. |
 | Core Tools version | `check_func_core_tools_version` | `compare_version` | Detected Core Tools version is lower than `4.0`. |
 | Durable Functions configuration | `check_durabletask_config` | `conditional_exists` | Durable usage detected but `$.extensions.durableTask` is missing. |
-| Application Insights configuration | `check_app_insights` | `any_of_exists` | No telemetry signal found in env vars or `host.json`. |
+| Application Insights configuration | `check_app_insights` | `app_insights_connection` | No connection string set, or only a legacy instrumentation key is configured. |
 | `extensionBundle` | `check_extension_bundle` | `host_json_property` | `$.extensionBundle` key is not present in `host.json`. |
 | ASGI/WSGI compatibility | `check_asgi_wsgi_exposure` | `callable_detection` | No ASGI/WSGI app exposure patterns are detected. |
 | Unwanted files | `check_unused_files` | `file_glob_check` | Common deploy-time junk patterns are found. |

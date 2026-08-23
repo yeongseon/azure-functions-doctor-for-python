@@ -24,7 +24,7 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_func_cli` | Azure Functions Core Tools (func) | tooling | tooling | `executable_exists` | No | full |
 | `check_func_core_tools_version` | Azure Functions Core Tools version | tooling | tooling | `compare_version` | No | full |
 | `check_durabletask_config` | Durable Functions configuration | configuration | durable | `conditional_exists` | No | full |
-| `check_app_insights` | Application Insights configuration | telemetry | monitoring | `any_of_exists` | No | full |
+| `check_app_insights` | Application Insights configuration | telemetry | monitoring | `app_insights_connection` | No | full |
 | `check_extension_bundle` | extensionBundle | configuration | extensions | `host_json_property` | No | full |
 | `check_asgi_wsgi_exposure` | ASGI/WSGI compatibility | framework | asgi_wsgi | `callable_detection` | No | full |
 | `check_unused_files` | Detect unused or invalid files | project_health | cleanup | `file_glob_check` | No | full |

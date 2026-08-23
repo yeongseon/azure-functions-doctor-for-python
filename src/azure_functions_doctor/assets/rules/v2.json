@@ -264,18 +264,12 @@
     "category": "telemetry",
     "section": "monitoring",
     "label": "Application Insights configuration",
-    "description": "Checks for Application Insights connection settings via environment variables or host.json.",
-    "type": "any_of_exists",
+    "description": "Checks that Application Insights uses a connection string (instrumentation-key ingestion ended 2025-03-31).",
+    "type": "app_insights_connection",
     "required": false,
-    "condition": {
-      "targets": [
-        "APPLICATIONINSIGHTS_CONNECTION_STRING",
-        "APPINSIGHTS_INSTRUMENTATIONKEY",
-        "host.json:instrumentationKey"
-      ]
-    },
-    "hint": "Configure Application Insights to get telemetry and diagnostics in production.",
-    "hint_url": "https://learn.microsoft.com/azure/azure-monitor/app/azure-functions",
+    "condition": {},
+    "hint": "Set APPLICATIONINSIGHTS_CONNECTION_STRING (instrumentation keys are retired). Optionally set APPLICATIONINSIGHTS_AUTHENTICATION_STRING for Entra (AAD) auth.",
+    "hint_url": "https://learn.microsoft.com/azure/azure-monitor/app/migrate-from-instrumentation-keys-to-connection-strings",
     "check_order": 24
   },
   {
