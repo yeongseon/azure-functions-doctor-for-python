@@ -97,6 +97,19 @@ def test_cli_sarif_output() -> None:
     expected_exit = 1 if has_error else 0
     assert result.exit_code == expected_exit
 
+def test_cli_sarif_ruleid_propagates_from_rule_id() -> None:
+    """SARIF ``ruleId`` comes from the result's ``rule_id``, matching driver rule ids."""
+    result = runner.invoke(app, ["doctor", "--format", "sarif"])
+    data = json.loads(result.output)
+    run = data["runs"][0]
+    driver_ids = {rule["id"] for rule in run["tool"]["driver"]["rules"]}
+    findings = run.get("results", [])
+    # There must be findings to make this assertion meaningful.
+    assert findings
+    for finding in findings:
+        rule_id = finding["ruleId"]
+        assert rule_id, "every SARIF finding must carry a ruleId"
+        assert rule_id in driver_ids, f"ruleId {rule_id!r} must match a driver rule id"
 
 def test_cli_junit_output() -> None:
     """Test CLI outputs JUnit format."""

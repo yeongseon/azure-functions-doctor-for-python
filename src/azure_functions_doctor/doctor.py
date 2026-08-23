@@ -23,11 +23,41 @@ logger = get_logger(__name__)
 
 ProgrammingModel = Literal["v2", "unsupported_v1", "mixed", "unknown"]
 
+_VALID_SEVERITIES = ("error", "warning", "info")
+_VALID_TIERS = ("core", "extended", "experimental")
+
+
+def _resolve_severity(rule: Rule) -> str:
+    """Resolve a rule's runtime severity, falling back to ``required``."""
+    severity = rule.get("severity")
+    if severity in _VALID_SEVERITIES:
+        return str(severity)
+    return "error" if rule.get("required", True) else "warning"
+
+
+def _resolve_gate(rule: Rule) -> bool:
+    """Whether a failing rule gates the run, independent of severity."""
+    gate = rule.get("gate")
+    if isinstance(gate, bool):
+        return gate
+    return bool(rule.get("required", True))
+
+
+def _resolve_tier(rule: Rule) -> str:
+    """Resolve a rule's maturity tier, falling back to ``required``."""
+    tier = rule.get("tier")
+    if tier in _VALID_TIERS:
+        return str(tier)
+    return "core" if rule.get("required", True) else "extended"
+
 
 class CheckResult(TypedDict, total=False):
+    rule_id: str
     label: str
     value: str
     status: str
+    severity: str
+    tier: str
     hint: str
     hint_url: str
     file: str
@@ -193,6 +223,7 @@ class Doctor:
             "status": "fail",
             "items": [
                 {
+                    "rule_id": "check_programming_model_v2",
                     "label": label,
                     "value": value,
                     "status": "fail",
@@ -289,28 +320,36 @@ class Doctor:
                     rule_duration_ms,
                 )
 
-                # Simplified canonical mapping:
-                # pass stays pass, skip stays skip (regardless of required),
-                # otherwise required -> fail and optional -> warn.
-                required = rule.get("required", True)
+                # Canonical mapping driven by explicit severity/gate/tier
+                # (each derived from ``required`` when not set on the rule):
+                #   pass -> pass, skip -> skip; a failing handler maps to
+                #   "fail" when severity is "error", otherwise "warn". The
+                #   section is only gated to fail when the rule is a gate.
+                severity = _resolve_severity(rule)
+                gate = _resolve_gate(rule)
+                tier = _resolve_tier(rule)
+                rule_id = rule.get("id", "unknown_rule")
                 if handler_status == "pass":
                     canonical = "pass"
                 elif handler_status == "skip":
                     canonical = "skip"
                 else:
-                    canonical = "fail" if required else "warn"
+                    canonical = "fail" if severity == "error" else "warn"
 
                 detail = result.get("detail", "")
                 if canonical == "warn":
                     detail += " (optional)"
 
                 item: CheckResult = {
-                    "label": rule.get("label", rule.get("id", "unknown_rule")),
+                    "rule_id": rule_id,
+                    "label": rule.get("label", rule_id),
                     "value": detail,
                     "status": canonical,
+                    "severity": severity,
+                    "tier": tier,
                 }
 
-                if canonical == "fail" and required:
+                if canonical == "fail" and gate:
                     section_result["status"] = "fail"
 
                 if "hint" in rule:

@@ -10,7 +10,7 @@ from rich.text import Text
 import typer
 
 from azure_functions_doctor import __version__
-from azure_functions_doctor.doctor import Doctor
+from azure_functions_doctor.doctor import Doctor, _resolve_severity, _resolve_tier
 from azure_functions_doctor.logging_config import (
     get_logger,
     log_diagnostic_complete,
@@ -262,8 +262,7 @@ def doctor(
         raise typer.Exit(1 if fail_count > 0 else 0)
 
     if format == "sarif":
-        # Build label → rule mapping for enriched ruleId and metadata
-        label_to_rule = {r.get("label", "unknown_rule"): r for r in loaded_rules}
+        # rule_id is emitted on every result, so SARIF uses it directly
 
         # Build driver.rules from the full loaded ruleset
         driver_rules = []
@@ -277,6 +276,8 @@ def doctor(
                 "properties": {
                     "category": rule.get("category", ""),
                     "required": rule.get("required", False),
+                    "tier": _resolve_tier(rule),
+                    "severity": _resolve_severity(rule),
                 },
             }
             hint_url = rule.get("hint_url", "")
@@ -291,9 +292,7 @@ def doctor(
                 # Skipped checks are not findings; exclude them from SARIF output.
                 if status in ("pass", "skip"):
                     continue
-                label = item.get("label", "")
-                matched_rule = label_to_rule.get(label)
-                rule_id = matched_rule.get("id", label) if matched_rule else label
+                rule_id = item.get("rule_id") or item.get("label", "")
                 level = "error" if status == "fail" else "warning"
                 loc_file = item.get("file")
                 if loc_file:

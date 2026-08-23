@@ -1070,6 +1070,9 @@ class Rule(TypedDict, total=False):
     section: str
     description: str
     required: bool
+    severity: Literal["error", "warning", "info"]
+    gate: bool
+    tier: Literal["core", "extended", "experimental"]
     condition: Condition
     hint: str
     fix: str
