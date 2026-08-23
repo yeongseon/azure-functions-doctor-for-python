@@ -366,8 +366,12 @@ _ENDPOINT_METADATA_DECORATORS = frozenset({"openapi", "openapi_metadata", "langg
 def _collect_routes_missing_validate_http_locations(
     path: Path,
 ) -> list[tuple[str, int, Optional[int], int]]:
-    """Return ``(label, lineno)`` pairs for HTTP route handlers that lack an
-    *active* ``@validate_http`` and therefore emit no endpoint OpenAPI metadata.
+    """Return ``(label, lineno)`` pairs for HTTP route handlers that expose no
+    endpoint OpenAPI metadata.
+
+    A handler is considered *covered* when it carries an *active* ``@validate_http``
+    or any other supported endpoint-metadata decorator (e.g. ``@openapi`` or the
+    LangGraph metadata decorators); such handlers are omitted from the result.
 
     ``label`` is ``"file:function"`` and ``lineno`` is the 1-based source line of
     the offending function definition.

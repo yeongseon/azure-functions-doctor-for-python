@@ -352,7 +352,7 @@ Found unwanted files: ['tests/', '.venv']
 
 - **What it checks:** In projects depending on `azure-functions-validation`, HTTP route handlers emit endpoint OpenAPI metadata via `@validate_http` **or** another supported metadata decorator (`@openapi`, LangGraph metadata). Routes annotated with those decorators are not flagged even without `@validate_http`.
 - **Why it matters:** Handlers without it will not appear in generated OpenAPI specs.
-- **How to fix:** Apply `@validate_http` to route handlers that should emit metadata.
+- **How to fix:** Apply `@validate_http` — or another supported endpoint-metadata decorator (`@openapi` or the LangGraph metadata decorators) — to route handlers that should emit metadata.
 - **Severity:** Warning only (`required: false`).
 
 ## 25) `check_openapi_version_mixing`
