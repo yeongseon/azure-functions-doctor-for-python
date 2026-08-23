@@ -99,12 +99,17 @@ def test_cli_sarif_output() -> None:
 
 def test_cli_sarif_ruleid_propagates_from_rule_id() -> None:
     """SARIF ``ruleId`` comes from the result's ``rule_id``, matching driver rule ids."""
-    result = runner.invoke(app, ["doctor", "--format", "sarif"])
+    result = runner.invoke(
+        app,
+        ["doctor", "--path", str(FIXTURES_DIR / "unknown"), "--format", "sarif"],
+    )
     data = json.loads(result.output)
     run = data["runs"][0]
     driver_ids = {rule["id"] for rule in run["tool"]["driver"]["rules"]}
     findings = run.get("results", [])
-    # There must be findings to make this assertion meaningful.
+    # The unknown fixture short-circuits on programming-model detection, which
+    # deterministically yields at least one SARIF finding regardless of the
+    # environment or repository state.
     assert findings
     for finding in findings:
         rule_id = finding["ruleId"]

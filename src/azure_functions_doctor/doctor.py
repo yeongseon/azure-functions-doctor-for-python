@@ -227,6 +227,8 @@ class Doctor:
                     "label": label,
                     "value": value,
                     "status": "fail",
+                    "severity": "error",
+                    "tier": "core",
                     "hint": hint,
                 }
             ],
@@ -336,8 +338,12 @@ class Doctor:
                 else:
                     canonical = "fail" if severity == "error" else "warn"
 
+                failed = handler_status not in ("pass", "skip")
                 detail = result.get("detail", "")
-                if canonical == "warn":
+                # A failing rule is "optional" when it does not gate the run,
+                # independent of its display severity (a gate rule may still
+                # carry severity "warning"/"info").
+                if failed and not gate:
                     detail += " (optional)"
 
                 item: CheckResult = {
@@ -349,7 +355,7 @@ class Doctor:
                     "tier": tier,
                 }
 
-                if canonical == "fail" and gate:
+                if failed and gate:
                     section_result["status"] = "fail"
 
                 if "hint" in rule:
