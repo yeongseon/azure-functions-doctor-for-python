@@ -357,6 +357,12 @@ def _is_spec_serving_handler(node: ast.FunctionDef | ast.AsyncFunctionDef) -> bo
     return False
 
 
+# Decorators that emit OpenAPI endpoint metadata other than ``@validate_http``.
+# A route carrying any of these is considered metadata-covered and is not
+# flagged for missing endpoint metadata.
+_ENDPOINT_METADATA_DECORATORS = frozenset({"openapi", "openapi_metadata", "langgraph_metadata"})
+
+
 def _collect_routes_missing_validate_http_locations(
     path: Path,
 ) -> list[tuple[str, int, Optional[int], int]]:
@@ -386,6 +392,7 @@ def _collect_routes_missing_validate_http_locations(
             is_route = False
             route_idx: Optional[int] = None
             validate_idx: Optional[int] = None
+            has_other_metadata = False
             for i, dec in enumerate(node.decorator_list):
                 inner: ast.expr = dec.func if isinstance(dec, ast.Call) else dec
                 if (
@@ -399,10 +406,13 @@ def _collect_routes_missing_validate_http_locations(
                         route_idx = i
                 if validate_idx is None and _decorator_simple_name(dec) == "validate_http":
                     validate_idx = i
+                if _decorator_simple_name(dec) in _ENDPOINT_METADATA_DECORATORS:
+                    has_other_metadata = True
             has_active_validate_http = (
                 validate_idx is not None and route_idx is not None and validate_idx > route_idx
             )
-            if is_route and not has_active_validate_http and not _is_spec_serving_handler(node):
+            covered = has_active_validate_http or has_other_metadata
+            if is_route and not covered and not _is_spec_serving_handler(node):
                 uncovered.append(
                     (
                         f"{py_file.relative_to(path)}:{node.name}",
@@ -444,18 +454,17 @@ def _dotted_call_name(func: ast.expr) -> Optional[str]:
     return None
 
 
-def _collect_openapi_version_mixing(path: Path) -> tuple[set[str], set[str]]:
-    """Return (v30_signals, v31_signals) found across the project.
+def _collect_openapi_version_mixing(path: Path) -> dict[str, set[str]]:
+    """Return a mapping of OpenAPI ``major.minor`` version -> signals found.
 
-    OpenAPI 3.0 signals: a string constant like ``3.0.N`` or a
-    keyword argument named ``nullable``. OpenAPI 3.1 signals: a string constant
-    like ``3.1.N``. Callers treat a non-empty intersection of both
-    sets as a version-mixing warning.
+    Recognised keys are ``"3.0"``, ``"3.1"`` and ``"3.2"``. Signals are string
+    constants like ``3.0.N`` / ``3.1.N`` / ``3.2.N``; a ``nullable`` keyword
+    argument is a 3.0-only signal (``nullable`` was removed in OpenAPI 3.1+).
+    Callers treat two or more populated version keys as a version-mixing warning,
+    so a single-version project (including 3.2-only) never warns.
     """
-    v30: set[str] = set()
-    v31: set[str] = set()
-    v30_re = re.compile(r"^3\.0\.\d+$")
-    v31_re = re.compile(r"^3\.1\.\d+$")
+    signals: dict[str, set[str]] = {"3.0": set(), "3.1": set(), "3.2": set()}
+    version_re = re.compile(r"^3\.(0|1|2)\.\d+$")
     for _py_file, content in _iter_project_py_contents(path):
         try:
             tree = ast.parse(content)
@@ -463,13 +472,12 @@ def _collect_openapi_version_mixing(path: Path) -> tuple[set[str], set[str]]:
             continue
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
-                if v30_re.match(node.value):
-                    v30.add(node.value)
-                elif v31_re.match(node.value):
-                    v31.add(node.value)
+                match = version_re.match(node.value)
+                if match is not None:
+                    signals[f"3.{match.group(1)}"].add(node.value)
             elif isinstance(node, ast.keyword) and node.arg == "nullable":
-                v30.add("nullable")
-    return v30, v31
+                signals["3.0"].add("nullable")
+    return signals
 
 
 def _collect_scan_before_spec(path: Path, scan_names: set[str], spec_names: set[str]) -> list[str]:

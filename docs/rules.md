@@ -350,14 +350,14 @@ Found unwanted files: ['tests/', '.venv']
 
 ## 24) `check_endpoint_metadata`
 
-- **What it checks:** In projects depending on `azure-functions-validation`, HTTP route handlers use `@validate_http` so they emit endpoint OpenAPI metadata.
+- **What it checks:** In projects depending on `azure-functions-validation`, HTTP route handlers emit endpoint OpenAPI metadata via `@validate_http` **or** another supported metadata decorator (`@openapi`, LangGraph metadata). Routes annotated with those decorators are not flagged even without `@validate_http`.
 - **Why it matters:** Handlers without it will not appear in generated OpenAPI specs.
 - **How to fix:** Apply `@validate_http` to route handlers that should emit metadata.
 - **Severity:** Warning only (`required: false`).
 
 ## 25) `check_openapi_version_mixing`
 
-- **What it checks:** A project does not mix OpenAPI 3.0 signals (3.0.x version strings or the `nullable` keyword) with OpenAPI 3.1 signals (3.1.x version strings).
+- **What it checks:** A project does not mix two or more OpenAPI versions. It recognizes 3.0 signals (3.0.x version strings or the `nullable` keyword), 3.1 signals (3.1.x strings), and **3.2** signals (3.2.x strings). A single-version project — including 3.2-only — never warns.
 - **Why it matters:** Mixing versions produces inconsistent generated specs.
 - **How to fix:** Standardize on a single OpenAPI version across the project.
 - **Severity:** Warning only (`required: false`).
