@@ -48,7 +48,12 @@ from azure_functions_doctor.handlers._helpers import (
     pyproject_declares_dependencies,
     pyproject_dependency_names,
 )
-from azure_functions_doctor.target_resolver import resolve_python_target, resolve_target_value
+from azure_functions_doctor.target_resolver import (
+    SUPPORTED_PYTHON_VERSIONS,
+is_supported_python_target,
+resolve_python_target,
+resolve_target_value,
+)
 
 
 class HandlerRegistry:
@@ -96,23 +101,32 @@ class HandlerRegistry:
             )
             current = parse_version(current_version)
             expected = parse_version(str(value))
-            passed = {
+            operator_passed = {
                 ">=": current >= expected,
                 "<=": current <= expected,
                 "==": current == expected,
                 ">": current > expected,
                 "<": current < expected,
             }.get(operator, False)
+            supported = is_supported_python_target(current_version)
+            passed = operator_passed and supported
+            supported_range = f"{SUPPORTED_PYTHON_VERSIONS[0]}\u2013{SUPPORTED_PYTHON_VERSIONS[-1]}"
             if source == "override":
                 detail = (
-                    f"Target Python: {current_version} (override) — Tool runtime: {tool_runtime}"
+                    f"Target Python: {current_version} (override) "
+                    f"\u2014 Tool runtime: {tool_runtime}"
                 )
             elif source == "tool-runtime":
                 detail = f"Python {current_version} (tool runtime, {operator}{value})"
             else:
                 detail = (
                     f"Target Python: {current_version} ({source}, {operator}{value}) "
-                    f"— Tool runtime: {tool_runtime}"
+                    f"\u2014 Tool runtime: {tool_runtime}"
+                )
+            if not supported:
+                detail += (
+                    f" \u2014 unsupported target; Azure Functions supports "
+                    f"Python {supported_range}"
                 )
             return _create_result(
                 "pass" if passed else "fail",

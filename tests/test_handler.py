@@ -78,8 +78,8 @@ def test_compare_python_version_override_fail() -> None:
     assert "Tool runtime:" in result["detail"]
 
 
-def test_compare_python_version_uses_pyproject_target(tmp_path: Path) -> None:
-    """A project's requires-python floor drives the comparison, not the runtime."""
+def test_compare_python_version_ignores_pyproject_target(tmp_path: Path) -> None:
+    """requires-python is a floor, not a target: it must not drive the comparison."""
     (tmp_path / "pyproject.toml").write_text(
         '[project]\nrequires-python = ">=3.11"\n', encoding="utf-8"
     )
@@ -88,14 +88,76 @@ def test_compare_python_version_uses_pyproject_target(tmp_path: Path) -> None:
         "condition": {
             "target": "python",
             "operator": ">=",
-            "value": "3.12",
+            "value": "3.10",
         },
     }
     result = generic_handler(rule, tmp_path)
-    assert result["status"] == "fail"
-    assert "pyproject:requires-python" in result["detail"]
-    assert "Target Python: 3.11" in result["detail"]
+    # Falls back to the tool runtime, never pyproject:requires-python.
+    assert "pyproject:requires-python" not in result["detail"]
+    assert "tool runtime" in result["detail"]
 
+
+def test_compare_python_version_unsupported_target_fails() -> None:
+    """A too-new Python target fails even when the operator condition holds."""
+    rule: Rule = {
+        "type": "compare_version",
+        "condition": {
+            "target": "python",
+            "operator": ">=",
+            "value": "3.10",
+        },
+    }
+    result = generic_handler(rule, Path("."), {"target_python": "3.15"})
+    assert result["status"] == "fail"
+    assert "unsupported target" in result["detail"]
+    assert "3.10\u20133.14" in result["detail"]
+
+
+def test_compare_python_version_too_old_target_fails() -> None:
+    """A too-old Python target fails and reports the supported range."""
+    rule: Rule = {
+        "type": "compare_version",
+        "condition": {
+            "target": "python",
+            "operator": "<=",
+            "value": "3.14",
+        },
+    }
+    result = generic_handler(rule, Path("."), {"target_python": "3.9"})
+    assert result["status"] == "fail"
+    assert "unsupported target" in result["detail"]
+
+
+def test_compare_python_version_supported_target_passes() -> None:
+    """A supported target that satisfies the operator passes."""
+    rule: Rule = {
+        "type": "compare_version",
+        "condition": {
+            "target": "python",
+            "operator": ">=",
+            "value": "3.10",
+        },
+    }
+    result = generic_handler(rule, Path("."), {"target_python": "3.12"})
+    assert result["status"] == "pass"
+    assert "unsupported target" not in result["detail"]
+
+
+def test_compare_python_version_from_python_version_file(tmp_path: Path) -> None:
+    """A supported .python-version target drives the comparison and provenance."""
+    (tmp_path / ".python-version").write_text("3.12\n", encoding="utf-8")
+    rule: Rule = {
+        "type": "compare_version",
+        "condition": {
+            "target": "python",
+            "operator": ">=",
+            "value": "3.10",
+        },
+    }
+    result = generic_handler(rule, tmp_path)
+    assert result["status"] == "pass"
+    assert ".python-version" in result["detail"]
+    assert "unsupported target" not in result["detail"]
 
 def test_compare_func_core_tools_version_pass(monkeypatch: MonkeyPatch) -> None:
     """Test that the func Core Tools version check passes when version meets minimum."""
