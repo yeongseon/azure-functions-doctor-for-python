@@ -216,9 +216,12 @@ x = 1
                 "status": "fail",
                 "items": [
                     {
+                        "rule_id": "check_programming_model_v2",
                         "label": "Unsupported programming model: Python v1",
                         "value": UNSUPPORTED_V1_VALUE,
                         "status": "fail",
+                        "severity": "error",
+                        "tier": "core",
                         "hint": UNSUPPORTED_V1_HINT,
                     }
                 ],
@@ -240,9 +243,12 @@ x = 1
                 "status": "fail",
                 "items": [
                     {
+                        "rule_id": "check_programming_model_v2",
                         "label": "Python v2 programming model was not detected",
                         "value": UNKNOWN_VALUE,
                         "status": "fail",
+                        "severity": "error",
+                        "tier": "core",
                         "hint": UNKNOWN_HINT,
                     }
                 ],

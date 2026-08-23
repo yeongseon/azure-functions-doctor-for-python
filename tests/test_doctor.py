@@ -174,3 +174,46 @@ def test_load_rules_invalid_schema_raises_value_error(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="Invalid rules file"):
         doctor.load_rules()
+
+
+def test_resolve_severity_gate_tier_fallback_from_required() -> None:
+    """Explicit severity/gate/tier win; otherwise they fall back to ``required``."""
+    from typing import cast
+
+    from azure_functions_doctor.doctor import (
+        _resolve_gate,
+        _resolve_severity,
+        _resolve_tier,
+    )
+    from azure_functions_doctor.handlers import Rule
+
+    def rule(**kwargs: object) -> Rule:
+        return cast(Rule, kwargs)
+
+    # Explicit values are honored.
+    explicit = rule(
+        severity="info",
+        gate=False,
+        tier="experimental",
+        required=True,
+    )
+    assert _resolve_severity(explicit) == "info"
+    assert _resolve_gate(explicit) is False
+    assert _resolve_tier(explicit) == "experimental"
+
+    # Fallbacks derive from ``required=True``.
+    required_true = rule(required=True)
+    assert _resolve_severity(required_true) == "error"
+    assert _resolve_gate(required_true) is True
+    assert _resolve_tier(required_true) == "core"
+
+    # Fallbacks derive from ``required=False``.
+    required_false = rule(required=False)
+    assert _resolve_severity(required_false) == "warning"
+    assert _resolve_gate(required_false) is False
+    assert _resolve_tier(required_false) == "extended"
+
+    # Invalid explicit values are ignored in favor of the fallback.
+    invalid = rule(severity="bogus", tier="bogus", required=False)
+    assert _resolve_severity(invalid) == "warning"
+    assert _resolve_tier(invalid) == "extended"

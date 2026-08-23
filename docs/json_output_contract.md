@@ -31,9 +31,12 @@ If `--output` is omitted, JSON is printed to stdout.
       "status": "fail",
       "items": [
         {
+          "rule_id": "check_python_version",
           "label": "Python version",
           "value": "Python 3.9.18 (>=3.10)",
           "status": "fail",
+          "severity": "error",
+          "tier": "core",
           "hint": "Target a Python version supported by Azure Functions: 3.10, 3.11, 3.12, 3.13, or 3.14.",
           "hint_url": "https://learn.microsoft.com/..."
         }
@@ -69,9 +72,12 @@ If `--output` is omitted, JSON is printed to stdout.
 
 | Field | Type | Description |
 | --- | --- | --- |
+| `rule_id` | string | Stable machine-oriented rule identifier (matches the rule `id` in the ruleset). Used directly as the SARIF `ruleId`. |
 | `label` | string | Check display label. |
 | `value` | string | Diagnostic detail text from handler execution. |
 | `status` | `pass` \| `warn` \| `fail` | Canonical item-level status. |
+| `severity` | `error` \| `warning` \| `info` | Runtime severity of the rule. A failing `error` rule maps to `fail`; otherwise it maps to `warn`. |
+| `tier` | `core` \| `extended` \| `experimental` | Rule maturity/tier classification. |
 | `hint` | string (optional) | Human-readable remediation guidance. |
 | `hint_url` | string (optional) | Supporting documentation link. |
 
@@ -88,9 +94,12 @@ Use the following contract expectations when writing parsers.
 | `metadata.target_python` | Stable | Safe for correlating requested target Python version. |
 | `results[].category` | Stable | Prefer for machine grouping. |
 | `results[].status` | Stable | Safe for section-level logic. |
+| `results[].items[].rule_id` | Stable | Prefer for machine matching of specific rules; used as SARIF `ruleId`. |
 | `results[].items[].label` | Stable | Safe for human-readable matching. |
 | `results[].items[].status` | Stable | Primary gate/filter field. |
 | `results[].items[].value` | Stable | Safe for reporting detail text. |
+| `results[].items[].severity` | Stable | Runtime severity classification. |
+| `results[].items[].tier` | Stable | Rule maturity/tier classification. |
 | `results[].title` | Detail | Display-oriented; do not hardcode behavior on casing/format. |
 | `results[].items[].hint` | Detail | Helpful for UX, optional in parsers. |
 | `results[].items[].hint_url` | Detail | Helpful for UX, optional in parsers. |

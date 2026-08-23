@@ -194,9 +194,36 @@ Rules without a documentation anchor belong in the Experimental tier until a ref
 
 ---
 
-## Proposed Future Metadata
+## Rule Identity, Severity, and Tier Metadata
 
-The following optional fields are reserved for future schema extensions.
+As of the rule-model refactor, the schema and runtime model rule **identity**,
+**severity**, **gate**, and **tier** explicitly instead of overloading `required`.
+Each emitted check result carries a stable `rule_id` (used directly by the SARIF
+reporter — no fragile reverse-mapping from the human-readable label).
+
+```json
+{
+  "id": "check_host_json",
+  "severity": "error",
+  "gate": true,
+  "tier": "core"
+}
+```
+
+| Field | Values | Purpose |
+|---|---|---|
+| `severity` | `error`, `warning`, `info` | Runtime severity of a failing rule. A failing `error` rule maps to `fail`; otherwise it maps to `warn`. |
+| `gate` | `true`, `false` | Whether a failing rule fails its section (gates the run), independent of severity. |
+| `tier` | `core`, `extended`, `experimental` | Explicit maturity/tier classification. |
+
+All three are **optional** and backward compatible: when omitted they are derived
+from `required` (`severity` → `error`/`warning`, `gate` → the `required` value,
+`tier` → `core`/`extended`). This keeps existing `v2.json` entries valid while
+allowing rules to specify the three concerns independently.
+
+### Proposed Future Metadata
+
+The following optional fields remain reserved for future schema extensions.
 They are **not currently enforced** by the schema or handler runtime.
 
 ```json
@@ -204,8 +231,7 @@ They are **not currently enforced** by the schema or handler runtime.
   "id": "check_host_json",
   "source_type": "ms_learn",
   "source_title": "Azure Functions host.json reference",
-  "source_url": "https://learn.microsoft.com/azure/azure-functions/functions-host-json",
-  "tier": "core"
+  "source_url": "https://learn.microsoft.com/azure/azure-functions/functions-host-json"
 }
 ```
 
@@ -214,7 +240,6 @@ They are **not currently enforced** by the schema or handler runtime.
 | `source_type` | `ms_learn`, `derived`, `heuristic` | Classification of rule's documentation basis |
 | `source_title` | String | Human-readable title of the source document |
 | `source_url` | URI | Direct link to the authoritative reference |
-| `tier` | `core`, `extended`, `experimental` | Explicit tier classification |
 
 To adopt these fields, update `rules.schema.json`, the `Rule` TypedDict in `handlers/_helpers.py`,
 and all entries in `v2.json`.

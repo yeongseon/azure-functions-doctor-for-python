@@ -116,7 +116,17 @@
       },
       "severity": {
         "type": "string",
-        "description": "Severity classification for the rule (optional)."
+        "description": "Severity wired into runtime output: 'error' maps a failing check to fail, 'warning'/'info' map it to warn. When omitted it is derived from 'required'.",
+        "enum": ["error", "warning", "info"]
+      },
+      "gate": {
+        "type": "boolean",
+        "description": "Whether a failing check gates the run (fails its section / non-zero exit). Separate from severity. When omitted it is derived from 'required'."
+      },
+      "tier": {
+        "type": "string",
+        "description": "Maturity tier of the rule. When omitted it is derived from 'required' (required -> core, optional -> extended).",
+        "enum": ["core", "extended", "experimental"]
       },
       "fix": {
         "type": "string",
