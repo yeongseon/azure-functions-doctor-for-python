@@ -202,6 +202,23 @@ def test_collect_routes_missing_validate_http_excludes_spec_serving(tmp_path: Pa
     assert helpers._collect_routes_missing_validate_http(tmp_path) == ["function_app.py:items"]
 
 
+def test_collect_routes_openapi_decorator_covers_metadata(tmp_path: Path) -> None:
+    # A route carrying @openapi already emits endpoint metadata, so it must not
+    # be flagged even without @validate_http.
+    helpers = import_module("azure_functions_doctor.handlers._helpers")
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n"
+        "from azure_functions_openapi import openapi\n"
+        "fa = func.FunctionApp()\n\n"
+        "@fa.route(route='items')\n"
+        "@openapi(summary='List items')\n"
+        "def items(req):\n"
+        "    return req\n",
+        encoding="utf-8",
+    )
+    assert helpers._collect_routes_missing_validate_http(tmp_path) == []
+
+
 # ---------------------------------------------------------------------------
 # Regression: @validate_http above a binding decorator (dead handler)
 # ---------------------------------------------------------------------------

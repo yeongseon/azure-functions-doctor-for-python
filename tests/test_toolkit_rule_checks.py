@@ -70,7 +70,11 @@ def test_openapi_version_mixing_both_signals_fails(tmp_path: Path) -> None:
         "app.py",
         "V30 = '3.0.3'\nV31 = '3.1.0'\n",
     )
-    assert _collect_openapi_version_mixing(tmp_path) == ({"3.0.3"}, {"3.1.0"})
+    assert _collect_openapi_version_mixing(tmp_path) == {
+        "3.0": {"3.0.3"},
+        "3.1": {"3.1.0"},
+        "3.2": set(),
+    }
     assert _status("openapi_version_mixing", tmp_path) == "fail"
 
 
@@ -80,8 +84,9 @@ def test_openapi_version_mixing_nullable_counts_as_v30(tmp_path: Path) -> None:
         "app.py",
         "def f():\n    schema(nullable=True)\n    return '3.1.0'\n",
     )
-    v30, v31 = _collect_openapi_version_mixing(tmp_path)
-    assert "nullable" in v30 and "3.1.0" in v31
+    signals = _collect_openapi_version_mixing(tmp_path)
+    assert "nullable" in signals["3.0"] and "3.1.0" in signals["3.1"]
+
     assert _status("openapi_version_mixing", tmp_path) == "fail"
 
 
@@ -90,9 +95,20 @@ def test_openapi_version_mixing_single_version_passes(tmp_path: Path) -> None:
     assert _status("openapi_version_mixing", tmp_path) == "pass"
 
 
+def test_openapi_version_mixing_32_only_passes(tmp_path: Path) -> None:
+    _write(tmp_path, "app.py", "V = '3.2.0'\n")
+    assert _collect_openapi_version_mixing(tmp_path)["3.2"] == {"3.2.0"}
+    assert _status("openapi_version_mixing", tmp_path) == "pass"
+
+
+def test_openapi_version_mixing_31_and_32_fails(tmp_path: Path) -> None:
+    _write(tmp_path, "app.py", "V31 = '3.1.0'\nV32 = '3.2.0'\n")
+    assert _status("openapi_version_mixing", tmp_path) == "fail"
+
+
 def test_openapi_version_mixing_skips_syntax_error(tmp_path: Path) -> None:
     _write(tmp_path, "broken.py", "def f(:\n")
-    assert _collect_openapi_version_mixing(tmp_path) == (set(), set())
+    assert _collect_openapi_version_mixing(tmp_path) == {"3.0": set(), "3.1": set(), "3.2": set()}
 
 
 # ---------------------------------------------------------------------------

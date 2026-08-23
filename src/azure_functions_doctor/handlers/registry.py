@@ -949,15 +949,18 @@ class HandlerRegistry:
     def _handle_openapi_version_mixing(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
-        """Detect when both OpenAPI 3.0 and 3.1 signals appear in one project."""
-        v30, v31 = _collect_openapi_version_mixing(path)
-        if not (v30 and v31):
+        """Detect when two or more OpenAPI versions (3.0/3.1/3.2) appear together."""
+        signals = _collect_openapi_version_mixing(path)
+        present = {version: sigs for version, sigs in signals.items() if sigs}
+        if len(present) < 2:
             return _create_result("pass", "No OpenAPI version mixing detected")
         detail = "\n".join(
             [
                 "Mixed OpenAPI version signals detected:",
-                f"- 3.0 signals: {', '.join(sorted(v30))}",
-                f"- 3.1 signals: {', '.join(sorted(v31))}",
+                *[
+                    f"- {version} signals: {', '.join(sorted(sigs))}"
+                    for version, sigs in sorted(present.items())
+                ],
                 "",
                 "Fix: standardise on a single OpenAPI version across the project.",
             ]
