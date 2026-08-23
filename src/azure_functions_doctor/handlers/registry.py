@@ -51,9 +51,9 @@ from azure_functions_doctor.handlers._helpers import (
 )
 from azure_functions_doctor.target_resolver import (
     SUPPORTED_PYTHON_VERSIONS,
-is_supported_python_target,
-resolve_python_target,
-resolve_target_value,
+    is_supported_python_target,
+    resolve_python_target,
+    resolve_target_value,
 )
 
 

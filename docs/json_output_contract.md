@@ -33,7 +33,7 @@ If `--output` is omitted, JSON is printed to stdout.
         {
           "rule_id": "check_python_version",
           "label": "Python version",
-          "value": "Python 3.9.18 (>=3.10)",
+          "value": "Python 3.9.18 (tool runtime, >=3.10) — unsupported target; Azure Functions supports Python 3.10–3.14",
           "status": "fail",
           "severity": "error",
           "tier": "core",
