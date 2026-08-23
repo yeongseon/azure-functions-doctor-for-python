@@ -90,18 +90,18 @@
     "category": "dependencies",
     "section": "python_env",
     "label": "requirements.txt",
-    "description": "Checks that dependencies are declared via requirements.txt or pyproject.toml.",
+    "description": "Checks that dependencies are declared for the deployment mode: requirements.txt for remote build, or pyproject.toml for a local/prebuilt build.",
     "type": "dependency_manifest",
     "required": true,
     "condition": {
       "target": "requirements.txt"
     },
-    "hint": "Add a requirements.txt file (or declare dependencies in pyproject.toml) to install your packages.",
+    "hint": "Azure remote build installs from requirements.txt, so add one (e.g. 'pip freeze > requirements.txt'). pyproject.toml alone is sufficient only for local/prebuilt deployments (--deployment-mode local).",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#managing-dependencies",
     "source_type": "ms_learn",
     "source_title": "Azure Functions Python developer guide — Managing dependencies",
     "source_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#managing-dependencies",
-    "why_it_matters": "Azure Functions installs from requirements.txt at deployment time. Projects that manage dependencies in pyproject.toml typically generate requirements.txt during packaging, so either manifest satisfies this check.",
+    "why_it_matters": "Azure Functions performs a remote build by default and installs dependencies from requirements.txt; it never reads pyproject.toml. A pyproject-only project passes locally but fails at deploy time unless it uses a local/prebuilt deployment.",
     "symptoms": "ModuleNotFoundError at runtime; deployment pipeline fails with missing package errors; cold start crashes.",
     "fix_command": "pip freeze > requirements.txt",
     "check_order": 4
@@ -111,14 +111,14 @@
     "category": "dependencies",
     "section": "python_env",
     "label": "azure-functions package",
-    "description": "Checks if the azure-functions package is declared in requirements.txt or pyproject.toml.",
+    "description": "Checks that the azure-functions package is installable for the deployment mode (requirements.txt for remote build, pyproject.toml for local/prebuilt).",
     "type": "package_declared",
     "required": true,
     "condition": {
       "package": "azure-functions",
       "file": "requirements.txt"
     },
-    "hint": "Add azure-functions to requirements.txt.",
+    "hint": "Add azure-functions to requirements.txt (Azure remote build installs from it). pyproject.toml alone suffices only for local/prebuilt deployments (--deployment-mode local).",
     "hint_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python",
     "source_type": "ms_learn",
     "source_title": "Azure Functions Python developer guide",

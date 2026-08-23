@@ -21,7 +21,8 @@ If `--output` is omitted, JSON is printed to stdout.
     "generated_at": "2026-03-14T10:40:20.731Z",
     "target_path": "/absolute/path/to/project",
     "programming_model": "v2",
-    "target_python": null
+    "target_python": null,
+    "deployment_mode": "remote-build"
   },
   "results": [
     {
@@ -53,6 +54,7 @@ If `--output` is omitted, JSON is printed to stdout.
 | `target_path` | string | Resolved absolute project path used for checks. |
 | `programming_model` | string | Detected Azure Functions programming model (`v2`, `mixed`, `unsupported_v1`, or `unknown`). |
 | `target_python` | string \| null | Target Python version requested via `--target-python`, or `null` when not set. |
+| `deployment_mode` | string | Deployment mode used for dependency checks: `remote-build` (default) or `local`. |
 
 ### `results[]`
 

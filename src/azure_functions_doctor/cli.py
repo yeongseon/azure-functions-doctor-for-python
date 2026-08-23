@@ -28,6 +28,7 @@ console = Console()
 logger = get_logger(__name__)
 
 SUPPORTED_TARGET_PYTHON_VERSIONS = SUPPORTED_PYTHON_VERSIONS
+SUPPORTED_DEPLOYMENT_MODES = ("remote-build", "local")
 
 
 def _validate_inputs(
@@ -35,6 +36,7 @@ def _validate_inputs(
     format_type: str,
     output: Optional[Path],
     target_python: Optional[str] = None,
+    deployment_mode: Optional[str] = None,
 ) -> None:
     """Validate CLI inputs before processing."""
     try:
@@ -86,6 +88,12 @@ def _validate_inputs(
             f"Invalid target Python: {target_python}. Supported values: {supported}"
         )
 
+    if deployment_mode is not None and deployment_mode not in SUPPORTED_DEPLOYMENT_MODES:
+        supported = ", ".join(SUPPORTED_DEPLOYMENT_MODES)
+        raise typer.BadParameter(
+            f"Invalid deployment mode: {deployment_mode}. Supported values: {supported}"
+        )
+
 
 def _write_output(content: str, output: Optional[Path], label: str) -> None:
     if output:
@@ -133,6 +141,16 @@ def doctor(
     target_python: Annotated[
         Optional[str], typer.Option("--target-python", help="Override target Python runtime")
     ] = None,
+    deployment_mode: Annotated[
+        str,
+        typer.Option(
+            "--deployment-mode",
+            help=(
+                "Deployment mode: 'remote-build' (Azure builds from requirements.txt) "
+                "or 'local' (dependencies prebuilt/vendored locally)."
+            ),
+        ),
+    ] = "remote-build",
 ) -> None:
     """
     Run diagnostics on an Azure Functions application.
@@ -149,7 +167,7 @@ def doctor(
         target_python: Optional target Python runtime override.
     """
     # Validate inputs before proceeding
-    _validate_inputs(path, format, output, target_python)
+    _validate_inputs(path, format, output, target_python, deployment_mode)
 
     if rules is not None and not rules.exists():
         raise typer.BadParameter(f"Rules path does not exist: {rules}")
@@ -162,7 +180,13 @@ def doctor(
         setup_logging(level=None, format_style="simple")
 
     start_time = time.time()
-    doctor = Doctor(path, profile=profile, rules_path=rules, target_python=target_python)
+    doctor = Doctor(
+        path,
+        profile=profile,
+        rules_path=rules,
+        target_python=target_python,
+        deployment_mode=deployment_mode,
+    )
     resolved_path = Path(path).resolve()
     report_properties = doctor.get_report_properties()
 

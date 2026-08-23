@@ -40,6 +40,7 @@ from azure_functions_doctor.handlers._helpers import (
     _resolve_host_json_pointer,
     _rule_handler,
     _source_contains_ast,
+    is_local_prebuilt_deployment,
     logger,
     parse_compare_version,
     parse_package,
@@ -219,13 +220,13 @@ class HandlerRegistry:
     def _handle_dependency_manifest(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
-        """Pass when the project declares dependencies via requirements.txt OR
-        pyproject.toml.
+        """Validate the dependency manifest against the deployment mode.
 
-        Azure Functions installs from requirements.txt at deploy time, but many
-        modern projects manage dependencies in ``pyproject.toml`` and generate
-        requirements.txt during packaging. Accept either manifest so
-        pyproject-only projects are not reported as broken.
+        Azure Functions performs a *remote build* by default, installing
+        dependencies from ``requirements.txt`` on the server. A pyproject-only
+        project therefore passes only for a local/prebuilt deployment; under
+        remote build a missing ``requirements.txt`` is flagged because the
+        server never reads ``pyproject.toml``.
         """
         condition = rule.get("condition", {}) or {}
         target = parse_target(condition) or "requirements.txt"
@@ -233,10 +234,21 @@ class HandlerRegistry:
         if req_path.is_file():
             return _create_result("pass", f"{req_path} exists")
         if pyproject_declares_dependencies(path):
-            return _create_result(
-                "pass",
-                f"{req_path} not found; dependencies declared in pyproject.toml",
+            if is_local_prebuilt_deployment(path, context):
+                return _create_result(
+                    "pass",
+                    f"{req_path} not found; dependencies declared in pyproject.toml "
+                    "(local/prebuilt deployment)",
+                )
+            detail = (
+                f"{req_path} not found; dependencies are only declared in "
+                "pyproject.toml. Azure remote build installs from requirements.txt, "
+                "so generate one (e.g. 'pip freeze > requirements.txt') or deploy "
+                "with a local/prebuilt build (--deployment-mode local)."
             )
+            if not rule.get("required", True):
+                detail += " (optional)"
+            return _create_result("fail", detail)
         detail = f"{req_path} not found and pyproject.toml declares no dependencies"
         if not rule.get("required", True):
             detail += " (optional)"
@@ -310,12 +322,21 @@ class HandlerRegistry:
         normalized_target = canonicalize_name(package_name)
         req_path = path / Path(req_file)
         if not req_path.exists():
-            # No requirements.txt: fall back to pyproject.toml so pyproject-only
-            # projects can still declare the package.
+            # No requirements.txt: fall back to pyproject.toml. This is valid
+            # only for a local/prebuilt deployment; remote build reads
+            # requirements.txt, never pyproject.toml.
             if normalized_target in pyproject_dependency_names(path):
+                if is_local_prebuilt_deployment(path, context):
+                    return _create_result(
+                        "pass",
+                        f"Package '{package_name}' declared in pyproject.toml "
+                        "(local/prebuilt deployment)",
+                    )
                 return _create_result(
-                    "pass",
-                    f"Package '{package_name}' declared in pyproject.toml",
+                    "fail",
+                    f"Package '{package_name}' is only declared in pyproject.toml; "
+                    "Azure remote build installs from requirements.txt. Add it there "
+                    "or deploy with a local/prebuilt build (--deployment-mode local).",
                 )
             return _create_result(
                 "fail",
@@ -328,9 +349,17 @@ class HandlerRegistry:
         normalized = _parse_requirements_names(content)
         declared = normalized_target in normalized
         if not declared and normalized_target in pyproject_dependency_names(path):
+            if is_local_prebuilt_deployment(path, context):
+                return _create_result(
+                    "pass",
+                    f"Package '{package_name}' declared in pyproject.toml "
+                    "(local/prebuilt deployment)",
+                )
             return _create_result(
-                "pass",
-                f"Package '{package_name}' declared in pyproject.toml",
+                "fail",
+                f"Package '{package_name}' is only declared in pyproject.toml; "
+                "Azure remote build installs from requirements.txt. Add it there "
+                "or deploy with a local/prebuilt build (--deployment-mode local).",
             )
         return _create_result(
             "pass" if declared else "fail",

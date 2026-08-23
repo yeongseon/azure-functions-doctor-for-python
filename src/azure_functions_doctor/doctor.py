@@ -57,10 +57,12 @@ class Doctor:
         profile: Optional[str] = None,
         rules_path: Optional[Path] = None,
         target_python: Optional[str] = None,
+        deployment_mode: str = "remote-build",
     ) -> None:
         self.project_path: Path = Path(path).resolve()
         self.profile = profile
         self.target_python: Optional[str] = target_python
+        self.deployment_mode: str = deployment_mode
         self.rules_path: Optional[Path] = None
         if rules_path is not None:
             resolved = rules_path.resolve()
@@ -74,6 +76,7 @@ class Doctor:
         return {
             "programming_model": self.programming_model,
             "target_python": self.target_python,
+            "deployment_mode": self.deployment_mode,
         }
 
     def _detect_programming_model(self) -> ProgrammingModel:
@@ -259,7 +262,10 @@ class Doctor:
             grouped[rule.get("section", "unknown")].append(rule)
 
         results: list[SectionResult] = []
-        context: RuleContext = {"target_python": self.target_python}
+        context: RuleContext = {
+            "target_python": self.target_python,
+            "deployment_mode": self.deployment_mode,
+        }
 
         for section, checks in grouped.items():
             section_result: SectionResult = {
