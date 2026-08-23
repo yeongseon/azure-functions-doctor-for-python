@@ -491,7 +491,9 @@ class HandlerRegistry:
         A plain decorator-based ``FunctionApp`` project has no ASGI/WSGI app and
         should not be warned, so the check **skips** when there is no framework
         signal at all. When a framework is present but its callable is not wired
-        into Azure Functions it warns; a correctly exposed callable passes.
+        into Azure Functions it returns ``fail`` (surfaced as a warning by the
+        doctor only because this rule is optional); a correctly exposed callable
+        passes.
         """
         # Azure Functions wiring that actually exposes an ASGI/WSGI callable.
         exposure_patterns = [

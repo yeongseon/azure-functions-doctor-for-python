@@ -291,7 +291,7 @@ host.json property '$.extensionBundle' not found
 Example warning detail:
 
 ```text
-ASGI/WSGI framework detected but no callable is exposed via AsgiFunctionApp/WsgiFunctionApp
+ASGI/WSGI framework detected but no callable is exposed via AsgiFunctionApp/WsgiFunctionApp (or AsgiMiddleware/WsgiMiddleware); wire it into Azure Functions: ['main.py:\bFastAPI\s*\('] (optional)
 ```
 
 ## 17) `check_unused_files`

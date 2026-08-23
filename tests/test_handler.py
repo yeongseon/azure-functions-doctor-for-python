@@ -429,7 +429,7 @@ def test_conditional_exists_durable_present_pass() -> None:
         assert result["status"] == "pass"
 
 
-def test_callable_detection_pass_and_fail() -> None:
+def test_callable_detection_skip_fail_pass() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         # No ASGI/WSGI framework => skip (plain FunctionApp)
         rule: Rule = {"type": "callable_detection"}

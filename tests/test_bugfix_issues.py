@@ -137,7 +137,7 @@ def test_callable_detection_asgi_function_app_passes(tmp_path: Path) -> None:
     assert result["status"] == "pass"
 
 
-def test_callable_detection_fastapi_passes(tmp_path: Path) -> None:
+def test_callable_detection_fastapi_unexposed_fails(tmp_path: Path) -> None:
     """#307: FastAPI present but no exposure => warn (fail)."""
     (tmp_path / "main.py").write_text(
         "from fastapi import FastAPI\napp = FastAPI()\n",
@@ -150,7 +150,7 @@ def test_callable_detection_fastapi_passes(tmp_path: Path) -> None:
     assert result["status"] == "fail"
 
 
-def test_callable_detection_flask_passes(tmp_path: Path) -> None:
+def test_callable_detection_flask_unexposed_fails(tmp_path: Path) -> None:
     """#307: Flask present but no exposure => warn (fail)."""
     (tmp_path / "main.py").write_text(
         "from flask import Flask\napp = Flask(__name__)\n",

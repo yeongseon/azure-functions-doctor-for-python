@@ -2305,8 +2305,8 @@ def test_local_settings_json_exists() -> None:
         assert result["status"] in ("pass", "fail")  # pass if not git-tracked or git unavailable
 
 
-def test_executable_detection() -> None:
-    """Test _handle_callable_detection doesn't find executable pattern."""
+def test_callable_detection_skip_without_framework() -> None:
+    """callable_detection returns skip when no framework signal is present."""
     registry = HandlerRegistry()
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
