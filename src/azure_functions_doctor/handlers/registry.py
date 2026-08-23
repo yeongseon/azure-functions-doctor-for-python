@@ -803,31 +803,53 @@ class HandlerRegistry:
                 f"extensionBundle id '{bundle_id}' is not the recommended '{recommended_id}'",
             )
 
-        # Check that the version range starts with [4.
-        version_str = str(bundle_version)
-        if version_str.startswith("[4."):
+        version_str = str(bundle_version).strip()
+        # Parse a NuGet-style range: [lower, upper) with */numeric version parts.
+        range_match = re.match(
+            r"^([\[(])\s*"
+            r"(\d+)(?:\.(\d+|\*))?(?:\.(\d+|\*))?\s*,\s*"
+            r"(\d+)(?:\.(\d+|\*))?(?:\.(\d+|\*))?\s*"
+            r"([\])])$",
+            version_str,
+        )
+        if range_match is None:
+            return _create_result(
+                "fail",
+                f"extensionBundle version '{version_str}' is not a valid range;"
+                " use the recommended [4.0.0, 5.0.0)",
+            )
+
+        lower_bracket = range_match.group(1)
+        lower_major = int(range_match.group(2))
+        upper_major = int(range_match.group(5))
+        upper_bracket = range_match.group(8)
+
+        if lower_major < 4:
+            return _create_result(
+                "fail",
+                f"extensionBundle version '{version_str}' is below"
+                " recommended v4 range — upgrade to [4.0.0, 5.0.0)",
+            )
+
+        # Valid v4: lower bound inclusive starting at major 4, upper bound
+        # exclusive at exactly major 5 (i.e. [4.x, 5.0.0)).
+        is_valid_v4 = (
+            lower_bracket == "["
+            and lower_major == 4
+            and upper_major == 5
+            and upper_bracket == ")"
+        )
+        if is_valid_v4:
             return _create_result(
                 "pass",
                 f"extensionBundle uses recommended v4 range: {version_str}",
             )
 
-        # Detect older major versions
-        import re as _re
-
-        major_match = _re.search(r"\[(\d+)\.", version_str)
-        if major_match:
-            major = int(major_match.group(1))
-            if major < 4:
-                return _create_result(
-                    "fail",
-                    f"extensionBundle version '{version_str}' is below"
-                    " recommended v4 range — upgrade to [4.*, 5.0.0)",
-                )
-
         return _create_result(
             "fail",
-            f"extensionBundle version '{version_str}' does not match"
-            " recommended v4 range [4.*, 5.0.0)",
+            f"extensionBundle version '{version_str}' does not match the"
+            " recommended v4 range [4.0.0, 5.0.0); the upper bound must be an"
+            " exclusive 5.0.0",
         )
 
     @_rule_handler
