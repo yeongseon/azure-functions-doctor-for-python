@@ -37,7 +37,6 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_scan_before_spec` | Endpoint scan before spec build | framework | programming_model | `scan_before_spec` | No | full |
 | `check_langgraph_anonymous_auth` | LangGraph route authentication | configuration | security | `langgraph_anonymous_auth` | No | full |
 | `check_durable_nondeterminism` | Orchestrator determinism | framework | durable | `durable_nondeterminism` | Yes | minimal, full |
-| `check_unsupported_metadata_version` | Supported metadata version | configuration | extensions | `unsupported_metadata_version` | No | full |
 | `check_otel_trace_context_activation` | OTel trace-context activation | configuration | observability | `otel_activation` | No | full |
 
 ## Rule Types
