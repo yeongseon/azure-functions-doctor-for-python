@@ -479,6 +479,106 @@ def test_any_of_exists_env_and_file(tmp_path: Path, monkeypatch: MonkeyPatch) ->
     assert res3["status"] == "fail"
 
 
+_APP_INSIGHTS_ENV = (
+    "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "APPLICATIONINSIGHTS_AUTHENTICATION_STRING",
+    "APPINSIGHTS_INSTRUMENTATIONKEY",
+)
+
+
+def _clear_app_insights_env(monkeypatch: MonkeyPatch) -> None:
+    for name in _APP_INSIGHTS_ENV:
+        monkeypatch.delenv(name, raising=False)
+
+
+def test_app_insights_connection_string_passes(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _clear_app_insights_env(monkeypatch)
+    monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "InstrumentationKey=abc")
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "pass"
+    assert "connection string configured" in res["detail"]
+
+
+def test_app_insights_connection_string_with_auth(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _clear_app_insights_env(monkeypatch)
+    monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "InstrumentationKey=abc")
+    monkeypatch.setenv("APPLICATIONINSIGHTS_AUTHENTICATION_STRING", "Authorization=AAD")
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "pass"
+    assert "Entra auth" in res["detail"]
+
+
+def test_app_insights_conn_and_legacy_key_fails(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _clear_app_insights_env(monkeypatch)
+    monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "InstrumentationKey=abc")
+    monkeypatch.setenv("APPINSIGHTS_INSTRUMENTATIONKEY", "legacy-key")
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "fail"
+    assert "legacy instrumentation key" in res["detail"]
+
+
+def test_app_insights_legacy_key_only_fails(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _clear_app_insights_env(monkeypatch)
+    monkeypatch.setenv("APPINSIGHTS_INSTRUMENTATIONKEY", "legacy-key")
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "fail"
+    assert "ingestion ended" in res["detail"]
+
+
+def test_app_insights_host_json_key_only_fails(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _clear_app_insights_env(monkeypatch)
+    (tmp_path / "host.json").write_text(json.dumps({"instrumentationKey": "host-key"}))
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "fail"
+    assert "instrumentation key" in res["detail"]
+
+
+def test_app_insights_not_configured_fails(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _clear_app_insights_env(monkeypatch)
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "fail"
+    assert "not configured" in res["detail"]
+
+
+def test_app_insights_empty_conn_string_treated_as_unconfigured(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
+    """An empty/whitespace connection string must not count as configured."""
+    _clear_app_insights_env(monkeypatch)
+    monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "   ")
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "fail"
+    assert "not configured" in res["detail"]
+
+
+def test_app_insights_auth_without_conn_string_fails(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
+    """Entra auth set but no connection string is a dedicated misconfiguration."""
+    _clear_app_insights_env(monkeypatch)
+    monkeypatch.setenv("APPLICATIONINSIGHTS_AUTHENTICATION_STRING", "Authorization=AAD")
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "fail"
+    assert "APPLICATIONINSIGHTS_CONNECTION_STRING is missing" in res["detail"]
+
+
+def test_app_insights_invalid_host_json_ignored(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    _clear_app_insights_env(monkeypatch)
+    (tmp_path / "host.json").write_text("{ not valid json")
+    rule = _make_rule("app_insights_connection", {})
+    res = generic_handler(rule, tmp_path)
+    assert res["status"] == "fail"
+    assert "not configured" in res["detail"]
+
+
 def test_file_glob_check(tmp_path: Path) -> None:
     # create an unwanted file matching pattern
     bad = tmp_path / "secret.txt"

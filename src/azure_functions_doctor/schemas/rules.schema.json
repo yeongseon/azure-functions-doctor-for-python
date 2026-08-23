@@ -75,7 +75,8 @@
           "langgraph_anonymous_auth",
           "durable_nondeterminism",
           "unsupported_metadata_version",
-          "otel_activation"
+          "otel_activation",
+          "app_insights_connection"
         ]
       },
       "required": {

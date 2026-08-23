@@ -565,6 +565,76 @@ class HandlerRegistry:
         return _create_result("fail", "Targets not found")
 
     @_rule_handler
+    def _handle_app_insights_connection(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Validate Application Insights connection configuration.
+
+        Instrumentation-key ingestion ended 2025-03-31, so a connection string
+        (``APPLICATIONINSIGHTS_CONNECTION_STRING``) is now required. A legacy
+        instrumentation key (``APPINSIGHTS_INSTRUMENTATIONKEY`` or
+        ``host.json:instrumentationKey``) is treated as stale, and
+        ``APPLICATIONINSIGHTS_AUTHENTICATION_STRING`` is recognised for Entra
+        (AAD) authentication.
+        """
+        conn = (os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") or "").strip()
+        auth = (os.getenv("APPLICATIONINSIGHTS_AUTHENTICATION_STRING") or "").strip()
+        ik_env = (os.getenv("APPINSIGHTS_INSTRUMENTATIONKEY") or "").strip()
+
+        ik_host = False
+        host_path = path / "host.json"
+        if host_path.exists():
+            try:
+                data = json.loads(host_path.read_text(encoding="utf-8"))
+                node = _resolve_host_json_pointer(data, ["instrumentationKey"])
+                ik_host = node is not _HOST_JSON_MISSING and node is not None
+            except json.JSONDecodeError as exc:
+                logger.debug(f"Skip invalid host.json while checking App Insights: {exc}")
+
+        has_ik = bool(ik_env) or ik_host
+        auth_note = (
+            " Entra auth via APPLICATIONINSIGHTS_AUTHENTICATION_STRING is configured."
+            if auth
+            else ""
+        )
+
+        if conn:
+            if has_ik:
+                return _create_result(
+                    "fail",
+                    "Connection string is set, but a legacy instrumentation key is "
+                    "also configured; remove it (instrumentation-key ingestion ended "
+                    "2025-03-31)." + auth_note,
+                )
+            return _create_result(
+                "pass",
+                "Application Insights connection string configured." + auth_note,
+            )
+
+        if has_ik:
+            return _create_result(
+                "fail",
+                "Only a legacy Application Insights instrumentation key is configured; "
+                "instrumentation-key ingestion ended 2025-03-31. Set "
+                "APPLICATIONINSIGHTS_CONNECTION_STRING instead." + auth_note,
+            )
+
+        if auth:
+            return _create_result(
+                "fail",
+                "Application Insights Entra authentication "
+                "(APPLICATIONINSIGHTS_AUTHENTICATION_STRING) is configured, but "
+                "APPLICATIONINSIGHTS_CONNECTION_STRING is missing; set the connection "
+                "string to enable telemetry.",
+            )
+
+        return _create_result(
+            "fail",
+            "Application Insights is not configured; set "
+            "APPLICATIONINSIGHTS_CONNECTION_STRING to enable telemetry.",
+        )
+
+    @_rule_handler
     def _handle_file_glob_check(
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
