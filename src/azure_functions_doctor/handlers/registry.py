@@ -7,6 +7,7 @@ import shutil
 import sys
 from typing import Callable, Dict, List, Optional
 
+from packaging.requirements import InvalidRequirement, Requirement
 from packaging.utils import canonicalize_name
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
@@ -126,8 +127,7 @@ class HandlerRegistry:
                 )
             if not supported:
                 detail += (
-                    f" \u2014 unsupported target; Azure Functions supports "
-                    f"Python {supported_range}"
+                    f" \u2014 unsupported target; Azure Functions supports Python {supported_range}"
                 )
             return _create_result(
                 "pass" if passed else "fail",
@@ -1135,6 +1135,243 @@ class HandlerRegistry:
                 "",
                 "Fix: install the azure-functions-logging[otel] extra (or an "
                 "opentelemetry-* package), or disable activate_trace_context.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_functions_extension_version(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Flag a missing, legacy, or non-v4 FUNCTIONS_EXTENSION_VERSION setting.
+
+        The v1/v2/v3 runtimes are retired, so ``local.settings.json`` should pin
+        the extension version to the current runtime (``~4`` by default). The
+        expected value is overridable via ``condition.value``.
+        """
+        condition = rule.get("condition", {}) or {}
+        expected = str(condition.get("value") or "~4")
+        settings_path = path / "local.settings.json"
+        if not settings_path.exists():
+            return _create_result(
+                "skip",
+                "local.settings.json not present; FUNCTIONS_EXTENSION_VERSION check skipped",
+            )
+        try:
+            data = json.loads(settings_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            return _handle_specific_exceptions("reading local.settings.json", exc)
+        values = data.get("Values") if isinstance(data, dict) else None
+        current = values.get("FUNCTIONS_EXTENSION_VERSION") if isinstance(values, dict) else None
+        if current is None:
+            return _create_result(
+                "fail",
+                "FUNCTIONS_EXTENSION_VERSION is not set in local.settings.json; "
+                f"pin it to '{expected}' for the current Azure Functions runtime.",
+            )
+        if str(current).strip() != expected:
+            return _create_result(
+                "fail",
+                f"FUNCTIONS_EXTENSION_VERSION is '{current}', expected '{expected}'. "
+                "Legacy runtimes (~1/~2/~3) are retired; target the v4 runtime.",
+            )
+        return _create_result("pass", f"FUNCTIONS_EXTENSION_VERSION is '{expected}'")
+
+    @_rule_handler
+    def _handle_linux_fx_version(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Validate any Python ``linuxFxVersion`` declared in infra (bicep) config.
+
+        Flex Consumption and Linux plan apps encode their runtime in
+        ``linuxFxVersion`` (e.g. ``Python|3.12``). When such a declaration targets
+        a Python version outside the supported set it is flagged; when no Python
+        ``linuxFxVersion`` is determinable the check is skipped.
+        """
+        findings: list[tuple[str, str]] = []
+        pattern = re.compile(r"linuxFxVersion['\"]?\s*[:=]\s*['\"]?[Pp]ython\|(\d+\.\d+)")
+        for bicep in sorted(path.rglob("*.bicep")):
+            try:
+                text = bicep.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            for match in pattern.finditer(text):
+                findings.append((str(bicep.relative_to(path)), match.group(1)))
+        if not findings:
+            return _create_result(
+                "skip", "No Python linuxFxVersion found in infra config; check skipped"
+            )
+        unsupported = [(loc, ver) for loc, ver in findings if not is_supported_python_target(ver)]
+        if not unsupported:
+            return _create_result(
+                "pass", "linuxFxVersion Python runtime(s) target a supported version"
+            )
+        supported_range = f"{SUPPORTED_PYTHON_VERSIONS[0]}\u2013{SUPPORTED_PYTHON_VERSIONS[-1]}"
+        detail = "\n".join(
+            [
+                "Unsupported Python linuxFxVersion runtime(s) in infra config:",
+                *[f"- {loc}: Python|{ver}" for loc, ver in unsupported[:10]],
+                "",
+                f"Fix: target a supported Python runtime ({supported_range}).",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_host_json_log_level_conflict(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Flag host.json logLevel entries that conflict with the default level.
+
+        ``logging.logLevel`` category overrides win over ``default``. When a
+        category is configured *more verbose* than ``default`` it silently
+        overrides the intended-restrictive default, producing more logs (and
+        cost/PII exposure) than expected — a common misconfiguration.
+        """
+        host_path = path / "host.json"
+        if not host_path.exists():
+            return _create_result("skip", "host.json not found; logLevel check skipped")
+        try:
+            host_data = json.loads(host_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            return _handle_specific_exceptions("reading host.json", exc)
+        logging_cfg = host_data.get("logging") if isinstance(host_data, dict) else None
+        log_level = logging_cfg.get("logLevel") if isinstance(logging_cfg, dict) else None
+        if not isinstance(log_level, dict) or "default" not in log_level:
+            return _create_result(
+                "skip", "host.json has no logging.logLevel.default; conflict check skipped"
+            )
+        rank = {
+            "trace": 0,
+            "debug": 1,
+            "information": 2,
+            "warning": 3,
+            "error": 4,
+            "critical": 5,
+            "none": 6,
+        }
+        default_rank = rank.get(str(log_level["default"]).strip().lower())
+        if default_rank is None:
+            return _create_result(
+                "fail",
+                f"host.json logging.logLevel.default '{log_level['default']}' "
+                "is not a recognized log level.",
+            )
+        conflicts: list[str] = []
+        for category, level in log_level.items():
+            if category == "default":
+                continue
+            category_rank = rank.get(str(level).strip().lower())
+            if category_rank is not None and category_rank < default_rank:
+                conflicts.append(
+                    f"- {category}={level} is more verbose than default={log_level['default']}"
+                )
+        if not conflicts:
+            return _create_result(
+                "pass", "host.json logLevel categories are consistent with default"
+            )
+        detail = "\n".join(
+            [
+                "host.json logLevel category overrides conflict with the default level:",
+                *conflicts[:10],
+                "",
+                "Fix: lower the category level(s) to match the intended default, or "
+                "raise the default deliberately.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_dev_storage_connection(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Flag the Azurite/dev-storage emulator connection in deployable config.
+
+        ``AzureWebJobsStorage=UseDevelopmentStorage=true`` targets the local
+        Azurite emulator and must never reach a deployed app. It is expected in
+        ``local.settings.json`` (which is not deployed) but is a deploy-risk when
+        present in infra templates (bicep/ARM) that provision app settings.
+        """
+        emulator = "UseDevelopmentStorage=true"
+        findings: list[str] = []
+        candidates = list(path.rglob("*.bicep")) + [
+            p
+            for p in path.rglob("*.json")
+            if p.name not in ("local.settings.json",) and ".venv" not in p.parts
+        ]
+        for candidate in sorted(candidates):
+            try:
+                text = candidate.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            if "AzureWebJobsStorage" in text and emulator in text:
+                findings.append(str(candidate.relative_to(path)))
+        if not findings:
+            return _create_result(
+                "pass", "No dev-storage emulator connection found in deployable config"
+            )
+        detail = "\n".join(
+            [
+                "Dev-storage emulator connection in deployable config (ships to production):",
+                *[f"- {loc}" for loc in findings[:10]],
+                "",
+                "Fix: provision a real storage account connection for AzureWebJobsStorage "
+                "in deployment templates; keep UseDevelopmentStorage=true only in "
+                "local.settings.json.",
+            ]
+        )
+        return _create_result("fail", detail)
+
+    @_rule_handler
+    def _handle_unpinned_requirements(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when ``requirements.txt`` declares unpinned/unbounded dependencies.
+
+        Azure remote build resolves ``requirements.txt`` at deploy time, so
+        unpinned dependencies (no version specifier, or an open ``>=`` lower
+        bound with no upper bound) make deployments non-reproducible and prone to
+        surprise breakage.
+        """
+        condition = rule.get("condition", {}) or {}
+        target = parse_target(condition) or "requirements.txt"
+        req_path = path / target
+        if not req_path.is_file():
+            return _create_result("skip", f"{target} not found; unpinned check skipped")
+        try:
+            content = req_path.read_text(encoding="utf-8")
+        except OSError as exc:
+            return _handle_specific_exceptions(f"reading {target}", exc)
+        unpinned: list[str] = []
+        for raw in content.splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or line.startswith("-"):
+                continue
+            try:
+                requirement = Requirement(line)
+            except InvalidRequirement:
+                continue
+            if requirement.url is not None:
+                continue
+            specifiers = list(requirement.specifier)
+            if not specifiers:
+                unpinned.append(f"- {requirement.name} (no version specifier)")
+                continue
+            has_upper_bound = any(
+                spec.operator in ("==", "===", "~=", "<", "<=") for spec in specifiers
+            )
+            if not has_upper_bound:
+                bounds = ",".join(str(spec) for spec in specifiers)
+                unpinned.append(f"- {requirement.name} ({bounds}; no upper bound)")
+        if not unpinned:
+            return _create_result("pass", f"{target} dependencies are pinned/bounded")
+        detail = "\n".join(
+            [
+                f"Unpinned or unbounded dependencies in {target}:",
+                *unpinned[:10],
+                "",
+                "Fix: pin versions (e.g. 'package==1.2.3') or add an upper bound to "
+                "keep deployments reproducible.",
             ]
         )
         return _create_result("fail", detail)

@@ -18,7 +18,9 @@ from azure_functions_doctor.logging_config import (
     setup_logging,
 )
 from azure_functions_doctor.target_resolver import (
+    SUPPORTED_HOSTING_PLANS,
     SUPPORTED_PYTHON_VERSIONS,
+    is_supported_python_for_plan,
     resolve_python_target,
 )
 from azure_functions_doctor.utils import format_detail, format_status_icon
@@ -28,7 +30,7 @@ console = Console()
 logger = get_logger(__name__)
 
 SUPPORTED_TARGET_PYTHON_VERSIONS = SUPPORTED_PYTHON_VERSIONS
-SUPPORTED_DEPLOYMENT_MODES = ("remote-build", "local")
+SUPPORTED_DEPLOYMENT_MODES = ("remote-build", "local", "local-prebuilt", "container")
 
 
 def _validate_inputs(
@@ -37,6 +39,7 @@ def _validate_inputs(
     output: Optional[Path],
     target_python: Optional[str] = None,
     deployment_mode: Optional[str] = None,
+    hosting_plan: Optional[str] = None,
 ) -> None:
     """Validate CLI inputs before processing."""
     try:
@@ -94,6 +97,23 @@ def _validate_inputs(
             f"Invalid deployment mode: {deployment_mode}. Supported values: {supported}"
         )
 
+    if hosting_plan is not None and hosting_plan not in SUPPORTED_HOSTING_PLANS:
+        supported = ", ".join(SUPPORTED_HOSTING_PLANS)
+        raise typer.BadParameter(
+            f"Invalid hosting plan: {hosting_plan}. Supported values: {supported}"
+        )
+
+    if (
+        target_python is not None
+        and hosting_plan is not None
+        and not is_supported_python_for_plan(target_python, hosting_plan)
+    ):
+        raise typer.BadParameter(
+            f"Python {target_python} is not supported on the '{hosting_plan}' hosting plan. "
+            "Linux Consumption caps at Python 3.12; use Flex Consumption, Premium, or "
+            "Dedicated for newer runtimes."
+        )
+
 
 def _write_output(content: str, output: Optional[Path], label: str) -> None:
     if output:
@@ -146,11 +166,23 @@ def doctor(
         typer.Option(
             "--deployment-mode",
             help=(
-                "Deployment mode: 'remote-build' (Azure builds from requirements.txt) "
-                "or 'local' (dependencies prebuilt/vendored locally)."
+                "Deployment mode: 'remote-build' (Azure builds from requirements.txt), "
+                "'local' or 'local-prebuilt' (dependencies prebuilt/vendored locally), "
+                "or 'container' (dependencies baked into a custom container image)."
             ),
         ),
     ] = "remote-build",
+    hosting_plan: Annotated[
+        Optional[str],
+        typer.Option(
+            "--hosting-plan",
+            help=(
+                "Target Azure hosting plan for Python-version validation: "
+                "'linux-consumption' (caps at Python 3.12), 'flex-consumption', "
+                "'premium', or 'dedicated'."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """
     Run diagnostics on an Azure Functions application.
@@ -167,7 +199,7 @@ def doctor(
         target_python: Optional target Python runtime override.
     """
     # Validate inputs before proceeding
-    _validate_inputs(path, format, output, target_python, deployment_mode)
+    _validate_inputs(path, format, output, target_python, deployment_mode, hosting_plan)
 
     if rules is not None and not rules.exists():
         raise typer.BadParameter(f"Rules path does not exist: {rules}")

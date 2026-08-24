@@ -13,6 +13,22 @@ logger = get_logger(__name__)
 # inclusive major.minor set is unsupported and should fail diagnostics.
 SUPPORTED_PYTHON_VERSIONS: Tuple[str, ...] = ("3.10", "3.11", "3.12", "3.13", "3.14")
 
+# Python support is not uniform across Azure Functions hosting plans. Linux
+# Consumption is capped at Python 3.12 ("the last Python version supported for
+# Linux Consumption plan apps"), while Flex Consumption, Premium (Elastic
+# Premium), and Dedicated (App Service) plans track the newer runtimes. A flat
+# allow-list would pass invalid combinations such as Python 3.14 on Linux
+# Consumption, so support is modelled as a per-plan matrix.
+PYTHON_HOSTING_PLAN_MATRIX: Dict[str, Tuple[str, ...]] = {
+    "linux-consumption": ("3.10", "3.11", "3.12"),
+    "flex-consumption": ("3.10", "3.11", "3.12", "3.13", "3.14"),
+    "premium": ("3.10", "3.11", "3.12", "3.13", "3.14"),
+    "dedicated": ("3.10", "3.11", "3.12", "3.13", "3.14"),
+}
+
+# Hosting plans recognized by the Python-version compatibility matrix.
+SUPPORTED_HOSTING_PLANS: Tuple[str, ...] = tuple(PYTHON_HOSTING_PLAN_MATRIX)
+
 
 def _major_minor(version: str) -> Optional[Tuple[int, int]]:
     """Return the ``(major, minor)`` pair for a version string, or ``None``."""
@@ -36,6 +52,24 @@ def is_supported_python_target(version: str) -> bool:
     if parsed is None:
         return False
     supported = {_major_minor(v) for v in SUPPORTED_PYTHON_VERSIONS}
+    return parsed in supported
+
+
+def is_supported_python_for_plan(version: str, plan: str) -> bool:
+    """Return ``True`` when ``version`` is supported on the given hosting ``plan``.
+
+    Only the major.minor components are considered. Unknown plans fall back to
+    the plan-agnostic :func:`is_supported_python_target` check so callers never
+    reject a version merely because the plan name is unrecognized.
+    """
+    allowed = PYTHON_HOSTING_PLAN_MATRIX.get(plan)
+    if allowed is None:
+        return is_supported_python_target(version)
+    parsed = _major_minor(version)
+    if parsed is None:
+        return False
+    supported = {_major_minor(v) for v in allowed}
+    return parsed in supported
     return parsed in supported
 
 

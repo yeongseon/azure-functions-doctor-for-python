@@ -76,7 +76,12 @@
           "durable_nondeterminism",
           "unsupported_metadata_version",
           "otel_activation",
-          "app_insights_connection"
+          "app_insights_connection",
+          "functions_extension_version",
+          "linux_fx_version",
+          "host_json_log_level_conflict",
+          "dev_storage_connection",
+          "unpinned_requirements"
         ]
       },
       "required": {
