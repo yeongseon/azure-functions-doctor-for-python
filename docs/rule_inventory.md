@@ -38,6 +38,11 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_langgraph_anonymous_auth` | LangGraph route authentication | configuration | security | `langgraph_anonymous_auth` | No | full |
 | `check_durable_nondeterminism` | Orchestrator determinism | framework | durable | `durable_nondeterminism` | Yes | minimal, full |
 | `check_otel_trace_context_activation` | OTel trace-context activation | configuration | observability | `otel_activation` | No | full |
+| `check_functions_extension_version` | Functions extension version | configuration | runtime | `functions_extension_version` | No | full |
+| `check_linux_fx_version` | Linux runtime (linuxFxVersion) | configuration | runtime | `linux_fx_version` | No | full |
+| `check_host_json_log_level_conflict` | host.json logLevel conflict | configuration | observability | `host_json_log_level_conflict` | No | full |
+| `check_dev_storage_connection` | Dev-storage emulator connection | configuration | runtime | `dev_storage_connection` | No | full |
+| `check_unpinned_requirements` | Pinned requirements | dependencies | dependencies | `unpinned_requirements` | No | full |
 
 ## Rule Types
 

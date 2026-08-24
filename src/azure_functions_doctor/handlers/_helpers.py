@@ -907,11 +907,17 @@ def is_local_prebuilt_deployment(path: Path, context: Optional["RuleContext"] = 
 
     Azure Functions performs a *remote build* by default, installing
     dependencies from ``requirements.txt`` on the server. A local/prebuilt
-    deployment is assumed when the caller explicitly selects
-    ``deployment_mode='local'`` or when dependencies are vendored into a
-    ``.python_packages`` directory (as produced by a local/prebuilt build).
+    deployment is assumed when the caller explicitly selects a non-remote
+    deployment mode (``local``, ``local-prebuilt``, or ``container`` — all of
+    which resolve dependencies before/outside the Azure remote build) or when
+    dependencies are vendored into a ``.python_packages`` directory (as produced
+    by a local/prebuilt build).
     """
-    if context is not None and context.get("deployment_mode") == "local":
+    if context is not None and context.get("deployment_mode") in (
+        "local",
+        "local-prebuilt",
+        "container",
+    ):
         return True
     return (path / ".python_packages").is_dir()
 
