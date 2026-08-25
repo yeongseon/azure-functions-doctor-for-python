@@ -325,10 +325,21 @@ jobs:
 ```
 
 That is the entire integration: findings appear in the repository's
-**Security → Code scanning** tab on every push and pull request. The Action's
+**Security → Code scanning** tab on pushes and on pull requests from
+branches in the same repository. The Action's
 `format: sarif` + `upload-sarif: "true"` inputs map directly to the doctor CLI
 and the `upload-sarif` step in [`action.yml`](../../action.yml); no separate
 upload step is needed.
+
+> **Fork pull requests.** Pull requests opened from a *fork* run with a
+> read-only `GITHUB_TOKEN`, so the SARIF upload step is blocked and findings
+> will not appear in Code scanning for those runs. This affects only
+> fork PRs; pushes and same-repository PRs upload normally.
+
+> **Action pinning.** This copy-paste template uses mutable tags
+> (`actions/checkout@v4`, `yeongseon/azure-functions-doctor@v1`) for readability.
+> For a hardened, immutable setup, pin each `uses:` to a full commit SHA (with a
+> `# vX` comment) so the referenced actions cannot change under you.
 
 If you would rather wire the raw CLI yourself (e.g. to customize the run), use the
 step-level fragment below instead.
@@ -347,7 +358,7 @@ step-level fragment below instead.
 
       - name: Upload SARIF to GitHub Code Scanning
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: doctor.sarif
           category: azure-functions-doctor
