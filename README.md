@@ -195,7 +195,7 @@ Use `azure-functions-doctor` as a CI gate to block deployments on required failu
     upload-sarif: "true"
 ```
 
-See [docs/examples/ci_integration.md](docs/examples/ci_integration.md) for Azure DevOps, pre-commit, VS Code, and SARIF upload examples.
+See [docs/examples/ci_integration.md](docs/examples/ci_integration.md) for Azure DevOps, pre-commit, VS Code, and SARIF upload examples — including a [minimal copy-paste SARIF → GitHub code scanning recipe](docs/examples/ci_integration.md#minimal-copy-paste-recipe-official-action).
 
 ## Demo
 

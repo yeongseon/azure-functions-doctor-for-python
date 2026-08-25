@@ -289,6 +289,51 @@ Run it with **Terminal → Run Task → Azure Functions Doctor**. The JSON repor
 
 Upload doctor results as SARIF to surface findings in the GitHub Security tab:
 
+### Minimal copy-paste recipe (official Action)
+
+The fastest path is the official composite Action, which runs the doctor,
+produces SARIF, and calls `github/codeql-action/upload-sarif` for you. Copy this
+complete workflow into `.github/workflows/doctor-sarif.yml`:
+
+```yaml
+name: Doctor → Code Scanning
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write  # required for the SARIF upload
+
+jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run azure-functions-doctor (SARIF → Code Scanning)
+        uses: yeongseon/azure-functions-doctor@v1
+        with:
+          path: .
+          profile: minimal
+          format: sarif
+          output: doctor.sarif
+          upload-sarif: "true"
+```
+
+That is the entire integration: findings appear in the repository's
+**Security → Code scanning** tab on every push and pull request. The Action's
+`format: sarif` + `upload-sarif: "true"` inputs map directly to the doctor CLI
+and the `upload-sarif` step in [`action.yml`](../../action.yml); no separate
+upload step is needed.
+
+If you would rather wire the raw CLI yourself (e.g. to customize the run), use the
+step-level fragment below instead.
+
+
 ```yaml
       - name: Run doctor (SARIF output)
         id: doctor
