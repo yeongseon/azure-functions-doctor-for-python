@@ -372,7 +372,7 @@
       "decorators": ["with_context", "validate_http"]
     },
     "hint": "Move @validate_http below (closer to def) @with_context so it wraps first.",
-    "hint_url": "https://github.com/yeongseon/azure-functions-validation-python/blob/main/README.md#decorator-order",
+    "hint_url": "https://yeongseon.dev/azure-functions-python/platform/how-the-worker-binds-handlers/",
     "source_type": "heuristic",
     "why_it_matters": "Inverted decorator order lets @with_context wrap last, discarding the endpoint metadata attached by @validate_http and breaking OpenAPI generation.",
     "symptoms": "Missing or empty endpoint metadata at runtime; OpenAPI schema omits validated routes.",
@@ -389,7 +389,7 @@
     "required": false,
     "condition": {},
     "hint": "Add @validate_http to HTTP route handlers that should appear in the generated OpenAPI schema.",
-    "hint_url": "https://github.com/yeongseon/azure-functions-validation-python/blob/main/README.md#openapi-metadata",
+    "hint_url": "https://yeongseon.dev/contracts/endpoint/",
     "source_type": "heuristic",
     "why_it_matters": "Route handlers without @validate_http produce no endpoint metadata and stay invisible in auto-generated OpenAPI documentation.",
     "symptoms": "Endpoints missing from OpenAPI spec; incomplete API documentation.",
