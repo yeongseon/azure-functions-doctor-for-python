@@ -13,11 +13,12 @@ No runtime network calls are made; the catalog ships with the package.
 
 from __future__ import annotations
 
+import calendar
 from dataclasses import dataclass
 from datetime import date
 import importlib.resources
 import json
-from typing import Literal, Optional, cast
+from typing import Literal, Optional
 
 from azure_functions_doctor.logging_config import get_logger
 
@@ -75,10 +76,11 @@ class SupportEnd:
         parts = self.value.split("-")
         try:
             if self.precision == "day" and len(parts) == 3:
-                year, month, day = int(parts[0]), int(parts[1]), int(parts[2])
-                return f"{_MONTH_NAMES[month - 1]} {day}, {year}"
+                validated = date(int(parts[0]), int(parts[1]), int(parts[2]))
+                return f"{_MONTH_NAMES[validated.month - 1]} {validated.day}, {validated.year}"
             if self.precision == "month" and len(parts) >= 2:
                 year, month = int(parts[0]), int(parts[1])
+                date(year, month, 1)  # validate month is in 1..12
                 return f"{_MONTH_NAMES[month - 1]} {year}"
             if self.precision == "year":
                 return str(int(parts[0]))
@@ -87,6 +89,30 @@ class SupportEnd:
                 "Malformed support_end value %r for precision %s", self.value, self.precision
             )
         return self.value
+
+    def end_date(self) -> Optional[date]:
+        """Return the last calendar day covered by this support-end value.
+
+        For month precision the last day of the month is used, and for year
+        precision December 31, so date comparisons never treat a coarse value as
+        expiring earlier than the source guarantees. Malformed values yield
+        ``None``.
+        """
+        parts = self.value.split("-")
+        try:
+            if self.precision == "day" and len(parts) == 3:
+                return date(int(parts[0]), int(parts[1]), int(parts[2]))
+            if self.precision == "month" and len(parts) >= 2:
+                year, month = int(parts[0]), int(parts[1])
+                last_day = calendar.monthrange(year, month)[1]
+                return date(year, month, last_day)
+            if self.precision == "year":
+                return date(int(parts[0]), 12, 31)
+        except (ValueError, IndexError):
+            logger.warning(
+                "Malformed support_end value %r for precision %s", self.value, self.precision
+            )
+        return None
 
 
 @dataclass(frozen=True)
@@ -103,6 +129,27 @@ class Fact:
     support_end: Optional[SupportEnd] = None
     max_python: Optional[str] = None
     supersedes: Optional[str] = None
+
+    def effective_status(self, today: Optional[date] = None) -> Optional[str]:
+        """Return the status reconciled with ``today`` and ``support_end``.
+
+        The stored ``status`` is the source-verified baseline. When an
+        end-of-support date is known this reconciles it with the calendar so a
+        future end date is never reported as ``unsupported`` and a past end date
+        is never reported as still supported. The transition is deterministic and
+        self-correcting as time passes, without re-verifying the catalog.
+        """
+        if self.support_end is None:
+            return self.status
+        eos = self.support_end.end_date()
+        if eos is None:
+            return self.status
+        current = today if today is not None else date.today()
+        if current > eos:
+            return "unsupported"
+        if self.status == "unsupported":
+            return "retiring"
+        return self.status
 
 
 @dataclass(frozen=True)
@@ -135,14 +182,31 @@ class Catalog:
         """Return all facts in ``category`` in catalog order."""
         return tuple(fact for fact in self.facts if fact.category == category)
 
-    def python_versions(self) -> tuple[str, ...]:
-        """Return supported Python ``major.minor`` versions, sorted ascending."""
+    def known_python_versions(self) -> tuple[str, ...]:
+        """Return every Python ``major.minor`` in the catalog, sorted ascending."""
         versions = [
             fact.applies_to["python"]
             for fact in self.facts_by_category("python_runtime_lifecycle")
             if "python" in fact.applies_to
         ]
         return tuple(sorted(versions, key=lambda v: _parse_major_minor(v) or (0, 0)))
+
+    def supported_python_versions(self, as_of: Optional[date] = None) -> tuple[str, ...]:
+        """Return Python versions still supported as of ``as_of`` (default today).
+
+        A version is supported unless its effective status (baseline status
+        reconciled with its end-of-support date) is ``"unsupported"``.
+        """
+        versions = [
+            fact.applies_to["python"]
+            for fact in self.facts_by_category("python_runtime_lifecycle")
+            if "python" in fact.applies_to and fact.effective_status(as_of) != "unsupported"
+        ]
+        return tuple(sorted(versions, key=lambda v: _parse_major_minor(v) or (0, 0)))
+
+    def python_versions(self) -> tuple[str, ...]:
+        """Backward-compatible alias for :meth:`known_python_versions`."""
+        return self.known_python_versions()
 
     def python_eos(self, version: str) -> Optional[SupportEnd]:
         """Return the published end-of-support date for a Python ``version``."""
@@ -161,7 +225,7 @@ class Catalog:
         Each plan's allow-list is the globally supported Python set filtered by that
         plan's ``max_python`` cap (plans without a cap track the full set).
         """
-        supported = self.python_versions()
+        supported = self.supported_python_versions()
         matrix: dict[str, tuple[str, ...]] = {}
         for fact in self.facts_by_category("hosting_plan_python_cap"):
             plan = fact.applies_to.get("hosting_plan")
@@ -193,14 +257,23 @@ class Catalog:
         )
 
 
-def _parse_support_end(raw: Optional[dict[str, str]]) -> Optional[SupportEnd]:
+def _parse_support_end(raw: Optional[dict[str, object]]) -> Optional[SupportEnd]:
     if raw is None:
         return None
     value = raw.get("value")
     precision = raw.get("precision")
-    if value is None or precision not in ("day", "month", "year"):
+    if not isinstance(value, str) or precision not in ("day", "month", "year"):
         return None
-    return SupportEnd(value=value, precision=cast(Precision, precision))
+    return SupportEnd(value=value, precision=precision)
+
+
+def _as_str(value: object, default: str = "") -> str:
+    """Return ``value`` when it is a string, else ``default``.
+
+    Unlike ``str(value)`` this never turns an explicit JSON ``null`` into the
+    literal ``"None"``, preserving the module's tolerant-parsing contract.
+    """
+    return value if isinstance(value, str) else default
 
 
 def _parse_fact(raw: dict[str, object]) -> Fact:
@@ -214,12 +287,12 @@ def _parse_fact(raw: dict[str, object]) -> Fact:
     supersedes = raw.get("supersedes")
     status = raw.get("status")
     return Fact(
-        fact_id=str(raw.get("fact_id", "")),
-        category=str(raw.get("category", "")),
+        fact_id=_as_str(raw.get("fact_id")),
+        category=_as_str(raw.get("category")),
         applies_to=applies_to,
-        source_url=str(raw.get("source_url", "")),
-        last_verified=str(raw.get("last_verified", "")),
-        verification_notes=str(raw.get("verification_notes", "")),
+        source_url=_as_str(raw.get("source_url")),
+        last_verified=_as_str(raw.get("last_verified")),
+        verification_notes=_as_str(raw.get("verification_notes")),
         status=str(status) if isinstance(status, str) else None,
         support_end=support_end,
         max_python=str(max_python) if isinstance(max_python, str) else None,
@@ -271,6 +344,10 @@ def load_catalog() -> Catalog:
     except json.JSONDecodeError as exc:  # pragma: no cover - packaging safeguard
         logger.error("Invalid JSON in catalog.json: %s", exc)
         raise RuntimeError(f"Failed to parse catalog.json: {exc}") from exc
+
+    if not isinstance(raw, dict):
+        logger.error("catalog.json root is not a JSON object")
+        raise RuntimeError("catalog.json root must be a JSON object")
 
     _CATALOG_CACHE = _build_catalog(raw)
     return _CATALOG_CACHE
