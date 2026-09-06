@@ -97,6 +97,7 @@ def test_cli_sarif_output() -> None:
     expected_exit = 1 if has_error else 0
     assert result.exit_code == expected_exit
 
+
 def test_cli_sarif_ruleid_propagates_from_rule_id() -> None:
     """SARIF ``ruleId`` comes from the result's ``rule_id``, matching driver rule ids."""
     result = runner.invoke(
@@ -115,6 +116,7 @@ def test_cli_sarif_ruleid_propagates_from_rule_id() -> None:
         rule_id = finding["ruleId"]
         assert rule_id, "every SARIF finding must carry a ruleId"
         assert rule_id in driver_ids, f"ruleId {rule_id!r} must match a driver rule id"
+
 
 def test_cli_junit_output() -> None:
     """Test CLI outputs JUnit format."""
@@ -240,6 +242,7 @@ def test_cli_deployment_mode_local_end_to_end() -> None:
     )
     data = json.loads(result.output)
     assert data["metadata"]["deployment_mode"] == "local"
+
 
 def test_cli_json_output_includes_target_python_override() -> None:
     """Test JSON metadata includes target_python override."""
@@ -385,7 +388,11 @@ def _write_sarif_location_fixture(root: Path) -> int:
 
 def test_cli_sarif_output_emits_per_file_and_per_line_locations(tmp_path: Path) -> None:
     """SARIF results carry per-file locations for a file-based rule and per-line
-    locations (with region) for an AST-based rule."""
+    "locations (with region) for an AST-based rule.
+
+    Absolute scan roots must never leak into the document: URIs pair with
+    %SRCROOT%, so they stay scan-root-relative (issue #392).
+    """
     handler_line = _write_sarif_location_fixture(tmp_path)
 
     result = runner.invoke(app, ["doctor", "--path", str(tmp_path), "--format", "sarif"])
@@ -395,10 +402,18 @@ def test_cli_sarif_output_emits_per_file_and_per_line_locations(tmp_path: Path) 
     def _uri(res: Any) -> str:
         return str(res["locations"][0]["physicalLocation"]["artifactLocation"]["uri"])
 
+    # No absolute filesystem path leaks into any URI.
+    assert all(str(tmp_path) not in _uri(r) for r in sarif_results)
+    assert all(not _uri(r).startswith("/") for r in sarif_results)
+
     # File-based rule: missing host.json is reported against the offending file.
     host_json_results = [r for r in sarif_results if _uri(r) == "host.json"]
     assert host_json_results, "expected a SARIF result located at host.json"
     assert "region" not in host_json_results[0]["locations"][0]["physicalLocation"]
+
+    # Rules without a file location collapse to the scan-root-relative root.
+    fallback_results = [r for r in sarif_results if _uri(r) == "."]
+    assert fallback_results, "expected fallback results located at '.'"
 
     # AST-based rule: the flagged route carries a per-line region.
     ast_results = [r for r in sarif_results if _uri(r) == "function_app.py"]
@@ -411,6 +426,41 @@ def test_cli_sarif_output_emits_per_file_and_per_line_locations(tmp_path: Path) 
     assert region["startLine"] == handler_line
     assert region["endLine"] >= region["startLine"]
     assert region["startColumn"] >= 1
+
+    # Every finding carries a stable fingerprint for Code Scanning matching.
+    for res in sarif_results:
+        fp = res.get("partialFingerprints", {}).get("primaryLocationLineHash")
+        assert isinstance(fp, str) and fp
+
+
+def test_cli_sarif_rebases_relative_scan_root_in_both_branches(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A relative --path prefixes BOTH branches' URIs (issue #392).
+
+    Monorepo scenario: scanning ``services/api`` must emit
+    ``services/api/host.json`` from the file branch AND ``services/api/`` from
+    the fallback branch - never a bare ``host.json``.
+    """
+    services = tmp_path / "services" / "api"
+    services.mkdir(parents=True)
+    _write_sarif_location_fixture(services)
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(app, ["doctor", "--path", "services/api", "--format", "sarif"])
+    # The fixture intentionally fails required checks (exit 1 is expected).
+    sarif_results = json.loads(result.output)["runs"][0]["results"]
+
+    uris = {
+        str(r["locations"][0]["physicalLocation"]["artifactLocation"]["uri"]) for r in sarif_results
+    }
+    # File branch keeps the repo-root prefix.
+    assert "services/api/host.json" in uris
+    assert "services/api/function_app.py" in uris
+    # Fallback branch points at the prefixed scan root, not a bare name.
+    assert "services/api/" in uris
+    assert "host.json" not in uris
+    assert "function_app.py" not in uris
 
 
 def test_create_result_populates_optional_location_fields() -> None:

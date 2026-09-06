@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -337,6 +338,19 @@ def doctor(
             driver_rules.append(driver_rule)
 
         sarif_results = []
+        # SARIF artifactLocation URIs paired with %SRCROOT% must be relative
+        # references (SARIF 2.1.0 §3.4.4), so the scan root is normalized once
+        # (#392): a relative --path (e.g. "services/api" in a monorepo) becomes
+        # the repo-root prefix for every URI; an absolute --path cannot be
+        # related to the runner's checkout root, so URIs stay scan-root-relative
+        # and never leak filesystem paths into the report.
+        scan_root_norm = path.replace("\\", "/").rstrip("/")
+        scan_root_is_absolute = scan_root_norm.startswith("/") or (
+            len(scan_root_norm) > 1 and scan_root_norm[1] == ":"
+        )
+        scan_prefix = ""
+        if not scan_root_is_absolute and scan_root_norm not in ("", "."):
+            scan_prefix = scan_root_norm + "/"
         for section in results:
             for item in section["items"]:
                 status = item.get("status")
@@ -346,10 +360,23 @@ def doctor(
                 rule_id = item.get("rule_id") or item.get("label", "")
                 level = "error" if status == "fail" else "warning"
                 loc_file = item.get("file")
+                artifact_uri = ""
+                loc_line: object = None
                 if loc_file:
                     artifact_uri = str(loc_file).replace("\\", "/")
+                    if Path(str(loc_file)).is_absolute():
+                        # Defensive: handlers emit scan-root-relative paths; if an
+                        # absolute path ever reaches here, rebase it onto the
+                        # scan root so no filesystem path leaks (#392).
+                        try:
+                            artifact_uri = str(Path(str(loc_file)).relative_to(Path(path))).replace(
+                                "\\", "/"
+                            )
+                        except ValueError:
+                            artifact_uri = Path(str(loc_file)).name
                     if artifact_uri.startswith("./"):
                         artifact_uri = artifact_uri[2:]
+                    artifact_uri = scan_prefix + artifact_uri
                     physical_location: dict[str, object] = {
                         "artifactLocation": {
                             "uri": artifact_uri,
@@ -367,17 +394,29 @@ def doctor(
                             region["startColumn"] = loc_column
                         physical_location["region"] = region
                 else:
+                    # Rules without a file location point at the scan root in
+                    # its repo-root-relative form; absolute roots collapse to
+                    # "." so the URI stays a valid relative reference (#392).
                     physical_location = {
                         "artifactLocation": {
-                            "uri": path.replace("\\", "/").rstrip("/") + "/",
+                            "uri": scan_prefix if scan_prefix else ".",
                             "uriBaseId": "%SRCROOT%",
                         }
                     }
+                # Stable fingerprint so Code Scanning can match alerts across
+                # runs even when lines shift; without one, most findings share
+                # the same root location and alerts regenerate/duplicate (#392).
+                fingerprint_seed = f"{rule_id}:{artifact_uri}:{loc_line or 0}"
                 sarif_result: dict[str, object] = {
                     "ruleId": rule_id,
                     "message": {"text": item.get("value", "")},
                     "level": level,
                     "locations": [{"physicalLocation": physical_location}],
+                    "partialFingerprints": {
+                        "primaryLocationLineHash": hashlib.sha256(
+                            fingerprint_seed.encode("utf-8")
+                        ).hexdigest()
+                    },
                 }
                 props: dict[str, object] = {}
                 if item.get("hint"):
