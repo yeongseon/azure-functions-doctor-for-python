@@ -208,16 +208,21 @@ class Catalog:
         """Backward-compatible alias for :meth:`known_python_versions`."""
         return self.known_python_versions()
 
-    def python_eos(self, version: str) -> Optional[SupportEnd]:
-        """Return the published end-of-support date for a Python ``version``."""
+    def python_lifecycle_fact(self, version: str) -> Optional[Fact]:
+        """Return the ``python_runtime_lifecycle`` fact for a Python ``version``."""
         target = _parse_major_minor(version)
         if target is None:
             return None
         for fact in self.facts_by_category("python_runtime_lifecycle"):
             applies = fact.applies_to.get("python")
             if applies is not None and _parse_major_minor(applies) == target:
-                return fact.support_end
+                return fact
         return None
+
+    def python_eos(self, version: str) -> Optional[SupportEnd]:
+        """Return the published end-of-support date for a Python ``version``."""
+        fact = self.python_lifecycle_fact(version)
+        return fact.support_end if fact is not None else None
 
     def hosting_plan_matrix(self) -> dict[str, tuple[str, ...]]:
         """Reconstruct the per-plan supported-Python matrix from the catalog.

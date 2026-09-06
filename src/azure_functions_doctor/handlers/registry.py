@@ -1,3 +1,4 @@
+from datetime import date
 import importlib.util
 import json
 import os
@@ -12,6 +13,7 @@ from packaging.utils import canonicalize_name
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
 
+from azure_functions_doctor.compatibility import Catalog, load_catalog
 from azure_functions_doctor.handlers._helpers import (
     _HOST_JSON_MISSING,
     _PYTHON_CANDIDATES,
@@ -56,6 +58,82 @@ from azure_functions_doctor.target_resolver import (
     resolve_python_target,
     resolve_target_value,
 )
+
+# Issue #343: a Python runtime is flagged "retiring soon" (WARN) when its
+# published Azure Functions end-of-support date falls within this many days of
+# today. Beyond the window the runtime is "supported" (PASS); once the date has
+# passed it is "unsupported" (FAIL). Comparison uses the last calendar day the
+# source guarantees (month/year precision is widened, never narrowed), so the
+# tool never asserts a finer date than Microsoft publishes.
+PYTHON_RETIRING_SOON_WINDOW_DAYS = 180
+
+
+def _evaluate_python_lifecycle(
+    version: str,
+    *,
+    today: date,
+    catalog: Optional[Catalog] = None,
+) -> HandlerResult:
+    """Classify a Python ``version`` against its catalog end-of-support date.
+
+    Returns a :class:`HandlerResult` whose ``status``/``severity``/``gate`` encode
+    one of three deterministic states:
+
+    * **supported** -> ``pass``
+    * **retiring soon** (within :data:`PYTHON_RETIRING_SOON_WINDOW_DAYS`) ->
+      failing status refined to ``warning`` severity, non-gating
+    * **unsupported** (past end-of-support) -> failing status refined to
+      ``error`` severity, gating
+
+    Dates are rendered at the precision the catalog publishes (e.g.
+    ``"October 2026"``); no day-level countdown is synthesized. Auditable
+    evidence (source URL, ``last_verified``, ``catalog_version``) is attached so
+    the finding is offline-verifiable per the Finding Contract v2 (issue #348).
+    """
+    cat = load_catalog() if catalog is None else catalog
+    fact = cat.python_lifecycle_fact(version)
+    if fact is None or fact.support_end is None:
+        # No lifecycle data for this version (e.g. a version outside the
+        # supported band); check_python_version owns that failure, so stay quiet.
+        return _create_result("pass", f"Python {version}: no catalog lifecycle data")
+
+    eos = fact.support_end
+    rendered = eos.render()
+    end = eos.end_date()
+    last_verified = fact.last_verified or cat.last_verified
+
+    if end is not None and today > end:
+        status, severity, gate = "fail", "error", True
+        detail = (
+            f"Python {version} is past Azure Functions end-of-support "
+            f"(ended {rendered}); upgrade to a supported Python (3.12+)."
+        )
+    elif end is not None and (end - today).days <= PYTHON_RETIRING_SOON_WINDOW_DAYS:
+        status, severity, gate = "fail", "warning", False
+        detail = (
+            f"Python {version} support is expected to end in {rendered}; "
+            f"plan an upgrade to a newer Python (3.12+) before then."
+        )
+    else:
+        status, severity, gate = "pass", "info", False
+        detail = (
+            f"Python {version} is supported; Azure Functions support is "
+            f"expected to end in {rendered}."
+        )
+
+    result = _create_result(status, detail)
+    result["severity"] = severity
+    result["gate"] = gate
+    result["evidence"] = detail
+    result["expected"] = "A supported Azure Functions Python runtime (3.12+)"
+    result["actual"] = f"Python {version} (support ends {rendered})"
+    if fact.source_url:
+        result["source_url"] = fact.source_url
+    if last_verified:
+        result["last_verified"] = last_verified
+    if cat.catalog_version:
+        result["catalog_version"] = cat.catalog_version
+    return result
 
 
 class HandlerRegistry:
@@ -156,6 +234,21 @@ class HandlerRegistry:
             )
 
         return _create_result("fail", f"Unknown target for version comparison: {target}")
+
+    @_rule_handler
+    def _handle_python_runtime_lifecycle(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Flag a target Python runtime that is retiring soon or unsupported.
+
+        Reads end-of-support dates from the compatibility catalog (never
+        hardcoded) and renders them at the catalog's published precision, so a
+        month-precision source yields e.g. "October 2026" with no invented day
+        or countdown.
+        """
+        target_python = context.get("target_python") if context is not None else None
+        version, _source = resolve_python_target(path, override=target_python)
+        return _evaluate_python_lifecycle(version, today=date.today())
 
     @_rule_handler
     def _handle_env_var_exists(

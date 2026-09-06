@@ -12,6 +12,7 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_programming_model_v2` | Programming model v2 | project_structure | programming_model | `source_code_contains` | No | full |
 | `check_blueprint_registration` | Blueprint registration | project_structure | programming_model | `blueprint_registration` | No | full |
 | `check_python_version` | Python version | environment | python_env | `compare_version` | Yes | minimal, full |
+| `check_python_runtime_lifecycle` | Python runtime lifecycle | environment | python_env | `python_runtime_lifecycle` | No | full |
 | `check_venv` | Virtual environment | environment | python_env | `any_of_exists` | No | full |
 | `check_python_executable` | Python executable | environment | python_env | `path_exists` | No | full |
 | `check_requirements_txt` | requirements.txt | dependencies | python_env | `dependency_manifest` | Yes | minimal, full |
@@ -65,6 +66,7 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `host_json_version` | Checks that `host.json` declares `"version": "2.0"`. |
 | `local_settings_security` | Checks that `local.settings.json` is not tracked by git. |
 | `host_json_extension_bundle_version` | Checks that `extensionBundle` in `host.json` uses the recommended v4 range. |
+| `python_runtime_lifecycle` | Checks the target Python version against its published Azure Functions end-of-support date (WARN when retiring soon, FAIL when past end-of-support), rendered at the catalog's date precision. |
 
 ## False-positive Risk
 

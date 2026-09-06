@@ -81,7 +81,8 @@
           "linux_fx_version",
           "host_json_log_level_conflict",
           "dev_storage_connection",
-          "unpinned_requirements"
+          "unpinned_requirements",
+          "python_runtime_lifecycle"
         ]
       },
       "required": {
