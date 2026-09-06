@@ -24,7 +24,7 @@ Outputs to table, JSON, SARIF, or JUnit formats. Integrates with CI/CD pipelines
 ## CLI Commands
 
 Main entry points (all aliases):
-- `azure-functions-doctor doctor` — Run all diagnostics
+- `azure-functions-doctor doctor  # the `doctor` subcommand is optional` — Run all diagnostics
 - `azure-functions-doctor doctor` — Same as above
 - `fdoctor doctor` — Short alias
 
