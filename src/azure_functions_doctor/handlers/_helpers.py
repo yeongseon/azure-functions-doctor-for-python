@@ -1,4 +1,6 @@
 import ast
+import contextvars
+from fnmatch import fnmatch
 import json
 from pathlib import Path
 import re
@@ -7,11 +9,13 @@ from typing import (
     TYPE_CHECKING,
     Callable,
     Dict,
+    Iterable,
     Iterator,
     List,
     Literal,
     NamedTuple,
     Optional,
+    Tuple,
     TypedDict,
     TypeVar,
     Union,
@@ -56,6 +60,61 @@ EXCLUDED_PROJECT_DIRS = {
     ".hg",
     ".svn",
 }
+
+
+# Project-scoped extra exclude globs (issue #290). Populated from the
+# ``[tool.azure-functions-doctor].exclude`` config and layered on top of
+# ``EXCLUDED_PROJECT_DIRS``. Stored in a ``ContextVar`` so it stays scoped to
+# the active diagnostic run without threading a parameter through every
+# traversal helper. The tuple is ``(project_root, exclude_globs)``.
+_extra_excludes: contextvars.ContextVar[Tuple[Path, Tuple[str, ...]]] = (
+    contextvars.ContextVar("_extra_excludes", default=(Path(), ()))
+)
+
+
+def set_extra_excludes(
+    root: Path, globs: Iterable[str]
+) -> contextvars.Token[Tuple[Path, Tuple[str, ...]]]:
+    """Set the active extra-exclude globs and return a reset token."""
+    normalized = tuple(g for g in globs if g)
+    return _extra_excludes.set((root, normalized))
+
+
+def reset_extra_excludes(
+    token: contextvars.Token[Tuple[Path, Tuple[str, ...]]],
+) -> None:
+    """Restore the previous extra-exclude state."""
+    _extra_excludes.reset(token)
+
+
+def _matches_extra_exclude(candidate: Path) -> bool:
+    """True when ``candidate`` matches a configured extra-exclude glob.
+
+    Globs are matched against the candidate's POSIX path relative to the
+    configured project root. A trailing-slash-free directory glob such as
+    ``legacy`` also matches everything beneath it (``legacy/**``).
+    """
+    root, globs = _extra_excludes.get()
+    if not globs:
+        return False
+    try:
+        rel = candidate.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return False
+    for glob in globs:
+        pattern = glob.strip().rstrip("/")
+        if not pattern:
+            continue
+        if fnmatch(rel, pattern) or fnmatch(rel, f"{pattern}/*"):
+            return True
+    return False
+
+
+def _is_excluded_path(candidate: Path) -> bool:
+    """True when ``candidate`` is under an excluded dir or an extra glob."""
+    if any(part in EXCLUDED_PROJECT_DIRS for part in candidate.parts):
+        return True
+    return _matches_extra_exclude(candidate)
 
 
 class HandlerResult(TypedDict, total=False):
@@ -793,7 +852,7 @@ def _collect_unsupported_metadata_versions(
     seen: set[Path] = set()
     for pattern in files:
         for match in path.rglob(pattern):
-            if match in seen or any(part in EXCLUDED_PROJECT_DIRS for part in match.parts):
+            if match in seen or _is_excluded_path(match):
                 continue
             seen.add(match)
             data = _load(match)
@@ -843,7 +902,7 @@ def _source_contains_ast(source: str, identifier: str) -> bool:
 def _iter_project_py_contents(path: Path) -> Iterator[tuple[Path, str]]:
     """Yield (py_file, content) for each .py file under path, skipping excluded dirs."""
     for py_file in path.rglob("*.py"):
-        if any(part in EXCLUDED_PROJECT_DIRS for part in py_file.parts):
+        if _is_excluded_path(py_file):
             continue
         content = _read_project_python_file(py_file)
         if content is None:
@@ -954,6 +1013,38 @@ def pyproject_dependency_names(path: Path) -> set[str]:
         except InvalidRequirement:
             continue
     return names
+
+
+class DoctorConfig(TypedDict):
+    """Resolved ``[tool.azure-functions-doctor]`` project configuration."""
+
+    ignore: List[str]
+    exclude: List[str]
+
+
+def load_doctor_config(path: Path) -> DoctorConfig:
+    """Load ``[tool.azure-functions-doctor]`` settings from ``pyproject.toml``.
+
+    Returns ``ignore`` (rule ids to suppress and report as ``skip``) and
+    ``exclude`` (extra path globs layered on top of ``EXCLUDED_PROJECT_DIRS``).
+    Missing files, tables, or keys yield empty lists. Only string list entries
+    are honored; malformed values are ignored rather than raising.
+    """
+    config: DoctorConfig = {"ignore": [], "exclude": []}
+    data = _load_pyproject(path)
+    if not data:
+        return config
+    tool = data.get("tool")
+    if not isinstance(tool, dict):
+        return config
+    table = tool.get("azure-functions-doctor")
+    if not isinstance(table, dict):
+        return config
+    for key in ("ignore", "exclude"):
+        raw = table.get(key)
+        if isinstance(raw, list):
+            config[key] = [item for item in raw if isinstance(item, str)]
+    return config
 
 
 def pyproject_declares_dependencies(path: Path) -> bool:

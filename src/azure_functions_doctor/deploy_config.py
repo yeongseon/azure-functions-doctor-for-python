@@ -130,9 +130,9 @@ class _IaCScan:
 def _is_excluded(candidate: Path) -> bool:
     # Imported lazily to avoid an import cycle: the ``handlers`` package
     # re-exports this module's public API from its ``__init__``.
-    from azure_functions_doctor.handlers._helpers import EXCLUDED_PROJECT_DIRS
+    from azure_functions_doctor.handlers._helpers import _is_excluded_path
 
-    return any(part in EXCLUDED_PROJECT_DIRS for part in candidate.parts)
+    return _is_excluded_path(candidate)
 
 
 def _read_text(candidate: Path) -> Optional[str]:
