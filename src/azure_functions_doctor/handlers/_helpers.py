@@ -117,6 +117,29 @@ def _is_excluded_path(candidate: Path) -> bool:
     return _matches_extra_exclude(candidate)
 
 
+def iter_project_files(
+    project_path: Path, patterns: Union[str, tuple[str, ...], list[str]]
+) -> Iterator[Path]:
+    """Single entry point for project file traversal (issue #393).
+
+    Yields files under ``project_path`` matching ``patterns`` (rglob syntax),
+    honoring ``EXCLUDED_PROJECT_DIRS`` and the user's
+    ``[tool.azure-functions-doctor].exclude`` globs. Handlers must traverse
+    through this helper instead of calling ``Path.rglob`` directly so
+    virtualenvs, node_modules, caches, and user excludes are never scanned -
+    a regression test forbids raw rglob outside this module.
+    """
+    pattern_list: tuple[str, ...]
+    if isinstance(patterns, str):
+        pattern_list = (patterns,)
+    else:
+        pattern_list = tuple(patterns)
+    for pattern in pattern_list:
+        for candidate in sorted(project_path.rglob(pattern)):
+            if not _is_excluded_path(candidate):
+                yield candidate
+
+
 class HandlerResult(TypedDict, total=False):
     status: str
     detail: str
@@ -901,9 +924,7 @@ def _source_contains_ast(source: str, identifier: str) -> bool:
 
 def _iter_project_py_contents(path: Path) -> Iterator[tuple[Path, str]]:
     """Yield (py_file, content) for each .py file under path, skipping excluded dirs."""
-    for py_file in path.rglob("*.py"):
-        if _is_excluded_path(py_file):
-            continue
+    for py_file in iter_project_files(path, "*.py"):
         content = _read_project_python_file(py_file)
         if content is None:
             continue

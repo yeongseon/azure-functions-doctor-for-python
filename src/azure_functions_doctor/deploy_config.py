@@ -26,7 +26,7 @@ from dataclasses import dataclass, field
 import json
 from pathlib import Path
 import re
-from typing import Mapping, Optional
+from typing import Callable, Iterator, Mapping, Optional, Union
 
 from azure_functions_doctor.logging_config import get_logger
 
@@ -127,12 +127,12 @@ class _IaCScan:
     app_settings: dict[str, str] = field(default_factory=dict)
 
 
-def _is_excluded(candidate: Path) -> bool:
+def _shared_traversal() -> Callable[[Path, Union[str, tuple[str, ...], list[str]]], Iterator[Path]]:
     # Imported lazily to avoid an import cycle: the ``handlers`` package
     # re-exports this module's public API from its ``__init__``.
-    from azure_functions_doctor.handlers._helpers import _is_excluded_path
+    from azure_functions_doctor.handlers._helpers import iter_project_files
 
-    return _is_excluded_path(candidate)
+    return iter_project_files
 
 
 def _read_text(candidate: Path) -> Optional[str]:
@@ -157,11 +157,11 @@ def _iter_infra_files(project_path: Path) -> list[tuple[Path, str]]:
     signal, not deployable infrastructure.
     """
     files: list[tuple[Path, str]] = []
-    for candidate in sorted(project_path.rglob("*.bicep")):
-        if not _is_excluded(candidate):
-            files.append((candidate, "bicep"))
-    for candidate in sorted(project_path.rglob("*.json")):
-        if candidate.name == "local.settings.json" or _is_excluded(candidate):
+    iter_project_files = _shared_traversal()
+    for candidate in iter_project_files(project_path, "*.bicep"):
+        files.append((candidate, "bicep"))
+    for candidate in iter_project_files(project_path, "*.json"):
+        if candidate.name == "local.settings.json":
             continue
         files.append((candidate, "json"))
     return files
