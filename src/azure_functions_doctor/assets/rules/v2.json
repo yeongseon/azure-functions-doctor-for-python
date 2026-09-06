@@ -113,6 +113,26 @@
     "check_order": 4
   },
   {
+    "id": "check_flex_runtime_config",
+    "category": "configuration",
+    "section": "runtime",
+    "label": "Flex Consumption runtime config",
+    "description": "For a Flex Consumption app, validates the runtime declared under functionAppConfig.runtime (name/version) against the supported Python versions, and warns when a legacy linuxFxVersion is present (Flex ignores it).",
+    "type": "flex_runtime_config",
+    "required": false,
+    "tier": "core",
+    "condition": {},
+    "hint": "Declare the Flex Consumption runtime under functionAppConfig.runtime (name/version); do not use linuxFxVersion.",
+    "hint_url": "https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan",
+    "source_type": "ms_learn",
+    "source_title": "Azure Functions \u2014 Flex Consumption plan (functionAppConfig.runtime)",
+    "source_url": "https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan",
+    "why_it_matters": "Flex Consumption resolves its runtime from functionAppConfig.runtime and ignores linuxFxVersion; a misdeclared or unsupported runtime version fails to deploy or run.",
+    "symptoms": "A Flex app with only linuxFxVersion set has no effective runtime declaration; an unsupported Python version is rejected at deploy time.",
+    "tags": ["runtime", "flex-consumption", "configuration"],
+    "check_order": 5
+  },
+  {
     "id": "check_venv",
     "category": "environment",
     "section": "python_env",
