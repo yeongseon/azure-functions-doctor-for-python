@@ -35,20 +35,27 @@ def _profile(rule: dict) -> str:
     return "minimal, full" if rule.get("required", True) else "full"
 
 
+def _group(rule: dict) -> str:
+    # Functional group of the rule. 'core' targets Azure runtime/hosting/deploy
+    # correctness; 'integration' targets a specific ecosystem library and is only
+    # meaningful when that library is present. Defaults to 'core' when omitted.
+    return rule.get("group", "core")
+
+
 def _render_table(rules: list[dict]) -> str:
     lines = [
         TABLE_HEADER,
         "",
         f"{STAMP_PREFIX} — do not edit this table by hand -->",
         "",
-        "| Rule ID | Label | Category | Section | Type | Required | Profile |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+        "| Rule ID | Label | Category | Group | Section | Type | Required | Profile |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for rule in rules:
         required = "Yes" if rule.get("required", True) else "No"
         lines.append(
             f"| `{rule['id']}` | {rule.get('label', '')} | {rule.get('category', '')} "
-            f"| {rule.get('section', '')} | `{rule.get('type', '')}` | {required} "
+            f"| {_group(rule)} | {rule.get('section', '')} | `{rule.get('type', '')}` | {required} "
             f"| {_profile(rule)} |"
         )
     lines.append("")
