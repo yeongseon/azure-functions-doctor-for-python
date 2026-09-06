@@ -16,7 +16,7 @@ inputs:
   profile:
     description: "Rule profile: 'minimal' (required checks only), 'deploy' (runtime/hosting/deployment correctness), 'development' (dev-environment checks), or 'full' (all checks)"
     required: false
-    default: "minimal"
+    default: "deploy"
   format:
     description: "Output format: 'json', 'sarif', 'junit', or 'table'"
     required: false
@@ -151,7 +151,7 @@ runs:
 
     - name: Upload SARIF to GitHub Code Scanning
       if: inputs.upload-sarif == 'true' && inputs.format == 'sarif' && always()
-      uses: github/codeql-action/upload-sarif@v4
+      uses: github/codeql-action/upload-sarif@cdf488f595d6e07e03d4674febd5ab45fa938 # v4.37.9
       with:
         sarif_file: ${{ inputs.output }}
         category: ${{ inputs.sarif-category }}
