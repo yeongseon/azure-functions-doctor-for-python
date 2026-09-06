@@ -109,17 +109,25 @@ def _evaluate_python_lifecycle(
     end = eos.end_date()
     last_verified = fact.last_verified or cat.last_verified
 
+    # Recommendation is derived from the catalog (single source of truth for
+    # Azure version knowledge), never hardcoded in this handler: point at the
+    # newest still-supported Python so the advice stays correct as the
+    # catalog rolls forward.
+    supported = cat.supported_python_versions(as_of=today)
+    recommended = supported[-1] if supported else None
+    target_hint = f" (e.g. {recommended})" if recommended else ""
+
     if end is not None and today > end:
         status, severity, gate = "fail", "error", True
         detail = (
             f"Python {version} is past Azure Functions end-of-support "
-            f"(ended {rendered}); upgrade to a supported Python (3.12+)."
+            f"(ended {rendered}); upgrade to a newer supported Python{target_hint}."
         )
     elif end is not None and (end - today).days <= PYTHON_RETIRING_SOON_WINDOW_DAYS:
         status, severity, gate = "fail", "warning", False
         detail = (
             f"Python {version} support is expected to end in {rendered}; "
-            f"plan an upgrade to a newer Python (3.12+) before then."
+            f"plan an upgrade to a newer supported Python{target_hint} before then."
         )
     else:
         status, severity, gate = "pass", "info", False
@@ -132,7 +140,7 @@ def _evaluate_python_lifecycle(
     result["severity"] = severity
     result["gate"] = gate
     result["evidence"] = detail
-    result["expected"] = "A supported Azure Functions Python runtime (3.12+)"
+    result["expected"] = "A supported Azure Functions Python runtime"
     result["actual"] = f"Python {version} (support ends {rendered})"
     if fact.source_url:
         result["source_url"] = fact.source_url
