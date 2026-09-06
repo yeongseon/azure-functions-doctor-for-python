@@ -475,3 +475,20 @@ def test_create_result_populates_optional_location_fields() -> None:
 
     bare = _create_result("pass", "ok")
     assert "file" not in bare and "line" not in bare
+
+def test_cli_version_flag_prints_package_version() -> None:
+    """--version prints the installed version without running a scan (#396)."""
+    from azure_functions_doctor import __version__
+
+    result = runner.invoke(app, ["--version"])
+    assert result.exit_code == 0
+    assert result.output.strip() == __version__
+
+
+def test_cli_doctor_subcommand_still_works_with_version_flag_present(
+    tmp_path: Path,
+) -> None:
+    """Adding the top-level --version callback does not break the subcommand."""
+    result = runner.invoke(app, ["doctor", "--path", str(tmp_path), "--format", "json"])
+    assert result.exit_code in (0, 1)
+    assert result.output.startswith("{")

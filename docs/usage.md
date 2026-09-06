@@ -64,6 +64,7 @@ azure-functions-doctor doctor --target-python 3.12
 | `--output` | path | unset | Write output to file instead of stdout. |
 | `-v`, `--verbose` | flag | `false` | Show fix hints for non-passing checks (table mode). |
 | `--debug` | flag | `false` | Enable debug logging for troubleshooting. |
+| `--version` | Print the installed version and exit (no scan). |
 | `--profile` | enum | `full` behavior | Rule profile: `minimal` (required gating checks), `deploy` (Azure runtime/hosting/deployment correctness), `development` (local dev-environment checks), or `full` (all rules). |
 | `--rules` | path | unset | Custom rules file path. |
 | `--target-python` | string | unset | Override the Azure Functions target Python runtime: `3.10`, `3.11`, `3.12`, `3.13`, `3.14` (Preview). On the Linux Consumption plan, the maximum supported version is `3.12`. |

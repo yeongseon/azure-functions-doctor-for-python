@@ -30,6 +30,7 @@ Main entry points (all aliases):
 
 ### Key Options
 
+- `--version` — Print the installed azure-functions-doctor version and exit
 - `--path <PATH>` — Path to the Azure Functions app (default: current directory)
 - `--format <FORMAT>` — Output format: table (default), json, sarif, junit
 - `--output <PATH>` — Save output to file

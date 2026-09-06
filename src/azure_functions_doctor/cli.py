@@ -44,6 +44,26 @@ SUPPORTED_TARGET_PYTHON_VERSIONS = SUPPORTED_PYTHON_VERSIONS
 SUPPORTED_DEPLOYMENT_MODES = ("remote-build", "local", "local-prebuilt", "container")
 
 
+def _version_callback(value: bool) -> None:
+    """Print the installed version and exit (``--version``, issue #396)."""
+    if value:
+        typer.echo(__version__)
+        raise typer.Exit()
+
+
+@cli.callback()
+def _main(
+    version: bool = typer.Option(
+        False,
+        "--version",
+        callback=_version_callback,
+        is_eager=True,
+        help="Show the installed azure-functions-doctor version and exit.",
+    ),
+) -> None:
+    """Azure Functions Python runtime & deployment diagnostic engine."""
+
+
 def _validate_inputs(
     path: str,
     format_type: str,
