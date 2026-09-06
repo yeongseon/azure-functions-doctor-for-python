@@ -121,6 +121,7 @@ def test_get_report_properties_includes_target_python(tmp_path: Path) -> None:
         "programming_model": "v2",
         "target_python": "3.12",
         "deployment_mode": "remote-build",
+        "hosting_plan": None,
     }
 
 

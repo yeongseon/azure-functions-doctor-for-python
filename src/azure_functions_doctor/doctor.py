@@ -16,6 +16,7 @@ from azure_functions_doctor.handlers import (
     _iter_project_py_contents,
     _source_contains_ast,
     generic_handler,
+    resolve_target_config,
 )
 from azure_functions_doctor.logging_config import get_logger, log_rule_execution
 
@@ -88,11 +89,13 @@ class Doctor:
         rules_path: Optional[Path] = None,
         target_python: Optional[str] = None,
         deployment_mode: str = "remote-build",
+        hosting_plan: Optional[str] = None,
     ) -> None:
         self.project_path: Path = Path(path).resolve()
         self.profile = profile
         self.target_python: Optional[str] = target_python
         self.deployment_mode: str = deployment_mode
+        self.hosting_plan: Optional[str] = hosting_plan
         self.rules_path: Optional[Path] = None
         if rules_path is not None:
             resolved = rules_path.resolve()
@@ -107,6 +110,7 @@ class Doctor:
             "programming_model": self.programming_model,
             "target_python": self.target_python,
             "deployment_mode": self.deployment_mode,
+            "hosting_plan": self.hosting_plan,
         }
 
     def _detect_programming_model(self) -> ProgrammingModel:
@@ -298,6 +302,14 @@ class Doctor:
         context: RuleContext = {
             "target_python": self.target_python,
             "deployment_mode": self.deployment_mode,
+            "target_config": resolve_target_config(
+                self.project_path,
+                {
+                    "hosting_plan": self.hosting_plan,
+                    "runtime_version": self.target_python,
+                    "deployment_mode": self.deployment_mode,
+                },
+            ),
         }
 
         for section, checks in grouped.items():

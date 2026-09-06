@@ -218,6 +218,7 @@ def doctor(
         rules_path=rules,
         target_python=target_python,
         deployment_mode=deployment_mode,
+        hosting_plan=hosting_plan,
     )
     resolved_path = Path(path).resolve()
     report_properties = doctor.get_report_properties()
