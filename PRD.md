@@ -129,7 +129,7 @@ Path: examples/v2/http-trigger
   [✓] Programming model v2: decorators found
   ...
 
-Doctor summary:
+Doctor summary (to see all details, run azure-functions-doctor doctor -v):
   0 fails, 0 warnings, N passed
 Exit code: 0
 ```
@@ -168,4 +168,3 @@ azure-functions-doctor doctor --path examples/v2/broken-missing-host-json
 
 All examples are smoke-tested in CI. New diagnostic rules should ship with a corresponding
 broken example that demonstrates the failure.
-</content>
