@@ -177,7 +177,7 @@ class TestHandlerWiring:
     def _run(self, method: str, context: Optional[RuleContext]) -> dict[str, object]:
         registry = HandlerRegistry()
         handler = getattr(registry, method)
-        with patch("azure_functions_doctor.handlers.registry.date") as mock_date:
+        with patch("azure_functions_doctor.handlers.runtime.date") as mock_date:
             mock_date.today.return_value = TODAY
             return dict(handler({}, Path("."), context))
 
