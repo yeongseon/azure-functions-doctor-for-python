@@ -4,7 +4,8 @@
   "sources": {
     "supported_languages": "https://learn.microsoft.com/azure/azure-functions/supported-languages",
     "functions_versions": "https://learn.microsoft.com/azure/azure-functions/functions-versions",
-    "consumption_plan": "https://learn.microsoft.com/azure/azure-functions/consumption-plan"
+    "consumption_plan": "https://learn.microsoft.com/azure/azure-functions/consumption-plan",
+    "functions_app_settings": "https://learn.microsoft.com/azure/azure-functions/functions-app-settings"
   },
   "facts": [
     {
@@ -151,6 +152,14 @@
       "source_url": "https://learn.microsoft.com/azure/azure-functions/functions-versions",
       "last_verified": "2026-09-06",
       "verification_notes": "Microsoft Learn: 'Function apps still running the end-of-life v3 runtime on Linux in a Consumption plan stop running after September 30, 2026.'"
+    },
+    {
+      "fact_id": "flex-deprecated-app-settings",
+      "category": "flex_deprecated_settings",
+      "applies_to": { "hosting_plan": "flex-consumption" },
+      "source_url": "https://learn.microsoft.com/azure/azure-functions/functions-app-settings",
+      "last_verified": "2026-09-06",
+      "verification_notes": "Microsoft Learn 'App settings reference for Azure Functions': the Flex Consumption plan does not use a set of legacy app settings (runtime worker selection, Oryx/remote-build toggles, Azure Files content-share settings, run-from-package, and VNet route-all); the runtime stack, deployment package, scaling, and networking are configured through functionAppConfig and site networking properties instead."
     }
   ]
 }

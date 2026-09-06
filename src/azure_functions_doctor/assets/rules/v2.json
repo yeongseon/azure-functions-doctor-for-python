@@ -133,6 +133,26 @@
     "check_order": 5
   },
   {
+    "id": "check_flex_deprecated_settings",
+    "category": "configuration",
+    "section": "runtime",
+    "label": "Flex Consumption deprecated app settings",
+    "description": "For a Flex Consumption app, warns when legacy app settings that Flex ignores are declared (worker-runtime selection, Oryx/remote-build toggles, Azure Files content-share settings, run-from-package, and VNet route-all), citing the replacement mechanism for each.",
+    "type": "flex_deprecated_settings",
+    "required": false,
+    "tier": "core",
+    "condition": {},
+    "hint": "Remove legacy app settings on Flex Consumption; configure the runtime, deployment, scaling, and networking through functionAppConfig and site networking properties instead.",
+    "hint_url": "https://learn.microsoft.com/azure/azure-functions/functions-app-settings",
+    "source_type": "ms_learn",
+    "source_title": "Azure Functions \u2014 App settings reference (Flex Consumption plan deprecations)",
+    "source_url": "https://learn.microsoft.com/azure/azure-functions/functions-app-settings",
+    "why_it_matters": "Flex Consumption ignores a set of legacy app settings; leaving them in place is a configuration smell that masks the correct functionAppConfig-based configuration and can confuse deployments.",
+    "symptoms": "Deprecated app settings are silently ignored on Flex Consumption, so settings such as FUNCTIONS_WORKER_RUNTIME or WEBSITE_RUN_FROM_PACKAGE have no effect and hide the real configuration.",
+    "tags": ["runtime", "flex-consumption", "app-settings", "configuration"],
+    "check_order": 6
+  },
+  {
     "id": "check_venv",
     "category": "environment",
     "section": "python_env",

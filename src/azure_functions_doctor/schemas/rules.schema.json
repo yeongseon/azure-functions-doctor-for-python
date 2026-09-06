@@ -85,7 +85,8 @@
           "python_runtime_lifecycle",
           "functions_runtime_lifecycle",
           "hosting_plan_lifecycle",
-          "flex_runtime_config"
+          "flex_runtime_config",
+          "flex_deprecated_settings"
         ]
       },
       "required": {
