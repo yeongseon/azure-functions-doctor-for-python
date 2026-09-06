@@ -74,6 +74,11 @@ class HandlerResult(TypedDict, total=False):
     source_url: str
     last_verified: str
     catalog_version: str
+    # Per-finding severity / gate refinements (issue #343): a handler may WARN on
+    # a retiring runtime but FAIL on an unsupported one, overriding the rule's
+    # static severity/gate. Both are optional; when absent the rule defaults win.
+    severity: str
+    gate: bool
 
 
 class RuleContext(TypedDict, total=False):

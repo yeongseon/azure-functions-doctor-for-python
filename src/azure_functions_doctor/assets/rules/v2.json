@@ -48,8 +48,29 @@
     "source_url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python#supported-python-versions",
     "why_it_matters": "Azure Functions supports only Python 3.10\u20133.14. Targeting an older interpreter (\u2264 3.9) or a version newer than the runtime supports causes deployment failures and unsupported runtime errors.",
     "symptoms": "Deployment fails with 'Python version not supported'; functions fail to start; a too-new interpreter is silently downgraded or rejected by the host.",
-    "fix_command": "pyenv install 3.10.16",
+    "fix_command": "pyenv install 3.12",
     "check_order": 1
+  },
+  {
+    "id": "check_python_runtime_lifecycle",
+    "category": "environment",
+    "section": "python_env",
+    "label": "Python runtime lifecycle",
+    "description": "Checks the target Python version against its published Azure Functions end-of-support date, warning on a retiring runtime and failing on one past end-of-support.",
+    "type": "python_runtime_lifecycle",
+    "required": false,
+    "tier": "core",
+    "condition": {
+      "target": "python"
+    },
+    "hint": "Target a Python version with a long support runway (3.12+). Upgrade a retiring runtime before its Azure Functions end-of-support date.",
+    "hint_url": "https://learn.microsoft.com/azure/azure-functions/supported-languages",
+    "source_type": "ms_learn",
+    "source_title": "Azure Functions \u2014 Supported languages (Python runtime lifecycle)",
+    "source_url": "https://learn.microsoft.com/azure/azure-functions/supported-languages",
+    "why_it_matters": "Azure Functions retires Python runtimes on a published schedule. Deploying on a runtime at or past end-of-support risks losing security updates and, eventually, the ability to deploy at all.",
+    "symptoms": "Deployments on a retiring runtime keep working until the end-of-support date, then fail or lose patching; upgrades left too late force a rushed migration.",
+    "check_order": 2
   },
   {
     "id": "check_venv",

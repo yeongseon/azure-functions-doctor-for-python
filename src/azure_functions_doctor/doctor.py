@@ -391,6 +391,15 @@ class Doctor:
                 severity = _resolve_severity(rule)
                 gate = _resolve_gate(rule)
                 tier = _resolve_tier(rule)
+                # A handler may refine severity/gate per finding (issue #343):
+                # e.g. a runtime-lifecycle check WARNs on a retiring runtime but
+                # FAILs on one past end-of-support. When absent, rule defaults win.
+                handler_severity = result.get("severity")
+                if handler_severity in _VALID_SEVERITIES:
+                    severity = str(handler_severity)
+                handler_gate = result.get("gate")
+                if isinstance(handler_gate, bool):
+                    gate = handler_gate
                 rule_id = rule.get("id", "unknown_rule")
                 if handler_status == "pass":
                     canonical = "pass"
