@@ -74,6 +74,23 @@ def _resolve_tier(rule: Rule) -> str:
     return "core" if rule.get("required", True) else "extended"
 
 
+# Rule-profile membership lives in a dependency-free module so lightweight
+# tooling can share the same source of truth; re-exported here for runtime use.
+from azure_functions_doctor.profiles import (  # noqa: E402
+    DEV_ENVIRONMENT_RULES,
+    PROFILE_NAMES,
+    profiles_for_rule,
+    rule_matches_profile,
+)
+
+__all__ = [
+    "DEV_ENVIRONMENT_RULES",
+    "PROFILE_NAMES",
+    "profiles_for_rule",
+    "rule_matches_profile",
+]
+
+
 class CheckResult(TypedDict, total=False):
     rule_id: str
     label: str
@@ -339,10 +356,10 @@ class Doctor:
 
     def run_all_checks(self, rules: Optional[list[Rule]] = None) -> list[SectionResult]:
         rules = self.load_rules() if rules is None else rules
-        if self.profile == "minimal":
-            rules = [rule for rule in rules if rule.get("required", True)]
-        elif self.profile not in (None, "full"):
-            raise ValueError("Profile must be 'minimal' or 'full'")
+        if self.profile is not None and self.profile != "full":
+            if self.profile not in PROFILE_NAMES:
+                raise ValueError("Profile must be one of: " + ", ".join(PROFILE_NAMES))
+            rules = [rule for rule in rules if rule_matches_profile(rule, self.profile)]
 
         if self.programming_model != "v2":
             logger.info(

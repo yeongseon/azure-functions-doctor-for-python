@@ -24,47 +24,47 @@ When a rule omits the field it defaults to `core`.
 
 | Rule ID | Label | Category | Group | Section | Type | Required | Profile |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `check_programming_model_v2` | Programming model v2 | project_structure | core | programming_model | `source_code_contains` | No | full |
-| `check_blueprint_registration` | Blueprint registration | project_structure | core | programming_model | `blueprint_registration` | No | full |
-| `check_python_version` | Python version | environment | core | python_env | `compare_version` | Yes | minimal, full |
-| `check_python_runtime_lifecycle` | Python runtime lifecycle | environment | core | python_env | `python_runtime_lifecycle` | No | full |
-| `check_venv` | Virtual environment | environment | core | python_env | `any_of_exists` | No | full |
-| `check_functions_runtime_lifecycle` | Functions runtime lifecycle | configuration | core | runtime | `functions_runtime_lifecycle` | No | full |
-| `check_python_executable` | Python executable | environment | core | python_env | `path_exists` | No | full |
-| `check_hosting_plan_lifecycle` | Hosting plan lifecycle | configuration | core | runtime | `hosting_plan_lifecycle` | No | full |
-| `check_requirements_txt` | requirements.txt | dependencies | core | python_env | `dependency_manifest` | Yes | minimal, full |
-| `check_flex_runtime_config` | Flex Consumption runtime config | configuration | core | runtime | `flex_runtime_config` | No | full |
-| `check_azure_functions_library` | azure-functions package | dependencies | core | python_env | `package_declared` | Yes | minimal, full |
-| `check_flex_deprecated_settings` | Flex Consumption deprecated app settings | configuration | core | runtime | `flex_deprecated_settings` | No | full |
-| `check_native_dependency_risk` | Native dependency risk | dependencies | core | python_env | `native_dependency_risk` | No | full |
-| `check_flex_deployment_storage` | Flex Consumption deployment storage | configuration | core | runtime | `flex_deployment_storage` | No | full |
-| `check_azure_functions_worker` | azure-functions-worker not pinned | dependencies | core | python_env | `package_forbidden` | No | full |
-| `check_host_json` | host.json | structure | core | project_structure | `file_exists` | Yes | minimal, full |
-| `check_binding_connection_resolution` | Binding connection resolution | configuration | core | runtime | `binding_connection_resolution` | No | full |
-| `check_host_json_version` | host.json version | structure | core | project_structure | `host_json_version` | Yes | minimal, full |
-| `check_local_settings` | local.settings.json | structure | core | project_structure | `file_exists` | No | full |
-| `check_func_cli` | Azure Functions Core Tools (func) | tooling | core | tooling | `executable_exists` | No | full |
-| `check_func_core_tools_version` | Azure Functions Core Tools version | tooling | core | tooling | `compare_version` | No | full |
-| `check_durabletask_config` | Durable Functions configuration | configuration | core | durable | `conditional_exists` | No | full |
-| `check_app_insights` | Application Insights configuration | telemetry | core | monitoring | `app_insights_connection` | No | full |
-| `check_extension_bundle` | extensionBundle | configuration | core | extensions | `host_json_property` | No | full |
-| `check_asgi_wsgi_exposure` | ASGI/WSGI compatibility | framework | core | asgi_wsgi | `callable_detection` | No | full |
-| `check_unused_files` | Detect unused or invalid files | project_health | core | cleanup | `file_glob_check` | No | full |
-| `check_funcignore` | .funcignore | project_health | core | cleanup | `file_exists` | No | full |
-| `check_local_settings_git_tracked` | local.settings.json not git-tracked | project_health | core | security | `local_settings_security` | No | full |
-| `check_extension_bundle_v4` | extensionBundle v4 recommended | configuration | core | extensions | `host_json_extension_bundle_version` | No | full |
-| `check_decorator_order` | Decorator order | framework | core | programming_model | `decorator_order` | No | full |
+| `check_programming_model_v2` | Programming model v2 | project_structure | core | programming_model | `source_code_contains` | No | deploy, full |
+| `check_blueprint_registration` | Blueprint registration | project_structure | core | programming_model | `blueprint_registration` | No | deploy, full |
+| `check_python_version` | Python version | environment | core | python_env | `compare_version` | Yes | minimal, deploy, full |
+| `check_python_runtime_lifecycle` | Python runtime lifecycle | environment | core | python_env | `python_runtime_lifecycle` | No | deploy, full |
+| `check_venv` | Virtual environment | environment | core | python_env | `any_of_exists` | No | development, full |
+| `check_functions_runtime_lifecycle` | Functions runtime lifecycle | configuration | core | runtime | `functions_runtime_lifecycle` | No | deploy, full |
+| `check_python_executable` | Python executable | environment | core | python_env | `path_exists` | No | development, full |
+| `check_hosting_plan_lifecycle` | Hosting plan lifecycle | configuration | core | runtime | `hosting_plan_lifecycle` | No | deploy, full |
+| `check_requirements_txt` | requirements.txt | dependencies | core | python_env | `dependency_manifest` | Yes | minimal, deploy, full |
+| `check_flex_runtime_config` | Flex Consumption runtime config | configuration | core | runtime | `flex_runtime_config` | No | deploy, full |
+| `check_azure_functions_library` | azure-functions package | dependencies | core | python_env | `package_declared` | Yes | minimal, deploy, full |
+| `check_flex_deprecated_settings` | Flex Consumption deprecated app settings | configuration | core | runtime | `flex_deprecated_settings` | No | deploy, full |
+| `check_native_dependency_risk` | Native dependency risk | dependencies | core | python_env | `native_dependency_risk` | No | deploy, full |
+| `check_flex_deployment_storage` | Flex Consumption deployment storage | configuration | core | runtime | `flex_deployment_storage` | No | deploy, full |
+| `check_azure_functions_worker` | azure-functions-worker not pinned | dependencies | core | python_env | `package_forbidden` | No | deploy, full |
+| `check_host_json` | host.json | structure | core | project_structure | `file_exists` | Yes | minimal, deploy, full |
+| `check_binding_connection_resolution` | Binding connection resolution | configuration | core | runtime | `binding_connection_resolution` | No | deploy, full |
+| `check_host_json_version` | host.json version | structure | core | project_structure | `host_json_version` | Yes | minimal, deploy, full |
+| `check_local_settings` | local.settings.json | structure | core | project_structure | `file_exists` | No | development, full |
+| `check_func_cli` | Azure Functions Core Tools (func) | tooling | core | tooling | `executable_exists` | No | development, full |
+| `check_func_core_tools_version` | Azure Functions Core Tools version | tooling | core | tooling | `compare_version` | No | development, full |
+| `check_durabletask_config` | Durable Functions configuration | configuration | core | durable | `conditional_exists` | No | deploy, full |
+| `check_app_insights` | Application Insights configuration | telemetry | core | monitoring | `app_insights_connection` | No | deploy, full |
+| `check_extension_bundle` | extensionBundle | configuration | core | extensions | `host_json_property` | No | deploy, full |
+| `check_asgi_wsgi_exposure` | ASGI/WSGI compatibility | framework | core | asgi_wsgi | `callable_detection` | No | deploy, full |
+| `check_unused_files` | Detect unused or invalid files | project_health | core | cleanup | `file_glob_check` | No | deploy, full |
+| `check_funcignore` | .funcignore | project_health | core | cleanup | `file_exists` | No | deploy, full |
+| `check_local_settings_git_tracked` | local.settings.json not git-tracked | project_health | core | security | `local_settings_security` | No | deploy, full |
+| `check_extension_bundle_v4` | extensionBundle v4 recommended | configuration | core | extensions | `host_json_extension_bundle_version` | No | deploy, full |
+| `check_decorator_order` | Decorator order | framework | core | programming_model | `decorator_order` | No | deploy, full |
 | `check_endpoint_metadata` | Endpoint metadata coverage | framework | integration | programming_model | `endpoint_metadata` | No | full |
 | `check_openapi_version_mixing` | OpenAPI version consistency | framework | integration | programming_model | `openapi_version_mixing` | No | full |
 | `check_scan_before_spec` | Endpoint scan before spec build | framework | integration | programming_model | `scan_before_spec` | No | full |
 | `check_langgraph_anonymous_auth` | LangGraph route authentication | configuration | integration | security | `langgraph_anonymous_auth` | No | full |
-| `check_durable_nondeterminism` | Orchestrator determinism | framework | core | durable | `durable_nondeterminism` | Yes | minimal, full |
+| `check_durable_nondeterminism` | Orchestrator determinism | framework | core | durable | `durable_nondeterminism` | Yes | minimal, deploy, full |
 | `check_otel_trace_context_activation` | OTel trace-context activation | configuration | integration | observability | `otel_activation` | No | full |
-| `check_functions_extension_version` | Functions extension version | configuration | core | runtime | `functions_extension_version` | No | full |
-| `check_linux_fx_version` | Linux runtime (linuxFxVersion) | configuration | core | runtime | `linux_fx_version` | No | full |
-| `check_host_json_log_level_conflict` | host.json logLevel conflict | configuration | core | observability | `host_json_log_level_conflict` | No | full |
-| `check_dev_storage_connection` | Dev-storage emulator connection | configuration | core | runtime | `dev_storage_connection` | No | full |
-| `check_unpinned_requirements` | Pinned requirements | dependencies | core | dependencies | `unpinned_requirements` | No | full |
+| `check_functions_extension_version` | Functions extension version | configuration | core | runtime | `functions_extension_version` | No | deploy, full |
+| `check_linux_fx_version` | Linux runtime (linuxFxVersion) | configuration | core | runtime | `linux_fx_version` | No | deploy, full |
+| `check_host_json_log_level_conflict` | host.json logLevel conflict | configuration | core | observability | `host_json_log_level_conflict` | No | deploy, full |
+| `check_dev_storage_connection` | Dev-storage emulator connection | configuration | core | runtime | `dev_storage_connection` | No | deploy, full |
+| `check_unpinned_requirements` | Pinned requirements | dependencies | core | dependencies | `unpinned_requirements` | No | deploy, full |
 
 ## Rule Types
 

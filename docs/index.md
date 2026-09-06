@@ -58,7 +58,7 @@ This enables direct CI usage without custom gate wrappers.
 ## Feature highlights
 
 - Declarative rules with schema validation
-- Profile-based execution (`full`, `minimal`)
+- Profile-based execution (`minimal`, `deploy`, `development`, `full`)
 - Multiple output formats (`table`, `json`, `sarif`, `junit`)
 - Custom rule file support via `--rules`
 - Programmatic API for pipeline/tool integration
