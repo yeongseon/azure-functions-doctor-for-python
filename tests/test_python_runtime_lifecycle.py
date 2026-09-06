@@ -31,7 +31,10 @@ class TestEvaluatePythonLifecycle:
         # Rendered at month precision: no invented day or countdown.
         assert "October 2028" in result["detail"]
         assert "remaining" not in result["detail"]
-        assert result["source_url"].startswith("https://learn.microsoft.com")
+        assert (
+            result["source_url"]
+            == "https://learn.microsoft.com/azure/azure-functions/supported-languages"
+        )
         assert result["last_verified"] == "2026-09-06"
         assert result["catalog_version"] == "1.0.0"
 
