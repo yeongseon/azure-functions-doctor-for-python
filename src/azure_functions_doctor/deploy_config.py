@@ -389,6 +389,32 @@ def _local_signals(project_path: Path) -> _IaCScan:
     return signals
 
 
+def local_settings_values(project_path: Path) -> dict[str, str]:
+    """Return the string entries of ``local.settings.json`` ``Values`` (empty if absent).
+
+    Only string-valued entries are returned; non-string values are ignored. This is
+    read directly (not through the precedence-based :func:`resolve_target_config`
+    ingestion) so the binding-connection resolution check (#352) can resolve
+    connection names against locally configured settings without changing what
+    :class:`TargetConfig.app_settings` exposes to other checks.
+    """
+    text = _read_text(project_path / "local.settings.json")
+    if text is None:
+        return {}
+    try:
+        data = json.loads(text)
+    except (ValueError, UnicodeDecodeError):
+        return {}
+    values = data.get("Values") if isinstance(data, dict) else None
+    if not isinstance(values, dict):
+        return {}
+    return {
+        key: value
+        for key, value in values.items()
+        if isinstance(key, str) and isinstance(value, str)
+    }
+
+
 def _resolve_field(
     override: Optional[str],
     iac: Optional[ResolvedField],
