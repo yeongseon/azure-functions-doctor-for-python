@@ -67,10 +67,12 @@ azure-functions-doctor doctor [OPTIONS]
 #### Rule Configuration
 
 - `--profile TEXT` (optional)
-  - Rule profile: `minimal` or `full`
+  - Rule profile: `minimal`, `deploy`, `development`, or `full`
   - **minimal**: Load only required rules (required=true). Faster, focused on blockers.
+  - **deploy**: Runtime/hosting/deployment correctness — core-group rules minus dev-environment checks.
+  - **development**: Dev-environment checks (venv, Python executable, Core Tools, local.settings).
   - **full** (default): Load all rules including recommended best practices
-  - Example: `--profile minimal` for required checks only
+  - Example: `--profile deploy` for a pre-deploy gate, `--profile minimal` for required checks only
 
 - `--rules PATH` (optional)
   - Path to custom rules JSON file (overrides built-in rules)

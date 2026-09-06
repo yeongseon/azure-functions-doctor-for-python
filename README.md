@@ -282,7 +282,7 @@ type-based handler, and aggregates the results into per-section output:
 flowchart LR
     CLI["cli.py<br/>Typer CLI"] --> DOC["doctor.py<br/>Diagnostic runner"]
     DOC --> RULES[("assets/<br/>Rule inventory")]
-    DOC --> HDLR["handlers.py<br/>Type-based dispatch"]
+    DOC --> HDLR["handlers/registry.py<br/>Type-based dispatch"]
     HDLR --> TR["target_resolver.py<br/>Version resolution"]
     DOC --> RES["SectionResult<br/>+ CheckResult"]
     RES --> OUT["table / json<br/>sarif / junit"]
@@ -333,7 +333,7 @@ When working with this codebase, LLM assistants should:
 2. **Refer to `llms-full.txt` for implementation details** — output contracts, rule structure, custom rule patterns, handler types
 3. **Check `src/azure_functions_doctor/cli.py`** — authoritative source for CLI options and validation
 4. **Review `src/azure_functions_doctor/assets/rules/v2.json`** — complete ruleset with check definitions
-5. **Consult `src/azure_functions_doctor/handlers.py`** — diagnostic rule handlers and pattern matchers
+5. **Consult `src/azure_functions_doctor/handlers/registry.py`** — diagnostic rule handlers and pattern matchers (`handlers/_helpers.py` for shared primitives)
 
 For bug reports, feature requests, or documentation improvements, please open an issue or pull request on GitHub.
 

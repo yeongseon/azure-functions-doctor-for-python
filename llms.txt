@@ -33,7 +33,7 @@ Main entry points (all aliases):
 - `--path <PATH>` — Path to the Azure Functions app (default: current directory)
 - `--format <FORMAT>` — Output format: table (default), json, sarif, junit
 - `--output <PATH>` — Save output to file
-- `--profile <PROFILE>` — Rule profile: minimal (required only) or full (default)
+- `--profile <PROFILE>` — Rule profile: minimal (required only), deploy (runtime/hosting/deployment correctness), development (dev-environment checks), or full (all rules; default when omitted)
 - `--rules <PATH>` — Custom rules file (JSON)
 - `--summary-json <PATH>` — Write JSON summary (passed/warned/failed counts)
 - `--verbose` — Show detailed hints for failed checks
@@ -80,8 +80,10 @@ azure-functions-doctor --format junit --output test-results.xml
 - **Triggers** — Proper HTTP/Timer/Storage trigger usage and configuration
 - **Core Tools** — Local Azure Functions Core Tools availability
 
-Rules support two profiles:
+Rules support four profiles:
 - **minimal** — Required checks only
+- **deploy** — Runtime/hosting/deployment correctness (core group, minus dev-environment checks)
+- **development** — Dev-environment checks (venv, Python executable, Core Tools, local.settings)
 - **full** — All checks including recommended best practices
 
 ## Documentation
