@@ -14,7 +14,9 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_python_version` | Python version | environment | python_env | `compare_version` | Yes | minimal, full |
 | `check_python_runtime_lifecycle` | Python runtime lifecycle | environment | python_env | `python_runtime_lifecycle` | No | full |
 | `check_venv` | Virtual environment | environment | python_env | `any_of_exists` | No | full |
+| `check_functions_runtime_lifecycle` | Functions runtime lifecycle | configuration | runtime | `functions_runtime_lifecycle` | No | full |
 | `check_python_executable` | Python executable | environment | python_env | `path_exists` | No | full |
+| `check_hosting_plan_lifecycle` | Hosting plan lifecycle | configuration | runtime | `hosting_plan_lifecycle` | No | full |
 | `check_requirements_txt` | requirements.txt | dependencies | python_env | `dependency_manifest` | Yes | minimal, full |
 | `check_azure_functions_library` | azure-functions package | dependencies | python_env | `package_declared` | Yes | minimal, full |
 | `check_native_dependency_risk` | Native dependency risk | dependencies | python_env | `native_dependency_risk` | No | full |
@@ -67,6 +69,8 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `local_settings_security` | Checks that `local.settings.json` is not tracked by git. |
 | `host_json_extension_bundle_version` | Checks that `extensionBundle` in `host.json` uses the recommended v4 range. |
 | `python_runtime_lifecycle` | Checks the target Python version against its published Azure Functions end-of-support date (WARN when retiring soon, FAIL when past end-of-support), rendered at the catalog's date precision. |
+| `functions_runtime_lifecycle` | Checks the Azure Functions runtime major version (from `FUNCTIONS_EXTENSION_VERSION`): v1 FAILs as incompatible with Python (with a lifecycle note), v2/v3 FAIL as out of support, v3 on Linux Consumption FAILs (apps stop running on a published date), and v4 PASSes. |
+| `hosting_plan_lifecycle` | Checks the resolved hosting plan against its published retirement date: informational when far off, WARN inside the retiring-soon window, and FAIL once retired (never a FAIL merely for being scheduled). |
 
 ## False-positive Risk
 

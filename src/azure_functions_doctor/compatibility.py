@@ -224,6 +224,40 @@ class Catalog:
         fact = self.python_lifecycle_fact(version)
         return fact.support_end if fact is not None else None
 
+    def functions_runtime_fact(self, runtime: str) -> Optional[Fact]:
+        """Return the plan-agnostic ``functions_runtime_lifecycle`` fact for a
+        runtime like ``"4.x"`` (the fact whose ``applies_to`` has no
+        ``hosting_plan`` qualifier). Returns ``None`` when unknown.
+        """
+        for fact in self.facts_by_category("functions_runtime_lifecycle"):
+            if (
+                fact.applies_to.get("functions_runtime") == runtime
+                and "hosting_plan" not in fact.applies_to
+            ):
+                return fact
+        return None
+
+    def functions_runtime_plan_fact(self, runtime: str, hosting_plan: str) -> Optional[Fact]:
+        """Return a plan-specific ``functions_runtime_lifecycle`` fact (e.g. the
+        v3-on-Linux-Consumption stop-running fact) or ``None``.
+        """
+        for fact in self.facts_by_category("functions_runtime_lifecycle"):
+            if (
+                fact.applies_to.get("functions_runtime") == runtime
+                and fact.applies_to.get("hosting_plan") == hosting_plan
+            ):
+                return fact
+        return None
+
+    def hosting_plan_lifecycle_fact(self, hosting_plan: str) -> Optional[Fact]:
+        """Return the ``hosting_plan_lifecycle`` fact for ``hosting_plan`` or
+        ``None`` when the plan has no published retirement.
+        """
+        for fact in self.facts_by_category("hosting_plan_lifecycle"):
+            if fact.applies_to.get("hosting_plan") == hosting_plan:
+                return fact
+        return None
+
     def hosting_plan_matrix(self) -> dict[str, tuple[str, ...]]:
         """Reconstruct the per-plan supported-Python matrix from the catalog.
 
