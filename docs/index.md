@@ -110,6 +110,7 @@ def has_required_failures(path: str) -> bool:
 
 - [Supported Versions](supported_versions.md)
 - [Semver Policy](semver_policy.md)
+- [Comparison vs Official Skill](comparison.md)
 - [Troubleshooting](troubleshooting.md)
 - [FAQ](faq.md)
 
