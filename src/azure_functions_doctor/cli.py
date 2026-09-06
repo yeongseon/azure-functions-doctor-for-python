@@ -156,7 +156,14 @@ def doctor(
         Optional[Path], typer.Option(help="Optional path to save output result")
     ] = None,
     profile: Annotated[
-        Optional[str], typer.Option(help="Rule profile: 'minimal' or 'full'")
+        Optional[str],
+        typer.Option(
+            help=(
+                "Rule profile: 'minimal' (required gating checks), 'deploy' "
+                "(Azure runtime/hosting/deployment correctness), 'development' "
+                "(local dev-environment checks), or 'full' (all rules)."
+            ),
+        ),
     ] = None,
     rules: Annotated[
         Optional[Path], typer.Option(help="Optional path to a custom rules file")
@@ -203,7 +210,7 @@ def doctor(
         debug: Enable debug logging to stderr.
         format: Output format: 'table', 'json', 'sarif', or 'junit'.
         output: Optional file path to save output result.
-        profile: Optional rule profile ('minimal' or 'full').
+        profile: Optional rule profile ('minimal', 'deploy', 'development', or 'full').
         rules: Optional path to a custom rules file.
         summary_json: Path to write a JSON summary with passed/warned/failed counts.
         target_python: Optional target Python runtime override.

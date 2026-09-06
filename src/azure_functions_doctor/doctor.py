@@ -74,6 +74,51 @@ def _resolve_tier(rule: Rule) -> str:
     return "core" if rule.get("required", True) else "extended"
 
 
+# Rules that validate the local developer environment rather than the deployed
+# application's runtime/hosting correctness (issue #356).
+DEV_ENVIRONMENT_RULES: frozenset[str] = frozenset(
+    {
+        "check_venv",
+        "check_python_executable",
+        "check_func_cli",
+        "check_func_core_tools_version",
+        "check_local_settings",
+    }
+)
+
+# Selectable rule profiles, ordered from narrowest to widest surface.
+PROFILE_NAMES: tuple[str, ...] = ("minimal", "deploy", "development", "full")
+
+
+def rule_matches_profile(rule: Rule, profile: str) -> bool:
+    """Return whether ``rule`` runs under the given ``profile``.
+
+    - ``full``: every rule.
+    - ``minimal``: required (gating) rules only.
+    - ``deploy``: core-group rules covering Azure runtime/hosting/deployment
+      correctness; developer-environment and integration rules are excluded.
+    - ``development``: developer-environment checks (virtual environment, Python
+      executable, Core Tools, local.settings existence).
+    """
+    if profile == "full":
+        return True
+    if profile == "minimal":
+        return bool(rule.get("required", True))
+    if profile == "development":
+        return rule.get("id") in DEV_ENVIRONMENT_RULES
+    if profile == "deploy":
+        return (
+            rule.get("group", "core") == "core"
+            and rule.get("id") not in DEV_ENVIRONMENT_RULES
+        )
+    raise ValueError("Profile must be one of: " + ", ".join(PROFILE_NAMES))
+
+
+def profiles_for_rule(rule: Rule) -> list[str]:
+    """Return the profile names ``rule`` participates in, widest-last."""
+    return [name for name in PROFILE_NAMES if rule_matches_profile(rule, name)]
+
+
 class CheckResult(TypedDict, total=False):
     rule_id: str
     label: str
@@ -339,10 +384,10 @@ class Doctor:
 
     def run_all_checks(self, rules: Optional[list[Rule]] = None) -> list[SectionResult]:
         rules = self.load_rules() if rules is None else rules
-        if self.profile == "minimal":
-            rules = [rule for rule in rules if rule.get("required", True)]
-        elif self.profile not in (None, "full"):
-            raise ValueError("Profile must be 'minimal' or 'full'")
+        if self.profile is not None and self.profile != "full":
+            if self.profile not in PROFILE_NAMES:
+                raise ValueError("Profile must be one of: " + ", ".join(PROFILE_NAMES))
+            rules = [rule for rule in rules if rule_matches_profile(rule, self.profile)]
 
         if self.programming_model != "v2":
             logger.info(
