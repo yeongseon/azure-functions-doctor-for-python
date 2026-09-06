@@ -476,6 +476,7 @@ def test_create_result_populates_optional_location_fields() -> None:
     bare = _create_result("pass", "ok")
     assert "file" not in bare and "line" not in bare
 
+
 def test_cli_version_flag_prints_package_version() -> None:
     """--version prints the installed version without running a scan (#396)."""
     from azure_functions_doctor import __version__
@@ -492,3 +493,60 @@ def test_cli_doctor_subcommand_still_works_with_version_flag_present(
     result = runner.invoke(app, ["doctor", "--path", str(tmp_path), "--format", "json"])
     assert result.exit_code in (0, 1)
     assert result.output.startswith("{")
+
+
+def test_cli_sarif_emits_one_result_per_finding(tmp_path: Path) -> None:
+    """Two uncovered routes yield two located endpoint_metadata results (#395)."""
+    (tmp_path / "requirements.txt").write_text(
+        "azure-functions==1.25.0\nazure-functions-validation==0.24.0\n", encoding="utf-8"
+    )
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n"
+        "from azure_functions_validation import validate_http\n"
+        "\n"
+        "app = func.FunctionApp()\n"
+        "\n"
+        "\n"
+        "@validate_http\n"
+        '@app.route(route="alpha")\n'
+        "def alpha(req):\n"
+        "    return req\n"
+        "\n"
+        "\n"
+        "@validate_http\n"
+        '@app.route(route="beta")\n'
+        "def beta(req):\n"
+        "    return req\n",
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["doctor", "--path", str(tmp_path), "--format", "sarif"])
+    sarif_results = json.loads(result.output)["runs"][0]["results"]
+    endpoint = [r for r in sarif_results if r["ruleId"] == "check_endpoint_metadata"]
+    assert len(endpoint) == 2, "expected one SARIF result per uncovered route"
+    lines = sorted(r["locations"][0]["physicalLocation"]["region"]["startLine"] for r in endpoint)
+    assert lines == [9, 15]
+    messages = " | ".join(r["message"]["text"] for r in endpoint)
+    assert "alpha" in messages and "beta" in messages
+    # Distinct fingerprints per finding.
+    prints = {r["partialFingerprints"]["primaryLocationLineHash"] for r in endpoint}
+    assert len(prints) == 2
+
+
+def test_cli_sarif_unpinned_requirements_lands_on_lines(tmp_path: Path) -> None:
+    """Each unpinned requirement carries its requirements.txt line (#394)."""
+    (tmp_path / "requirements.txt").write_text(
+        "azure-functions==1.25.0\nrequests>=2.0\nflask\n", encoding="utf-8"
+    )
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n\napp = func.FunctionApp()\n", encoding="utf-8"
+    )
+
+    result = runner.invoke(app, ["doctor", "--path", str(tmp_path), "--format", "sarif"])
+    sarif_results = json.loads(result.output)["runs"][0]["results"]
+    unpinned = [r for r in sarif_results if r["ruleId"] == "check_unpinned_requirements"]
+    assert unpinned, "expected unpinned-requirements findings"
+    lines = sorted(r["locations"][0]["physicalLocation"]["region"]["startLine"] for r in unpinned)
+    assert lines == [2, 3]
+    uris = {r["locations"][0]["physicalLocation"]["artifactLocation"]["uri"] for r in unpinned}
+    assert uris == {"requirements.txt"}

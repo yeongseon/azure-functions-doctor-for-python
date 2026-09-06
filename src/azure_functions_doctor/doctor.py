@@ -104,6 +104,8 @@ class CheckResult(TypedDict, total=False):
     line: int
     end_line: int
     column: int
+    # Per-finding locations (issues #394/#395); SARIF emits one result per entry.
+    locations: list[dict[str, object]]
     # Finding Contract v2 (issue #348): auditable evidence + freshness metadata.
     evidence: str
     expected: str
@@ -484,6 +486,8 @@ class Doctor:
                     item["end_line"] = result["end_line"]
                 if "column" in result:
                     item["column"] = result["column"]
+                if "locations" in result:
+                    item["locations"] = result["locations"]
 
                 section_result["items"].append(item)
 

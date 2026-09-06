@@ -4,7 +4,7 @@ Split out of handlers/registry.py; registration/dispatch stays there.
 """
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Sequence
 
 from azure_functions_doctor.deploy_config import (
     local_settings_values,
@@ -19,8 +19,19 @@ from azure_functions_doctor.handlers._helpers import (
 )
 
 
+def _normalize_reference(
+    ref: tuple[str, str] | tuple[str, str, int],
+) -> tuple[str, str, int]:
+    """Accept 2-tuples (legacy/tests) and 3-tuples (collector, with lineno)."""
+    if len(ref) == 3:
+        name, label, lineno = ref
+        return name, label, lineno
+    name, label = ref
+    return name, label, 0
+
+
 def _evaluate_binding_connection_resolution(
-    references: list[tuple[str, str]],
+    references: Sequence[tuple[str, str] | tuple[str, str, int]],
     app_settings: dict[str, str],
 ) -> HandlerResult:
     """Resolve v2 binding ``connection`` references against configured settings (#352).
@@ -43,16 +54,17 @@ def _evaluate_binding_connection_resolution(
     def _is_resolved(name: str) -> bool:
         return name in setting_names or name in identity_prefixes
 
-    unresolved: list[tuple[str, str]] = []
+    unresolved: list[tuple[str, str, int]] = []
     seen: set[tuple[str, str]] = set()
-    for name, label in references:
+    for raw_ref in references:
+        name, label, lineno = _normalize_reference(raw_ref)
         if _is_resolved(name):
             continue
         key = (name, label)
         if key in seen:
             continue
         seen.add(key)
-        unresolved.append((name, label))
+        unresolved.append((name, label, lineno))
 
     if not unresolved:
         return _create_result(
@@ -61,18 +73,35 @@ def _evaluate_binding_connection_resolution(
         )
 
     lines = ["Binding connections reference unconfigured settings:"]
-    lines.extend(f"  - {name} ({label})" for name, label in unresolved)
+    lines.extend(f"  - {name} ({label})" for name, label, _ln in unresolved)
     lines.append(
         "Add the missing app setting(s), or configure an identity-based connection "
         "group (<name>__serviceUri / <name>__accountName)."
     )
     detail = "\n".join(lines)
-    result = _create_result("fail", detail)
+    # One location per unresolved reference so each lands on its binding
+    # decorator line in SARIF (issue #394).
+    locations: list[dict[str, object]] = [
+        {
+            "file": label.rsplit(":", 1)[0],
+            "line": lineno if lineno > 0 else None,
+            "message": f"Binding connection '{name}' ({label}) has no matching app setting",
+        }
+        for name, label, lineno in unresolved[:10]
+    ]
+    first = unresolved[0]
+    result = _create_result(
+        "fail",
+        detail,
+        file=first[1].rsplit(":", 1)[0],
+        line=first[2] if first[2] > 0 else None,
+        locations=locations,
+    )
     result["severity"] = "warning"
     result["gate"] = False
     result["expected"] = "Every referenced binding connection has a matching app setting"
     result["actual"] = "Unresolved connections: " + ", ".join(
-        sorted({name for name, _ in unresolved})
+        sorted({name for name, _label, _ln in unresolved})
     )
     return result
 

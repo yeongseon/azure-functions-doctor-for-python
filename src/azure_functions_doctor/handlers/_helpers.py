@@ -148,6 +148,9 @@ class HandlerResult(TypedDict, total=False):
     line: int
     end_line: int
     column: int
+    # Per-finding locations (issue #394/#395): each entry is a dict with
+    # file/line/end_line/column/message keys; SARIF emits one result per entry.
+    locations: List[Dict[str, object]]
     # Finding Contract v2 (issue #348): optional auditable evidence a handler
     # may emit for date / compatibility findings.
     evidence: str
@@ -584,7 +587,9 @@ def _collect_openapi_version_mixing(path: Path) -> dict[str, set[str]]:
     return signals
 
 
-def _collect_scan_before_spec(path: Path, scan_names: set[str], spec_names: set[str]) -> list[str]:
+def _collect_scan_before_spec(
+    path: Path, scan_names: set[str], spec_names: set[str]
+) -> tuple[list[str], list[tuple[str, int]]]:
     """Return "file:spec_call" labels where a spec build precedes endpoint scan.
 
     For each file, records the line numbers of scan-style calls and spec-style
@@ -592,8 +597,13 @@ def _collect_scan_before_spec(path: Path, scan_names: set[str], spec_names: set[
     precedes the earliest scan call in that file. Additionally, if spec calls
     exist anywhere in the project but no scan call is ever seen, every spec call
     is reported (scanning was skipped entirely).
+
+    Returns ``(labels, located)`` where ``located`` carries ``(label, lineno)``
+    pairs so callers can emit per-line SARIF locations (issue #394).
     """
     violations: list[str] = []
+    located: list[tuple[str, int]] = []
+    all_spec_located: list[tuple[str, int]] = []
     any_scan_seen = False
     spec_labels: list[str] = []
     for py_file, content in _iter_project_py_contents(path):
@@ -614,17 +624,22 @@ def _collect_scan_before_spec(path: Path, scan_names: set[str], spec_names: set[
                 scan_lines.append(node.lineno)
             elif leaf in spec_names:
                 spec_calls.append((node.lineno, leaf))
+        for lineno, leaf in spec_calls:
+            label = f"{py_file.relative_to(path)}:{leaf}"
+            spec_labels.append(label)
+            all_spec_located.append((label, lineno))
         if scan_lines:
             any_scan_seen = True
             first_scan = min(scan_lines)
             for lineno, leaf in spec_calls:
                 if lineno < first_scan:
-                    violations.append(f"{py_file.relative_to(path)}:{leaf}")
-        for lineno, leaf in spec_calls:
-            spec_labels.append(f"{py_file.relative_to(path)}:{leaf}")
+                    label = f"{py_file.relative_to(path)}:{leaf}"
+                    violations.append(label)
+                    located.append((label, lineno))
     if spec_labels and not any_scan_seen:
-        return spec_labels
-    return violations
+        # Scanning was skipped entirely: every spec call is a violation.
+        return spec_labels, all_spec_located
+    return violations, located
 
 
 def _project_imports_langgraph(path: Path) -> bool:
@@ -696,8 +711,8 @@ def _collect_anonymous_auth_routes(path: Path, flag_missing_auth_level: bool = F
     return flagged
 
 
-def _collect_binding_connections(path: Path) -> list[tuple[str, str]]:
-    """Return ``(connection_name, "file:function")`` pairs for v2 binding decorators.
+def _collect_binding_connections(path: Path) -> list[tuple[str, str, int]]:
+    """Return ``(connection_name, "file:function", lineno)`` triples for v2 binding decorators.
 
     Scans decorators applied to a discovered ``FunctionApp``/``Blueprint`` alias for a
     ``connection="..."`` keyword and collects the referenced setting name. Only
@@ -706,7 +721,7 @@ def _collect_binding_connections(path: Path) -> list[tuple[str, str]]:
     Storage, Service Bus, Event Hub, Cosmos DB and any other binding that exposes a
     ``connection`` keyword, without hard-coding a decorator whitelist.
     """
-    references: list[tuple[str, str]] = []
+    references: list[tuple[str, str, int]] = []
     for py_file, content in _iter_project_py_contents(path):
         try:
             tree = ast.parse(content)
@@ -735,7 +750,7 @@ def _collect_binding_connections(path: Path) -> list[tuple[str, str]]:
                         and kw.value.value.strip()
                     ):
                         label = f"{py_file.relative_to(path)}:{node.name}"
-                        references.append((kw.value.value, label))
+                        references.append((kw.value.value, label, dec.lineno))
     return references
 
 
@@ -1145,8 +1160,16 @@ def _create_result(
     line: Optional[int] = None,
     end_line: Optional[int] = None,
     column: Optional[int] = None,
+    locations: Optional[List[Dict[str, object]]] = None,
 ) -> HandlerResult:
-    """Create a standardized result dictionary (status limited to 'pass'/'fail')."""
+    """Create a standardized result dictionary (status limited to 'pass'/'fail').
+
+    ``locations`` (issues #394/#395) carries every individual finding as
+    ``{"file", "line", "end_line", "column", "message"}`` so SARIF output can
+    emit one result per finding instead of collapsing N findings onto the
+    first location. When omitted, the scalar ``file``/``line`` fields are the
+    single-location form.
+    """
     res: HandlerResult = {"status": status, "detail": detail}
     if internal_error:
         res["internal_error"] = "true"
@@ -1158,6 +1181,8 @@ def _create_result(
         res["end_line"] = end_line
     if column is not None:
         res["column"] = column
+    if locations:
+        res["locations"] = locations
     return res
 
 

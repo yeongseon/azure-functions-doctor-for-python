@@ -53,6 +53,18 @@ class IntegrationHandlers:
         )
         first_label, first_line, first_end_line, first_column = uncovered[0]
         first_file = first_label.rsplit(":", 1)[0]
+        # One location per uncovered route so SARIF emits one result per
+        # finding instead of collapsing onto the first route (issue #395).
+        locations: list[dict[str, object]] = [
+            {
+                "file": label.rsplit(":", 1)[0],
+                "line": line_no,
+                "end_line": end_line,
+                "column": column,
+                "message": f"Route handler missing @validate_http (no endpoint metadata): {label}",
+            }
+            for label, line_no, end_line, column in uncovered[:10]
+        ]
         return _create_result(
             "fail",
             detail,
@@ -60,6 +72,7 @@ class IntegrationHandlers:
             line=first_line,
             end_line=first_end_line,
             column=first_column,
+            locations=locations,
         )
 
     @_rule_handler
@@ -115,7 +128,7 @@ class IntegrationHandlers:
                 "create_spec",
             ]
         )
-        violations = _collect_scan_before_spec(path, scan_names, spec_names)
+        violations, located = _collect_scan_before_spec(path, scan_names, spec_names)
         if not violations:
             return _create_result("pass", "No spec-before-scan ordering issues detected")
         detail = "\n".join(
@@ -126,7 +139,25 @@ class IntegrationHandlers:
                 "Fix: call the endpoint scan/registration before building the spec.",
             ]
         )
-        return _create_result("fail", detail)
+        # The collector already knows the offending lines; pass them through so
+        # SARIF findings land on the exact spec call (#394).
+        locations = [
+            {
+                "file": label.rsplit(":", 1)[0],
+                "line": lineno,
+                "message": f"OpenAPI spec built before endpoints were scanned: {label}",
+            }
+            for label, lineno in located[:10]
+            if label.rsplit(":", 1)[0] in {v.rsplit(":", 1)[0] for v in violations}
+        ]
+        first = located[0] if located else None
+        return _create_result(
+            "fail",
+            detail,
+            file=first[0].rsplit(":", 1)[0] if first else None,
+            line=first[1] if first else None,
+            locations=locations,
+        )
 
     @_rule_handler
     def _handle_langgraph_anonymous_auth(

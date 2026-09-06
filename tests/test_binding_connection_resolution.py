@@ -58,9 +58,9 @@ class TestCollectBindingConnections:
     def test_collects_string_literal_connections(self, tmp_path: Path) -> None:
         (tmp_path / "function_app.py").write_text(SAMPLE_APP, encoding="utf-8")
         refs = _collect_binding_connections(tmp_path)
-        names = sorted(name for name, _ in refs)
+        names = sorted(name for name, _label, _ln in refs)
         assert names == ["ServiceBusConnection", "StorageConnection"]
-        labels = {label for _, label in refs}
+        labels = {label for _name, label, _ln in refs}
         assert any("function_app.py:handle_bus" in label for label in labels)
 
     def test_ignores_non_literal_connection(self, tmp_path: Path) -> None:
@@ -99,7 +99,7 @@ class TestCollectBindingConnections:
         )
         (tmp_path / "bp.py").write_text(src, encoding="utf-8")
         refs = _collect_binding_connections(tmp_path)
-        assert [name for name, _ in refs] == ["QueueConnection"]
+        assert [name for name, _l, _n in refs] == ["QueueConnection"]
 
 
 class TestLocalSettingsValues:
