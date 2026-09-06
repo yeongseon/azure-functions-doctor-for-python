@@ -66,6 +66,14 @@ class HandlerResult(TypedDict, total=False):
     line: int
     end_line: int
     column: int
+    # Finding Contract v2 (issue #348): optional auditable evidence a handler
+    # may emit for date / compatibility findings.
+    evidence: str
+    expected: str
+    actual: str
+    source_url: str
+    last_verified: str
+    catalog_version: str
 
 
 class RuleContext(TypedDict, total=False):

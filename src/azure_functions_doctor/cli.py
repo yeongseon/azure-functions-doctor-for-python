@@ -3,14 +3,20 @@ import json
 import os
 from pathlib import Path
 import time
-from typing import Annotated, Optional
+from typing import Annotated, Mapping, Optional, cast
 
 from rich.console import Console
 from rich.text import Text
 import typer
 
 from azure_functions_doctor import __version__
-from azure_functions_doctor.doctor import Doctor, _resolve_severity, _resolve_tier
+from azure_functions_doctor.doctor import (
+    FINDING_EVIDENCE_KEYS,
+    FINDING_SCHEMA_VERSION,
+    Doctor,
+    _resolve_severity,
+    _resolve_tier,
+)
 from azure_functions_doctor.logging_config import (
     get_logger,
     log_diagnostic_complete,
@@ -23,7 +29,11 @@ from azure_functions_doctor.target_resolver import (
     is_supported_python_for_plan,
     resolve_python_target,
 )
-from azure_functions_doctor.utils import format_detail, format_status_icon
+from azure_functions_doctor.utils import (
+    format_detail,
+    format_freshness_line,
+    format_status_icon,
+)
 
 cli = typer.Typer()
 console = Console()
@@ -288,6 +298,7 @@ def doctor(
             **report_properties,
         }
         json_output = {
+            "schema_version": FINDING_SCHEMA_VERSION,
             "metadata": metadata,
             "results": results,
         }
@@ -361,8 +372,19 @@ def doctor(
                     "level": level,
                     "locations": [{"physicalLocation": physical_location}],
                 }
+                props: dict[str, object] = {}
                 if item.get("hint"):
-                    sarif_result["properties"] = {"hint": item.get("hint", "")}
+                    props["hint"] = item.get("hint", "")
+                item_map = cast(Mapping[str, object], item)
+                for key in FINDING_EVIDENCE_KEYS:
+                    val = item_map.get(key)
+                    if isinstance(val, str) and val:
+                        props[key] = val
+                analysis = item.get("analysis")
+                if analysis:
+                    props["analysis"] = analysis
+                if props:
+                    sarif_result["properties"] = props
                 sarif_results.append(sarif_result)
 
         sarif_output = {
@@ -461,6 +483,14 @@ def doctor(
                 line.append(f" ({status})", "italic dim")
 
             console.print(line)
+
+            # Finding Contract v2 (issue #348): surface source-verified freshness
+            # for date / compatibility findings that carry it.
+            freshness = format_freshness_line(
+                item.get("last_verified", ""), item.get("source_url", "")
+            )
+            if freshness:
+                console.print(f"    [dim]{freshness}[/dim]")
 
             # show hint as 'fix:' only when verbose is enabled
             if status != "pass" and verbose:
