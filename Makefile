@@ -134,7 +134,10 @@ endif
 	@git push origin HEAD
 	@git tag -a v$(VERSION) -m "Release v$(VERSION)"
 	@git push origin v$(VERSION)
-	@echo "Tagged release v$(VERSION)"
+	# Keep the moving v1 major branch (used by the GitHub Action pin
+	# yeongseon/azure-functions-doctor@v1) fast-forwarded to this release.
+	@git push origin HEAD:refs/heads/v1
+	@echo "Tagged release v$(VERSION) and fast-forwarded the v1 action branch"
 
 .PHONY: release
 release: ensure-hatch
