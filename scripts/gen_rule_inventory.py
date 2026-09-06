@@ -19,7 +19,11 @@ import json
 from pathlib import Path
 import sys
 
-from azure_functions_doctor.doctor import profiles_for_rule
+# Ensure the in-repo package is importable when this script is run directly
+# (e.g. ``python scripts/gen_rule_inventory.py`` in CI, without an editable install).
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from azure_functions_doctor.doctor import profiles_for_rule  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RULES_JSON = ROOT / "src" / "azure_functions_doctor" / "assets" / "rules" / "v2.json"
