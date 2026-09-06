@@ -28,6 +28,7 @@ from azure_functions_doctor.handlers._helpers import (
     _resolve_host_json_pointer,
     _rule_handler,
     _source_contains_ast,
+    iter_project_files,
     logger,
     parse_compare_version,
     parse_source_code,
@@ -190,7 +191,7 @@ class GenericHandlers:
         uses_durable = False
 
         try:
-            for py_file in path.rglob("*.py"):
+            for py_file in iter_project_files(path, "*.py"):
                 content = _read_project_python_file(py_file)
                 if content is None:
                     continue
@@ -263,7 +264,7 @@ class GenericHandlers:
         exposure_hits: List[str] = []
         framework_hits: List[str] = []
         try:
-            for py_file in path.rglob("*.py"):
+            for py_file in iter_project_files(path, "*.py"):
                 content = _read_project_python_file(py_file)
                 if content is None:
                     continue
@@ -361,7 +362,7 @@ class GenericHandlers:
         matches: List[str] = []
         try:
             for pat in patterns:
-                for p in path.rglob(pat):
+                for p in iter_project_files(path, pat):
                     matches.append(str(p.relative_to(path)))
                     if len(matches) >= 5:
                         break

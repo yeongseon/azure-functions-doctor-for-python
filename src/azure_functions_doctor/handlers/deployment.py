@@ -21,6 +21,7 @@ from azure_functions_doctor.handlers._helpers import (
     _handle_specific_exceptions,
     _resolve_host_json_path,
     _rule_handler,
+    iter_project_files,
 )
 from azure_functions_doctor.handlers.runtime import _attach_catalog_evidence
 from azure_functions_doctor.target_resolver import (
@@ -42,10 +43,9 @@ def _infra_declares_linux_fx_version(path: Path) -> bool:
     misconfiguration worth surfacing. ``local.settings.json`` is a local signal,
     not deployable infrastructure, so it is excluded.
     """
-    for pattern in ("*.bicep", "*.json"):
-        for infra in sorted(path.rglob(pattern)):
-            if infra.name == "local.settings.json":
-                continue
+    for infra in iter_project_files(path, ("*.bicep", "*.json")):
+        if infra.name == "local.settings.json":
+            continue
             try:
                 text = infra.read_text(encoding="utf-8")
             except OSError:
@@ -304,6 +304,11 @@ def _evaluate_flex_deployment_storage(
     return result
 
 
+# Local-only signals that are never deployable infrastructure: the live
+# local.settings.json and its *.sample.json template (#393).
+DEPLOY_CONFIG_SKIP_NAMES = frozenset({"local.settings.json", "local.settings.sample.json"})
+
+
 class DeploymentHandlers:
     """Deployment-correctness handlers and evaluators.
 
@@ -458,7 +463,7 @@ class DeploymentHandlers:
             )
         findings: list[tuple[str, str]] = []
         pattern = re.compile(r"linuxFxVersion['\"]?\s*[:=]\s*['\"]?[Pp]ython\|(\d+\.\d+)")
-        for bicep in sorted(path.rglob("*.bicep")):
+        for bicep in iter_project_files(path, "*.bicep"):
             try:
                 text = bicep.read_text(encoding="utf-8")
             except OSError:
@@ -498,10 +503,8 @@ class DeploymentHandlers:
         """
         emulator = "UseDevelopmentStorage=true"
         findings: list[str] = []
-        candidates = list(path.rglob("*.bicep")) + [
-            p
-            for p in path.rglob("*.json")
-            if p.name not in ("local.settings.json",) and ".venv" not in p.parts
+        candidates = list(iter_project_files(path, "*.bicep")) + [
+            p for p in iter_project_files(path, "*.json") if p.name not in DEPLOY_CONFIG_SKIP_NAMES
         ]
         for candidate in sorted(candidates):
             try:

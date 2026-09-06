@@ -9,7 +9,6 @@ from typing import Literal, Mapping, Optional, TypedDict, cast
 from jsonschema import ValidationError, validate
 
 from azure_functions_doctor.handlers import (
-    EXCLUDED_PROJECT_DIRS,
     HandlerResult,
     Rule,
     RuleContext,
@@ -17,6 +16,7 @@ from azure_functions_doctor.handlers import (
     _iter_project_py_contents,
     _source_contains_ast,
     generic_handler,
+    iter_project_files,
     load_doctor_config,
     reset_extra_excludes,
     resolve_target_config,
@@ -121,8 +121,6 @@ class SectionResult(TypedDict):
     items: list[CheckResult]
 
 
-
-
 def _apply_finding_contract_v2(item: CheckResult, result: HandlerResult) -> None:
     """Attach Finding Contract v2 metadata (issue #348) to a finding.
 
@@ -211,9 +209,7 @@ class Doctor:
 
     def _has_v1_signals(self) -> bool:
         """Check if the project contains legacy v1 function.json files."""
-        for function_json in self.project_path.rglob("function.json"):
-            if any(part in EXCLUDED_PROJECT_DIRS for part in function_json.parts):
-                continue
+        for function_json in iter_project_files(self.project_path, "function.json"):
             logger.debug("Detected v1 signal: %s", function_json)
             return True
         return False
@@ -407,10 +403,7 @@ class Doctor:
                     skip_item: CheckResult = {
                         "rule_id": rule_id,
                         "label": rule.get("label", rule_id),
-                        "value": (
-                            "Suppressed by pyproject "
-                            "[tool.azure-functions-doctor].ignore"
-                        ),
+                        "value": ("Suppressed by pyproject [tool.azure-functions-doctor].ignore"),
                         "status": "skip",
                         "severity": _resolve_severity(rule),
                         "tier": _resolve_tier(rule),
