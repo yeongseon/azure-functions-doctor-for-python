@@ -98,9 +98,33 @@ def _check_rule_inventory() -> list[str]:
     return errors
 
 
+def _check_readme_rule_count() -> list[str]:
+    """Assert README's "N diagnostic checks" count matches the shipped ruleset."""
+    readme = ROOT / "README.md"
+    content = readme.read_text(encoding="utf-8")
+    match = re.search(r"\*\*(\d+) diagnostic checks\*\*", content)
+    if not match:
+        return [
+            "README.md: could not find a '**N diagnostic checks**' count to "
+            "verify against the rule inventory."
+        ]
+    documented = int(match.group(1))
+    actual = len(_rule_ids_from_json())
+    if documented != actual:
+        return [
+            f"README.md: documented '{documented} diagnostic checks' does not "
+            f"match the {actual} rules in v2.json. Update the count in README.md."
+        ]
+    return []
+
+
 def main() -> int:
     version = _read_version()
-    errors = _check_version_refs(version) + _check_rule_inventory()
+    errors = (
+        _check_version_refs(version)
+        + _check_rule_inventory()
+        + _check_readme_rule_count()
+    )
     if errors:
         print("Documentation consistency check FAILED:")
         for err in errors:
