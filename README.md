@@ -111,6 +111,30 @@ azure-functions-doctor doctor --target-python 3.12
 Use `--target-python` when the Python running `azure-functions-doctor`
 is not the same as the Python version your Function App will run on Azure.
 
+### Project configuration (`pyproject.toml`)
+
+For per-project defaults, add a `[tool.azure-functions-doctor]` table to your
+`pyproject.toml`. This is a deliberately minimal surface for suppressing rules
+and scoping the scan:
+
+```toml
+[tool.azure-functions-doctor]
+# Rule ids to suppress. Suppressed rules are reported with the `skip`
+# status (never silently passed).
+ignore = ["check_application_insights", "check_core_tools"]
+
+# Extra path globs to exclude from scans, layered on top of the built-in
+# excluded directories (`.venv`, `node_modules`, `build`, ...). Globs are
+# matched against each path relative to the project root.
+exclude = ["legacy", "vendor/*.py"]
+```
+
+**Precedence.** CLI flags take precedence over configuration: `--profile` and
+`--rules` select the ruleset, and the config `ignore`/`exclude` then layer on
+top of the resolved run. Ignored rules that survive profile filtering are
+reported as `skip` rather than executed. There is no CLI equivalent for
+`ignore`/`exclude` in this minimal surface.
+
 ### Command name and deprecated aliases
 
 `azure-functions-doctor` is the **canonical** command. Two legacy console-script

@@ -18,6 +18,7 @@ from azure_functions_doctor.handlers._helpers import (
     EXCLUDED_PROJECT_DIRS,
     NATIVE_DEPENDENCY_PACKAGES,
     Condition,
+    DoctorConfig,
     HandlerResult,
     Rule,
     RuleContext,
@@ -36,6 +37,9 @@ from azure_functions_doctor.handlers._helpers import (
     _rule_handler,
     _source_contains_ast,
     _source_contains_blueprint_decorator,
+    load_doctor_config,
+    reset_extra_excludes,
+    set_extra_excludes,
 )
 from azure_functions_doctor.handlers.registry import (
     HandlerRegistry,
@@ -47,6 +51,10 @@ __all__ = [
     "EXCLUDED_PROJECT_DIRS",
     "NATIVE_DEPENDENCY_PACKAGES",
     "Condition",
+    "DoctorConfig",
+    "load_doctor_config",
+    "set_extra_excludes",
+    "reset_extra_excludes",
     "HandlerRegistry",
     "HandlerResult",
     "Rule",

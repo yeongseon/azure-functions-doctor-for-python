@@ -17,7 +17,10 @@ from azure_functions_doctor.handlers import (
     _iter_project_py_contents,
     _source_contains_ast,
     generic_handler,
+    load_doctor_config,
+    reset_extra_excludes,
     resolve_target_config,
+    set_extra_excludes,
 )
 from azure_functions_doctor.logging_config import get_logger, log_rule_execution
 
@@ -150,6 +153,12 @@ class Doctor:
             if not resolved.is_file():
                 raise ValueError(f"rules_path must be an existing file: {resolved}")
             self.rules_path = resolved
+        # Config-based suppression / exclusion (issue #290). CLI selections
+        # (profile, rules_path) take precedence for ruleset selection; the
+        # config ``ignore``/``exclude`` layer on top of the resolved run.
+        doctor_config = load_doctor_config(self.project_path)
+        self.ignore_rules: set[str] = set(doctor_config["ignore"])
+        self.exclude_globs: list[str] = list(doctor_config["exclude"])
         self.programming_model: ProgrammingModel = self._detect_programming_model()
 
     def get_report_properties(self) -> dict[str, Optional[str]]:
@@ -348,6 +357,10 @@ class Doctor:
             grouped[rule.get("section", "unknown")].append(rule)
 
         results: list[SectionResult] = []
+        # Layer config ``exclude`` globs on top of EXCLUDED_PROJECT_DIRS for the
+        # duration of this run (issue #290). Each run sets its own value first,
+        # so state never leaks between runs.
+        exclude_token = set_extra_excludes(self.project_path, self.exclude_globs)
         context: RuleContext = {
             "target_python": self.target_python,
             "deployment_mode": self.deployment_mode,
@@ -370,6 +383,23 @@ class Doctor:
             }
 
             for rule in checks:
+                rule_id = rule.get("id", "unknown_rule")
+                # Config-based suppression (issue #290): report ignored rules
+                # with the explicit ``skip`` status instead of executing them.
+                if rule_id in self.ignore_rules:
+                    skip_item: CheckResult = {
+                        "rule_id": rule_id,
+                        "label": rule.get("label", rule_id),
+                        "value": (
+                            "Suppressed by pyproject "
+                            "[tool.azure-functions-doctor].ignore"
+                        ),
+                        "status": "skip",
+                        "severity": _resolve_severity(rule),
+                        "tier": _resolve_tier(rule),
+                    }
+                    section_result["items"].append(skip_item)
+                    continue
                 # Time rule execution for logging
                 rule_start = time.time()
                 result = generic_handler(rule, self.project_path, context)
@@ -449,4 +479,5 @@ class Doctor:
 
             results.append(section_result)
 
+        reset_extra_excludes(exclude_token)
         return results
