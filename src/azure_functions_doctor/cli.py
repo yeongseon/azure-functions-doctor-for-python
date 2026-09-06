@@ -633,6 +633,42 @@ def _warn_deprecated_alias(alias: str) -> None:
     )
 
 
+# App-level options handled by the Typer callback itself; everything else
+# given before the (only) `doctor` subcommand belongs to the doctor run.
+_APP_LEVEL_FLAGS = {"--version", "--help", "-h"}
+
+
+def normalize_argv(argv: list[str]) -> list[str]:
+    """Insert the implicit ``doctor`` subcommand when it is omitted (#399).
+
+    ``doctor`` is the only command, so the top level accepts the same options:
+    ``azure-functions-doctor --path . --format json`` behaves identically to
+    ``azure-functions-doctor doctor --path . --format json``. Pure function so
+    the dispatch is unit-testable without spawning a process.
+    """
+    if not argv:
+        return ["doctor"]
+    first = argv[0]
+    if first == "doctor":
+        return list(argv)
+    if first in _APP_LEVEL_FLAGS:
+        return list(argv)
+    if first.startswith("-"):
+        return ["doctor", *argv]
+    # Unknown bare word: let Typer surface its own "no such command" error.
+    return list(argv)
+
+
+def main() -> None:
+    """Console-script entry point that tolerates the omitted subcommand."""
+    import sys
+
+    normalized = normalize_argv(sys.argv[1:])
+    if normalized != sys.argv[1:]:
+        sys.argv = [sys.argv[0], *normalized]
+    cli()
+
+
 def azure_functions_alias() -> None:
     """Deprecated alias entry point for the `azure-functions` console script."""
     _warn_deprecated_alias("azure-functions")

@@ -550,3 +550,35 @@ def test_cli_sarif_unpinned_requirements_lands_on_lines(tmp_path: Path) -> None:
     assert lines == [2, 3]
     uris = {r["locations"][0]["physicalLocation"]["artifactLocation"]["uri"] for r in unpinned}
     assert uris == {"requirements.txt"}
+
+
+def test_normalize_argv_inserts_implicit_doctor_subcommand() -> None:
+    """The lone subcommand may be omitted (#399)."""
+    from azure_functions_doctor.cli import normalize_argv
+
+    assert normalize_argv([]) == ["doctor"]
+    assert normalize_argv(["--path", ".", "--format", "json"]) == [
+        "doctor",
+        "--path",
+        ".",
+        "--format",
+        "json",
+    ]
+    assert normalize_argv(["doctor", "--path", "."]) == ["doctor", "--path", "."]
+    assert normalize_argv(["--version"]) == ["--version"]
+    assert normalize_argv(["--help"]) == ["--help"]
+    # Unknown bare words fall through so Typer reports the real error.
+    assert normalize_argv(["nonsense"]) == ["nonsense"]
+
+
+def test_cli_top_level_invocation_matches_subcommand(tmp_path: Path) -> None:
+    """`--path X --format json` and `doctor --path X --format json` agree (#399)."""
+    (tmp_path / "function_app.py").write_text(
+        "import azure.functions as func\n\napp = func.FunctionApp()\n", encoding="utf-8"
+    )
+    from azure_functions_doctor.cli import normalize_argv
+
+    with_sub = runner.invoke(app, ["doctor", "--path", str(tmp_path), "--format", "json"])
+    without_sub = runner.invoke(app, normalize_argv(["--path", str(tmp_path), "--format", "json"]))
+    assert with_sub.exit_code == without_sub.exit_code
+    assert json.loads(without_sub.output)["schema_version"] == "2.0"
