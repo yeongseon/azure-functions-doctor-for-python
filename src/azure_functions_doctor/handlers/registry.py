@@ -486,6 +486,94 @@ def _evaluate_flex_extension_version(ext_value: Optional[str]) -> HandlerResult:
     return result
 
 
+# Legacy app settings that Flex Consumption ignores, mapped to the replacement
+# mechanism documented in Microsoft Learn's 'Flex Consumption plan deprecations'
+# table (issue #350). LinuxFxVersion (owned by check_flex_runtime_config, #345)
+# and FUNCTIONS_EXTENSION_VERSION (owned by check_functions_extension_version,
+# #346) are deliberately excluded so this rule never double-reports them.
+FLEX_DEPRECATED_APP_SETTINGS: dict[str, str] = {
+    "FUNCTIONS_WORKER_RUNTIME": "replaced by 'name' under functionAppConfig.runtime.",
+    "FUNCTIONS_WORKER_RUNTIME_VERSION": (
+        "replaced by 'version' under functionAppConfig.runtime."
+    ),
+    "FUNCTIONS_WORKER_PROCESS_COUNT": (
+        "not valid on Flex Consumption; per-instance concurrency is platform-managed."
+    ),
+    "SCM_DO_BUILD_DURING_DEPLOYMENT": (
+        "replaced by the remoteBuild parameter when deploying to Flex Consumption."
+    ),
+    "ENABLE_ORYX_BUILD": (
+        "replaced by the remoteBuild parameter when deploying to Flex Consumption."
+    ),
+    "WEBSITE_CONTENTSHARE": "replaced by functionAppConfig's deployment section.",
+    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": (
+        "replaced by functionAppConfig's deployment section."
+    ),
+    "WEBSITE_RUN_FROM_PACKAGE": (
+        "not used for deployments on Flex Consumption; use functionAppConfig.deployment."
+    ),
+    "WEBSITE_SKIP_CONTENTSHARE_VALIDATION": (
+        "a content share isn't used on Flex Consumption."
+    ),
+    "WEBSITE_VNET_ROUTE_ALL": (
+        "not used for networking on Flex Consumption; configure VNet integration "
+        "on the app's networking settings instead."
+    ),
+}
+
+
+def _evaluate_flex_deprecated_settings(
+    hosting_plan: Optional[str],
+    app_settings: dict[str, str],
+    *,
+    catalog: Optional[Catalog] = None,
+) -> HandlerResult:
+    """Warn on legacy app settings that Flex Consumption ignores (issue #350).
+
+    Only Flex apps are in scope (others SKIP). Declared settings are matched
+    against :data:`FLEX_DEPRECATED_APP_SETTINGS`; none present PASSes, otherwise a
+    non-gating WARN lists each deprecated setting with its replacement mechanism
+    and cites the catalog source. ``linuxFxVersion`` and
+    ``FUNCTIONS_EXTENSION_VERSION`` are intentionally absent from the map (owned by
+    #345 and #346), so this rule never emits a duplicate finding for them.
+    """
+    if hosting_plan != FLEX_CONSUMPTION_PLAN:
+        return _create_result(
+            "skip",
+            "Not a Flex Consumption app; deprecated-app-settings check skipped.",
+        )
+
+    present = [name for name in FLEX_DEPRECATED_APP_SETTINGS if name in app_settings]
+    if not present:
+        return _create_result(
+            "pass",
+            "No deprecated Flex Consumption app settings are declared.",
+        )
+
+    lines = ["Deprecated app settings declared on a Flex Consumption app:"]
+    lines.extend(f"  - {name}: {FLEX_DEPRECATED_APP_SETTINGS[name]}" for name in present)
+    lines.append(
+        "Flex Consumption ignores these settings; remove them and use the listed "
+        "replacement mechanism."
+    )
+    detail = "\n".join(lines)
+    result = _create_result("fail", detail)
+    result["severity"] = "warning"
+    result["gate"] = False
+    expected = "No deprecated legacy app settings on Flex Consumption"
+    actual = "Deprecated app settings declared: " + ", ".join(present)
+    cat = load_catalog() if catalog is None else catalog
+    fact = cat.flex_deprecated_settings_fact()
+    if fact is not None:
+        _attach_catalog_evidence(
+            result, fact, cat, detail=detail, expected=expected, actual=actual
+        )
+    else:
+        result["expected"] = expected
+        result["actual"] = actual
+    return result
+
+
 class HandlerRegistry:
     """Registry for diagnostic check handlers with individual handler methods."""
 
@@ -660,6 +748,32 @@ class HandlerRegistry:
             runtime_name,
             runtime_version,
             linux_fx_present=linux_fx_present,
+        )
+
+    @_rule_handler
+    def _handle_flex_deprecated_settings(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Warn when a Flex Consumption app declares deprecated legacy app settings (#350).
+
+        Flex Consumption ignores a set of legacy app settings (worker-runtime
+        selection, Oryx/remote-build toggles, Azure Files content-share settings,
+        run-from-package, and VNet route-all). This check is scoped to Flex apps and
+        WARNs (non-gating) with a per-setting replacement mechanism. ``linuxFxVersion``
+        and ``FUNCTIONS_EXTENSION_VERSION`` are owned by check_flex_runtime_config
+        (#345) and check_functions_extension_version (#346), so they are never
+        reported here.
+        """
+        target_config = context.get("target_config") if context is not None else None
+        if target_config is None:
+            return _create_result(
+                "skip",
+                "Deployment target could not be resolved; "
+                "Flex deprecated-app-settings check skipped.",
+            )
+        return _evaluate_flex_deprecated_settings(
+            target_config.hosting_plan.value,
+            target_config.app_settings,
         )
 
     @_rule_handler

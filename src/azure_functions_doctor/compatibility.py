@@ -258,6 +258,16 @@ class Catalog:
                 return fact
         return None
 
+    def flex_deprecated_settings_fact(self) -> Optional[Fact]:
+        """Return the ``flex_deprecated_settings`` catalog fact or ``None``.
+
+        This single fact carries the source URL and freshness metadata for the
+        Flex Consumption deprecated-app-settings check (issue #350); the list of
+        deprecated settings itself lives in the rule handler.
+        """
+        facts = self.facts_by_category("flex_deprecated_settings")
+        return facts[0] if facts else None
+
     def hosting_plan_matrix(self) -> dict[str, tuple[str, ...]]:
         """Reconstruct the per-plan supported-Python matrix from the catalog.
 
