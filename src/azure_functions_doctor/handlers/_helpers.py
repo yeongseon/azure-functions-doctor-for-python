@@ -67,8 +67,8 @@ EXCLUDED_PROJECT_DIRS = {
 # ``EXCLUDED_PROJECT_DIRS``. Stored in a ``ContextVar`` so it stays scoped to
 # the active diagnostic run without threading a parameter through every
 # traversal helper. The tuple is ``(project_root, exclude_globs)``.
-_extra_excludes: contextvars.ContextVar[Tuple[Path, Tuple[str, ...]]] = (
-    contextvars.ContextVar("_extra_excludes", default=(Path(), ()))
+_extra_excludes: contextvars.ContextVar[Tuple[Path, Tuple[str, ...]]] = contextvars.ContextVar(
+    "_extra_excludes", default=(Path(), ())
 )
 
 

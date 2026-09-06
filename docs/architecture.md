@@ -18,7 +18,7 @@ Core modules and responsibilities:
 - `__init__.py`: public exports and version string.
 - `cli.py`: Typer-based CLI entrypoint; maps flags to `Doctor` options.
 - `doctor.py`: `Doctor` runner — loads rules, executes handlers, aggregates results.
-- `handlers/` package: `Rule` type and shared helpers (`_helpers.py`), plus `generic_handler` and type-based rule dispatch via `HandlerRegistry` (`registry.py`).
+- `handlers/` package: `Rule` type and shared helpers (`_helpers.py`), plus `generic_handler` and type-based rule dispatch via `HandlerRegistry` (`registry.py`) over per-domain implementation modules (`generic`, `dependencies`, `runtime`, `monitoring`, `deployment`, `bindings`, `project`, `durable`, `integrations`).
 - `config.py`: configuration management (reserved for future use; not yet in the runtime path).
 - `target_resolver.py`: resolves runtime values (Python version, Core Tools version) for version-comparison checks.
 - `logging_config.py`: internal logging setup.

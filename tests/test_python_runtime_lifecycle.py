@@ -126,7 +126,7 @@ class TestLifecycleHandlerIntegration:
 
     def _lifecycle_item(self, today: date) -> dict[str, object]:
         doctor = Doctor(str(EXAMPLE_V2), target_python="3.10")
-        with patch("azure_functions_doctor.handlers.registry.date") as mock_date:
+        with patch("azure_functions_doctor.handlers.runtime.date") as mock_date:
             mock_date.today.return_value = today
             results = doctor.run_all_checks()
         for section in results:
@@ -145,7 +145,7 @@ class TestLifecycleHandlerIntegration:
 
     def test_unsupported_runtime_gates_the_section(self) -> None:
         doctor = Doctor(str(EXAMPLE_V2), target_python="3.10")
-        with patch("azure_functions_doctor.handlers.registry.date") as mock_date:
+        with patch("azure_functions_doctor.handlers.runtime.date") as mock_date:
             mock_date.today.return_value = AFTER_310_EOS
             results = doctor.run_all_checks()
         section = next(s for s in results if s["category"] == "python_env")
