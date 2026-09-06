@@ -23,7 +23,7 @@ pip install azure-functions-doctor
 All three commands are aliases to the same CLI:
 
 ```bash
-azure-functions doctor [OPTIONS]
+azure-functions-doctor doctor [OPTIONS]
 azure-functions-doctor doctor [OPTIONS]
 fdoctor doctor [OPTIONS]
 ```
@@ -35,7 +35,7 @@ Runs diagnostics on an Azure Functions Python v2 application.
 ### Syntax
 
 ```bash
-azure-functions doctor [OPTIONS]
+azure-functions-doctor doctor [OPTIONS]
 ```
 
 ### Options
@@ -105,47 +105,47 @@ azure-functions doctor [OPTIONS]
 
 **Basic check (current directory, table output):**
 ```bash
-azure-functions doctor
+azure-functions-doctor doctor
 ```
 
 **Verbose output for debugging:**
 ```bash
-azure-functions doctor --verbose
+azure-functions-doctor doctor --verbose
 ```
 
 **Required checks only (minimal profile):**
 ```bash
-azure-functions doctor --profile minimal
+azure-functions-doctor doctor --profile minimal
 ```
 
 **JSON output for CI integration:**
 ```bash
-azure-functions doctor --format json
+azure-functions-doctor doctor --format json
 ```
 
 **Save JSON to file with debug logging:**
 ```bash
-azure-functions doctor --format json --output diagnostics.json --debug
+azure-functions-doctor doctor --format json --output diagnostics.json --debug
 ```
 
 **SARIF output for GitHub Security tab:**
 ```bash
-azure-functions doctor --format sarif --output sarif.json
+azure-functions-doctor doctor --format sarif --output sarif.json
 ```
 
 **Custom rules with summary:**
 ```bash
-azure-functions doctor --rules ./custom-rules.json --summary-json summary.json
+azure-functions-doctor doctor --rules ./custom-rules.json --summary-json summary.json
 ```
 
 **JUnit output for CI/CD:**
 ```bash
-azure-functions doctor --format junit --output test-results.xml
+azure-functions-doctor doctor --format junit --output test-results.xml
 ```
 
 **Full diagnostics with all options:**
 ```bash
-azure-functions doctor \
+azure-functions-doctor doctor \
   --path ./my-app \
   --profile full \
   --format json \
@@ -173,7 +173,7 @@ Python Env
   [✓] Python version: 3.12 running
   [✗] Virtual environment
 
-Doctor summary (to see all details, run azure-functions doctor -v):
+Doctor summary (to see all details, run azure-functions-doctor doctor -v):
   1 fail, 1 warning, 8 passed
 Exit code: 1
 ```
