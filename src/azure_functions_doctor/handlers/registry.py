@@ -14,6 +14,7 @@ from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
 
 from azure_functions_doctor.compatibility import Catalog, Fact, load_catalog
+from azure_functions_doctor.deploy_config import flex_deployment_storage_shape
 from azure_functions_doctor.handlers._helpers import (
     _HOST_JSON_MISSING,
     _PYTHON_CANDIDATES,
@@ -574,6 +575,84 @@ def _evaluate_flex_deprecated_settings(
     return result
 
 
+def _evaluate_flex_deployment_storage(
+    hosting_plan: Optional[str],
+    storage: Optional[dict[str, object]],
+) -> HandlerResult:
+    """Validate a Flex Consumption app's deployment storage shape (issue #351).
+
+    Only Flex apps are in scope (others SKIP). Flex stores the deployment package
+    in a blob container declared under ``functionAppConfig.deployment.storage``.
+    When no such block is declared in infra the check SKIPs gracefully; otherwise
+    obviously wrong shapes are flagged (non-gating WARN): a missing container URL
+    (``value``), or missing/incomplete ``authentication`` (a managed identity or a
+    named storage connection string). A well-formed block PASSes. This is a static
+    shape check only; the storage account is never contacted.
+    """
+    if hosting_plan != FLEX_CONSUMPTION_PLAN:
+        return _create_result(
+            "skip",
+            "Not a Flex Consumption app; deployment-storage check skipped.",
+        )
+    if storage is None:
+        return _create_result(
+            "skip",
+            "Flex Consumption app declares no functionAppConfig.deployment.storage "
+            "in infra; deployment-storage check skipped.",
+        )
+
+    problems: list[str] = []
+    value = storage.get("value")
+    if not isinstance(value, str) or not value.strip():
+        problems.append(
+            "no deployment container is specified "
+            "(functionAppConfig.deployment.storage.value)"
+        )
+
+    authentication = storage.get("authentication")
+    if not isinstance(authentication, dict):
+        problems.append(
+            "no authentication is configured; use a managed identity or a storage "
+            "account connection string"
+        )
+    else:
+        auth_type = authentication.get("type")
+        if not isinstance(auth_type, str) or not auth_type.strip():
+            problems.append(
+                "deployment storage authentication is missing a 'type'"
+            )
+        elif auth_type == "StorageAccountConnectionString":
+            name = authentication.get("storageAccountConnectionStringName")
+            if not isinstance(name, str) or not name.strip():
+                problems.append(
+                    "connection-string authentication is missing "
+                    "'storageAccountConnectionStringName'"
+                )
+
+    if not problems:
+        return _create_result(
+            "pass",
+            "Flex Consumption deployment storage is configured "
+            "(container + authentication).",
+        )
+
+    lines = ["Flex Consumption deployment storage is misconfigured:"]
+    lines.extend(f"  - {problem}" for problem in problems)
+    lines.append(
+        "Declare a blob container under functionAppConfig.deployment.storage with "
+        "a value URL and authentication (managed identity or connection string)."
+    )
+    detail = "\n".join(lines)
+    result = _create_result("fail", detail)
+    result["severity"] = "warning"
+    result["gate"] = False
+    result["expected"] = (
+        "functionAppConfig.deployment.storage with a container URL and authentication"
+    )
+    result["actual"] = "; ".join(problems)
+    return result
+
+
 class HandlerRegistry:
     """Registry for diagnostic check handlers with individual handler methods."""
 
@@ -775,6 +854,34 @@ class HandlerRegistry:
             target_config.hosting_plan.value,
             target_config.app_settings,
         )
+
+    @_rule_handler
+    def _handle_flex_deployment_storage(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Validate a Flex Consumption app's deployment storage shape (#351).
+
+        Flex Consumption stores the deployment package in a blob container declared
+        under ``functionAppConfig.deployment.storage``. This check is scoped to Flex
+        apps (others SKIP). When infra declares no such block it SKIPs gracefully;
+        otherwise obviously wrong shapes WARN (non-gating): a missing container URL
+        or missing/incomplete authentication. The storage account is never
+        contacted -- this is a static shape check only.
+        """
+        target_config = context.get("target_config") if context is not None else None
+        if target_config is None:
+            return _create_result(
+                "skip",
+                "Deployment target could not be resolved; "
+                "Flex deployment-storage check skipped.",
+            )
+        hosting_plan = target_config.hosting_plan.value
+        storage = (
+            flex_deployment_storage_shape(path)
+            if hosting_plan == FLEX_CONSUMPTION_PLAN
+            else None
+        )
+        return _evaluate_flex_deployment_storage(hosting_plan, storage)
 
     @_rule_handler
     def _handle_env_var_exists(

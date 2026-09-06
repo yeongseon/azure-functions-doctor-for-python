@@ -22,6 +22,7 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_azure_functions_library` | azure-functions package | dependencies | python_env | `package_declared` | Yes | minimal, full |
 | `check_flex_deprecated_settings` | Flex Consumption deprecated app settings | configuration | runtime | `flex_deprecated_settings` | No | full |
 | `check_native_dependency_risk` | Native dependency risk | dependencies | python_env | `native_dependency_risk` | No | full |
+| `check_flex_deployment_storage` | Flex Consumption deployment storage | configuration | runtime | `flex_deployment_storage` | No | full |
 | `check_azure_functions_worker` | azure-functions-worker not pinned | dependencies | python_env | `package_forbidden` | No | full |
 | `check_host_json` | host.json | structure | project_structure | `file_exists` | Yes | minimal, full |
 | `check_host_json_version` | host.json version | structure | project_structure | `host_json_version` | Yes | minimal, full |
@@ -75,6 +76,7 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `hosting_plan_lifecycle` | Checks the resolved hosting plan against its published retirement date: informational when far off, WARN inside the retiring-soon window, and FAIL once retired (never a FAIL merely for being scheduled). |
 | `flex_runtime_config` | For a Flex Consumption app, validates the runtime declared under `functionAppConfig.runtime` (name/version) against the supported Python versions, and WARNs when a legacy `linuxFxVersion` is present (Flex ignores it). Non-Flex apps SKIP. |
 | `flex_deprecated_settings` | For a Flex Consumption app, WARNs (non-gating) when legacy app settings that Flex ignores are declared (worker-runtime selection, Oryx/remote-build toggles, Azure Files content-share settings, run-from-package, and VNet route-all), citing the replacement mechanism for each. `linuxFxVersion` and `FUNCTIONS_EXTENSION_VERSION` are owned by `flex_runtime_config` / `functions_extension_version` and never double-reported. Non-Flex apps SKIP. |
+| `flex_deployment_storage` | For a Flex Consumption app, validates the deployment storage shape declared under `functionAppConfig.deployment.storage`: a container URL (`value`) must be specified and authentication must be configured (managed identity or a named storage account connection string). Obviously wrong shapes WARN (non-gating); the storage account is never contacted. Non-Flex apps SKIP, and apps that declare no deployment storage block in infra SKIP gracefully. |
 
 ## False-positive Risk
 
