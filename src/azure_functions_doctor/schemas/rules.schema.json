@@ -82,7 +82,9 @@
           "host_json_log_level_conflict",
           "dev_storage_connection",
           "unpinned_requirements",
-          "python_runtime_lifecycle"
+          "python_runtime_lifecycle",
+          "functions_runtime_lifecycle",
+          "hosting_plan_lifecycle"
         ]
       },
       "required": {
