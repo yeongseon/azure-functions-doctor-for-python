@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 import sys
 from typing import (
+    TYPE_CHECKING,
     Callable,
     Dict,
     Iterator,
@@ -27,6 +28,9 @@ except ModuleNotFoundError:  # pragma: no cover - exercised on Python 3.10
 from azure_functions_doctor.logging_config import get_logger
 
 logger = get_logger(__name__)
+
+if TYPE_CHECKING:
+    from azure_functions_doctor.deploy_config import TargetConfig
 
 EXCLUDED_PROJECT_DIRS = {
     # Python virtual environments
@@ -67,6 +71,7 @@ class HandlerResult(TypedDict, total=False):
 class RuleContext(TypedDict, total=False):
     target_python: Optional[str]
     deployment_mode: Optional[str]
+    target_config: Optional["TargetConfig"]
 
 
 # Platform-aware candidates for executables (for symmetric fallback)

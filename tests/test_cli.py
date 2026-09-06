@@ -279,6 +279,7 @@ def test_cli_sarif_output_includes_target_python_override() -> None:
         "programming_model": "v2",
         "target_python": "3.11",
         "deployment_mode": "remote-build",
+        "hosting_plan": None,
     }
 
 

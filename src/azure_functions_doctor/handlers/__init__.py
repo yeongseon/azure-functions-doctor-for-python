@@ -6,6 +6,11 @@ before. Implementation lives in :mod:`._helpers` (pure helpers and types) and
 :mod:`.registry` (the ``HandlerRegistry`` dispatch class).
 """
 
+from azure_functions_doctor.deploy_config import (
+    ResolvedField,
+    TargetConfig,
+    resolve_target_config,
+)
 from azure_functions_doctor.handlers._helpers import (
     _HOST_JSON_MISSING,
     _PYTHON_CANDIDATES,
@@ -48,6 +53,9 @@ __all__ = [
     "RuleContext",
     "generic_handler",
     "resolve_target_value",
+    "ResolvedField",
+    "TargetConfig",
+    "resolve_target_config",
     "_collect_blueprint_aliases",
     "_collect_register_functions_args",
     "_collect_unregistered_blueprint_aliases",
