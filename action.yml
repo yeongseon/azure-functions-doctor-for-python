@@ -14,7 +14,7 @@ inputs:
     required: false
     default: "."
   profile:
-    description: "Rule profile: 'minimal' (required checks only) or 'full' (all checks)"
+    description: "Rule profile: 'minimal' (required checks only), 'deploy' (runtime/hosting/deployment correctness), 'development' (dev-environment checks), or 'full' (all checks)"
     required: false
     default: "minimal"
   format:
