@@ -56,6 +56,21 @@ class TestEvaluatePythonLifecycle:
         assert "past Azure Functions end-of-support" in result["detail"]
         assert "October 2026" in result["detail"]
 
+    def test_upgrade_recommendation_is_catalog_derived(self) -> None:
+        """The recommendation names the catalog's newest supported Python (#382 review)."""
+        catalog = load_catalog()
+        newest = catalog.supported_python_versions(as_of=BEFORE_ANY_EOS)[-1]
+
+        retiring = _evaluate_python_lifecycle("3.10", today=BEFORE_ANY_EOS)
+        assert f"(e.g. {newest})" in retiring["detail"]
+        # No Azure version knowledge is hardcoded in the handler strings.
+        assert "3.12+" not in retiring["detail"]
+        assert retiring["expected"] == "A supported Azure Functions Python runtime"
+
+        unsupported = _evaluate_python_lifecycle("3.10", today=AFTER_310_EOS)
+        assert f"(e.g. {newest})" in unsupported["detail"]
+        assert "3.12+" not in unsupported["detail"]
+
     def test_unknown_version_is_neutral(self) -> None:
         result = _evaluate_python_lifecycle("3.15", today=BEFORE_ANY_EOS)
         assert result["status"] == "pass"

@@ -63,7 +63,7 @@
     "condition": {
       "target": "python"
     },
-    "hint": "Target a Python version with a long support runway (3.12+). Upgrade a retiring runtime before its Azure Functions end-of-support date.",
+    "hint": "Target a Python version with a long support runway. Upgrade a retiring runtime before its Azure Functions end-of-support date.",
     "hint_url": "https://learn.microsoft.com/azure/azure-functions/supported-languages",
     "source_type": "ms_learn",
     "source_title": "Azure Functions \u2014 Supported languages (Python runtime lifecycle)",
