@@ -84,7 +84,8 @@
           "unpinned_requirements",
           "python_runtime_lifecycle",
           "functions_runtime_lifecycle",
-          "hosting_plan_lifecycle"
+          "hosting_plan_lifecycle",
+          "flex_runtime_config"
         ]
       },
       "required": {

@@ -53,8 +53,10 @@ from azure_functions_doctor.handlers._helpers import (
     pyproject_dependency_names,
 )
 from azure_functions_doctor.target_resolver import (
+    PYTHON_HOSTING_PLAN_MATRIX,
     SUPPORTED_PYTHON_VERSIONS,
-    is_supported_python_target,
+    is_supported_python_for_plan,
+is_supported_python_target,
     resolve_python_target,
     resolve_target_value,
 )
@@ -363,6 +365,101 @@ def _evaluate_hosting_plan_lifecycle(
     return result
 
 
+# Issue #345: Flex Consumption declares its runtime under
+# ``functionAppConfig.runtime`` (name/version) and ignores ``linuxFxVersion``.
+# The canonical plan name matches deploy_config.PLAN_FLEX_CONSUMPTION.
+FLEX_CONSUMPTION_PLAN = "flex-consumption"
+
+_LINUX_FX_KEY_RE = re.compile(r"linuxFxVersion", re.IGNORECASE)
+
+
+def _infra_declares_linux_fx_version(path: Path) -> bool:
+    """Return ``True`` when any infra file declares a ``linuxFxVersion`` key.
+
+    Flex Consumption ignores ``linuxFxVersion``; its presence on a Flex app is a
+    misconfiguration worth surfacing. ``local.settings.json`` is a local signal,
+    not deployable infrastructure, so it is excluded.
+    """
+    for pattern in ("*.bicep", "*.json"):
+        for infra in sorted(path.rglob(pattern)):
+            if infra.name == "local.settings.json":
+                continue
+            try:
+                text = infra.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            if _LINUX_FX_KEY_RE.search(text):
+                return True
+    return False
+
+
+def _evaluate_flex_runtime_config(
+    hosting_plan: Optional[str],
+    runtime_name: Optional[str],
+    runtime_version: Optional[str],
+    *,
+    linux_fx_present: bool,
+) -> HandlerResult:
+    """Validate a Flex Consumption app's ``functionAppConfig.runtime`` (issue #345).
+
+    Only Flex apps are in scope (others SKIP). A ``linuxFxVersion`` declaration on
+    a Flex app is a misconfiguration (WARN) because Flex ignores it. Otherwise the
+    declared Python runtime version is validated against the Flex hosting-plan
+    matrix (Flex supports through 3.14); an undeclared or non-Python runtime SKIPs.
+    """
+    if hosting_plan != FLEX_CONSUMPTION_PLAN:
+        return _create_result(
+            "skip",
+            "Not a Flex Consumption app; functionAppConfig.runtime check skipped.",
+        )
+
+    if linux_fx_present:
+        detail = (
+            "linuxFxVersion is declared on a Flex Consumption app, which ignores "
+            "it; declare the runtime under functionAppConfig.runtime (name/version) "
+            "instead."
+        )
+        result = _create_result("fail", detail)
+        result["severity"] = "warning"
+        result["gate"] = False
+        result["expected"] = "Runtime declared under functionAppConfig.runtime"
+        result["actual"] = "linuxFxVersion declared on a Flex Consumption app"
+        return result
+
+    if runtime_name is None or runtime_version is None:
+        return _create_result(
+            "skip",
+            "Flex Consumption app declares no functionAppConfig.runtime "
+            "name/version; check skipped.",
+        )
+
+    if runtime_name != "python":
+        return _create_result(
+            "skip",
+            f"Flex Consumption runtime is '{runtime_name}', not Python; "
+            "Python runtime check skipped.",
+        )
+
+    if is_supported_python_for_plan(runtime_version, FLEX_CONSUMPTION_PLAN):
+        return _create_result(
+            "pass",
+            f"Flex Consumption runtime Python {runtime_version} is supported.",
+        )
+
+    allowed = PYTHON_HOSTING_PLAN_MATRIX.get(FLEX_CONSUMPTION_PLAN, SUPPORTED_PYTHON_VERSIONS)
+    supported_range = f"{allowed[0]}\u2013{allowed[-1]}" if allowed else "the supported set"
+    detail = (
+        f"Flex Consumption runtime Python {runtime_version} is not supported; "
+        f"target a supported Python runtime ({supported_range})."
+    )
+    result = _create_result("fail", detail)
+    result["severity"] = "error"
+    result["gate"] = True
+    result["expected"] = f"A supported Flex Consumption Python runtime ({supported_range})"
+    result["actual"] = f"functionAppConfig.runtime = python {runtime_version}"
+    return result
+
+
 class HandlerRegistry:
     """Registry for diagnostic check handlers with individual handler methods."""
 
@@ -507,6 +604,37 @@ class HandlerRegistry:
             target_config.hosting_plan.value if target_config is not None else None
         )
         return _evaluate_hosting_plan_lifecycle(hosting_plan, today=date.today())
+
+    @_rule_handler
+    def _handle_flex_runtime_config(
+        self, rule: Rule, path: Path, context: Optional[RuleContext] = None
+    ) -> HandlerResult:
+        """Validate a Flex Consumption app's ``functionAppConfig.runtime`` (issue #345).
+
+        Flex Consumption declares its runtime under ``functionAppConfig.runtime``
+        (name/version) rather than ``linuxFxVersion``. This check is scoped to Flex
+        apps: it WARNs when a legacy ``linuxFxVersion`` is present (Flex ignores it)
+        and otherwise validates the declared Python runtime against the Flex
+        hosting-plan matrix.
+        """
+        target_config = context.get("target_config") if context is not None else None
+        hosting_plan: Optional[str] = None
+        runtime_name: Optional[str] = None
+        runtime_version: Optional[str] = None
+        if target_config is not None:
+            hosting_plan = target_config.hosting_plan.value
+            runtime_name = target_config.runtime_name.value
+            runtime_version = target_config.runtime_version.value
+        linux_fx_present = (
+            hosting_plan == FLEX_CONSUMPTION_PLAN
+            and _infra_declares_linux_fx_version(path)
+        )
+        return _evaluate_flex_runtime_config(
+            hosting_plan,
+            runtime_name,
+            runtime_version,
+            linux_fx_present=linux_fx_present,
+        )
 
     @_rule_handler
     def _handle_env_var_exists(
@@ -1534,11 +1662,23 @@ class HandlerRegistry:
     ) -> HandlerResult:
         """Validate any Python ``linuxFxVersion`` declared in infra (bicep) config.
 
-        Flex Consumption and Linux plan apps encode their runtime in
-        ``linuxFxVersion`` (e.g. ``Python|3.12``). When such a declaration targets
+        Scoped to legacy Linux / Premium / Dedicated / classic Consumption apps.
+        Flex Consumption declares its runtime under ``functionAppConfig.runtime``
+        and ignores ``linuxFxVersion``, so Flex apps SKIP here and are handled by
+        ``check_flex_runtime_config`` (issue #345). When such a declaration targets
         a Python version outside the supported set it is flagged; when no Python
         ``linuxFxVersion`` is determinable the check is skipped.
         """
+        target_config = context.get("target_config") if context is not None else None
+        if (
+            target_config is not None
+            and target_config.hosting_plan.value == FLEX_CONSUMPTION_PLAN
+        ):
+            return _create_result(
+                "skip",
+                "Flex Consumption app; linuxFxVersion is not used "
+                "(see check_flex_runtime_config).",
+            )
         findings: list[tuple[str, str]] = []
         pattern = re.compile(r"linuxFxVersion['\"]?\s*[:=]\s*['\"]?[Pp]ython\|(\d+\.\d+)")
         for bicep in sorted(path.rglob("*.bicep")):
