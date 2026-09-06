@@ -25,6 +25,7 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `check_flex_deployment_storage` | Flex Consumption deployment storage | configuration | runtime | `flex_deployment_storage` | No | full |
 | `check_azure_functions_worker` | azure-functions-worker not pinned | dependencies | python_env | `package_forbidden` | No | full |
 | `check_host_json` | host.json | structure | project_structure | `file_exists` | Yes | minimal, full |
+| `check_binding_connection_resolution` | Binding connection resolution | configuration | runtime | `binding_connection_resolution` | No | full |
 | `check_host_json_version` | host.json version | structure | project_structure | `host_json_version` | Yes | minimal, full |
 | `check_local_settings` | local.settings.json | structure | project_structure | `file_exists` | No | full |
 | `check_func_cli` | Azure Functions Core Tools (func) | tooling | tooling | `executable_exists` | No | full |
@@ -77,6 +78,7 @@ Rules are defined in `src/azure_functions_doctor/assets/rules/v2.json`.
 | `flex_runtime_config` | For a Flex Consumption app, validates the runtime declared under `functionAppConfig.runtime` (name/version) against the supported Python versions, and WARNs when a legacy `linuxFxVersion` is present (Flex ignores it). Non-Flex apps SKIP. |
 | `flex_deprecated_settings` | For a Flex Consumption app, WARNs (non-gating) when legacy app settings that Flex ignores are declared (worker-runtime selection, Oryx/remote-build toggles, Azure Files content-share settings, run-from-package, and VNet route-all), citing the replacement mechanism for each. `linuxFxVersion` and `FUNCTIONS_EXTENSION_VERSION` are owned by `flex_runtime_config` / `functions_extension_version` and never double-reported. Non-Flex apps SKIP. |
 | `flex_deployment_storage` | For a Flex Consumption app, validates the deployment storage shape declared under `functionAppConfig.deployment.storage`: a container URL (`value`) must be specified and authentication must be configured (managed identity or a named storage account connection string). Obviously wrong shapes WARN (non-gating); the storage account is never contacted. Non-Flex apps SKIP, and apps that declare no deployment storage block in infra SKIP gracefully. |
+| `binding_connection_resolution` | Extracts `connection="..."` references from v2 trigger/binding decorators (Storage, Service Bus, Event Hub, Cosmos DB, and any binding exposing a `connection` keyword) and resolves each against `local.settings.json` Values plus the ingested deploy-config app settings. Unresolved connections WARN (non-gating). Identity-based connection groups (`<name>__serviceUri` / `<name>__accountName`) are treated as configured to avoid false positives. Only string-literal connection names are inspected; dynamic expressions are skipped. |
 
 ## False-positive Risk
 

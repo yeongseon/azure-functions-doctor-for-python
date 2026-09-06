@@ -614,6 +614,49 @@ def _collect_anonymous_auth_routes(path: Path, flag_missing_auth_level: bool = F
     return flagged
 
 
+def _collect_binding_connections(path: Path) -> list[tuple[str, str]]:
+    """Return ``(connection_name, "file:function")`` pairs for v2 binding decorators.
+
+    Scans decorators applied to a discovered ``FunctionApp``/``Blueprint`` alias for a
+    ``connection="..."`` keyword and collects the referenced setting name. Only
+    string-literal connection names are collected; dynamic expressions (variables,
+    ``os.environ[...]``) cannot be resolved statically and are skipped. This covers
+    Storage, Service Bus, Event Hub, Cosmos DB and any other binding that exposes a
+    ``connection`` keyword, without hard-coding a decorator whitelist.
+    """
+    references: list[tuple[str, str]] = []
+    for py_file, content in _iter_project_py_contents(path):
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            continue
+        app_aliases = _discover_functionapp_aliases(content)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            for dec in node.decorator_list:
+                if not isinstance(dec, ast.Call):
+                    continue
+                inner = dec.func
+                if not (
+                    isinstance(inner, ast.Attribute)
+                    and isinstance(inner.value, ast.Name)
+                    and inner.value.id in app_aliases
+                ):
+                    continue
+                for kw in dec.keywords:
+                    if kw.arg != "connection":
+                        continue
+                    if (
+                        isinstance(kw.value, ast.Constant)
+                        and isinstance(kw.value.value, str)
+                        and kw.value.value.strip()
+                    ):
+                        label = f"{py_file.relative_to(path)}:{node.name}"
+                        references.append((kw.value.value, label))
+    return references
+
+
 def _project_activates_trace_context(path: Path) -> list[str]:
     """Return "file:location" labels where the project explicitly opts into
     ``azure-functions-logging`` OTel trace-context activation.
