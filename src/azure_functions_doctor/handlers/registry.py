@@ -460,6 +460,32 @@ def _evaluate_flex_runtime_config(
     return result
 
 
+def _evaluate_flex_extension_version(ext_value: Optional[str]) -> HandlerResult:
+    """Classify FUNCTIONS_EXTENSION_VERSION for a Flex Consumption app (issue #346).
+
+    Flex Consumption does not support the ``FUNCTIONS_EXTENSION_VERSION`` app
+    setting: it only runs on runtime v4 and the value is backend-managed. A
+    missing value is therefore correct (SKIP), while an explicit value is a
+    deprecated/unsupported setting worth surfacing (WARN).
+    """
+    if ext_value is None:
+        return _create_result(
+            "skip",
+            "FUNCTIONS_EXTENSION_VERSION is not required on Flex Consumption "
+            "(the runtime is v4 and backend-managed); check skipped.",
+        )
+    detail = (
+        f"FUNCTIONS_EXTENSION_VERSION is set to '{ext_value}' but is not supported "
+        "on Flex Consumption; the runtime is v4 and backend-managed. Remove the setting."
+    )
+    result = _create_result("fail", detail)
+    result["severity"] = "warning"
+    result["gate"] = False
+    result["expected"] = "No FUNCTIONS_EXTENSION_VERSION on Flex Consumption"
+    result["actual"] = f"FUNCTIONS_EXTENSION_VERSION = {ext_value}"
+    return result
+
+
 class HandlerRegistry:
     """Registry for diagnostic check handlers with individual handler methods."""
 
@@ -1627,7 +1653,17 @@ class HandlerRegistry:
         The v1/v2/v3 runtimes are retired, so ``local.settings.json`` should pin
         the extension version to the current runtime (``~4`` by default). The
         expected value is overridable via ``condition.value``.
+
+        Flex Consumption is special-cased (issue #346): it does not support this
+        app setting at all, so a missing value SKIPs and an explicit value WARNs
+        instead of following the legacy-runtime logic.
         """
+        target_config = context.get("target_config") if context is not None else None
+        if (
+            target_config is not None
+            and target_config.hosting_plan.value == FLEX_CONSUMPTION_PLAN
+        ):
+            return _evaluate_flex_extension_version(target_config.extension_version.value)
         condition = rule.get("condition", {}) or {}
         expected = str(condition.get("value") or "~4")
         settings_path = path / "local.settings.json"
