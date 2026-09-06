@@ -17,6 +17,8 @@ Read this in: [한국어](README.ko.md) | [日本語](README.ja.md) | [简体中
 
 **Azure Functions Doctor** is the pre-deploy health gate for **Azure Functions Python v2** projects — a diagnostic CLI that catches configuration issues, missing dependencies, and environment problems before they cause runtime failures in production.
 
+> **Looking for the official `azure-functions-skills` doctor?** This is an independent, offline, deterministic Python package — see [how it compares](docs/comparison.md) and when to use each.
+
 ---
 
 Part of the **Azure Functions Python DX Toolkit**

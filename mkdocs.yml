@@ -39,6 +39,7 @@ nav:
   - Reference:
       - Architecture: architecture.md
       - Supported Versions: supported_versions.md
+      - Comparison vs Official Skill: comparison.md
       - Semver Policy: semver_policy.md
   - Contributing:
       - Development: development.md
