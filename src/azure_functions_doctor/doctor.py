@@ -4,12 +4,13 @@ import importlib.resources
 import json
 from pathlib import Path
 import time
-from typing import Literal, Optional, TypedDict
+from typing import Literal, Mapping, Optional, TypedDict, cast
 
 from jsonschema import ValidationError, validate
 
 from azure_functions_doctor.handlers import (
     EXCLUDED_PROJECT_DIRS,
+    HandlerResult,
     Rule,
     RuleContext,
     _discover_functionapp_aliases,
@@ -26,6 +27,24 @@ ProgrammingModel = Literal["v2", "unsupported_v1", "mixed", "unknown"]
 
 _VALID_SEVERITIES = ("error", "warning", "info")
 _VALID_TIERS = ("core", "extended", "experimental")
+
+# Finding Contract v2 (issue #348): the machine-output schema version for the
+# ``json`` format. Bumped from the implicit v1 (which carried only rule_id /
+# status / severity / tier) to v2, which adds auditable evidence and freshness
+# fields plus an ``analysis`` block. This is independent of the SARIF schema
+# version ("2.1.0").
+FINDING_SCHEMA_VERSION = "2.0"
+
+# Finding Contract v2 evidence / freshness fields carried from a handler result
+# into the emitted finding. All are optional strings.
+FINDING_EVIDENCE_KEYS = (
+    "evidence",
+    "expected",
+    "actual",
+    "source_url",
+    "last_verified",
+    "catalog_version",
+)
 
 
 def _resolve_severity(rule: Rule) -> str:
@@ -65,6 +84,14 @@ class CheckResult(TypedDict, total=False):
     line: int
     end_line: int
     column: int
+    # Finding Contract v2 (issue #348): auditable evidence + freshness metadata.
+    evidence: str
+    expected: str
+    actual: str
+    source_url: str
+    last_verified: str
+    catalog_version: str
+    analysis: dict[str, str]
 
 
 class SectionResult(TypedDict):
@@ -72,6 +99,27 @@ class SectionResult(TypedDict):
     category: str
     status: str  # 'pass' or 'fail'
     items: list[CheckResult]
+
+
+
+
+def _apply_finding_contract_v2(item: CheckResult, result: HandlerResult) -> None:
+    """Attach Finding Contract v2 metadata (issue #348) to a finding.
+
+    Copies any auditable evidence / freshness fields a handler emitted
+    (``evidence``, ``expected``, ``actual``, ``source_url``, ``last_verified``,
+    ``catalog_version``) into the finding, and always records the deterministic
+    analysis marker. ``analysis.type = "deterministic"`` is preferred over a
+    ``confidence`` float so this diagnostic output stays cleanly separated from
+    any future agent-inferred findings.
+    """
+    result_map = cast(Mapping[str, object], result)
+    item_map = cast("dict[str, object]", item)
+    for key in FINDING_EVIDENCE_KEYS:
+        value = result_map.get(key)
+        if isinstance(value, str) and value:
+            item_map[key] = value
+    item["analysis"] = {"type": "deterministic"}
 
 
 class Doctor:
@@ -234,6 +282,7 @@ class Doctor:
                     "severity": "error",
                     "tier": "core",
                     "hint": hint,
+                    "analysis": {"type": "deterministic"},
                 }
             ],
         }
@@ -366,6 +415,8 @@ class Doctor:
                     "severity": severity,
                     "tier": tier,
                 }
+
+                _apply_finding_contract_v2(item, result)
 
                 if failed and gate:
                     section_result["status"] = "fail"
