@@ -140,6 +140,11 @@
         "description": "Maturity tier of the rule. When omitted it is derived from 'required' (required -> core, optional -> extended).",
         "enum": ["core", "extended", "experimental"]
       },
+      "group": {
+        "type": "string",
+        "description": "Functional group of the rule: 'core' targets Azure runtime/hosting/deployment/bindings/durable/dependency/security correctness; 'integration' targets a specific ecosystem library (OpenAPI, validation, logging/OTel, LangGraph) and is only meaningful when that library is present. When omitted it defaults to 'core'.",
+        "enum": ["core", "integration"]
+      },
       "fix": {
         "type": "string",
         "description": "Natural language fix instruction (optional)."
