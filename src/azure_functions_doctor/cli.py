@@ -371,6 +371,62 @@ def doctor(
         scan_prefix = ""
         if not scan_root_is_absolute and scan_root_norm not in ("", "."):
             scan_prefix = scan_root_norm + "/"
+
+        def _physical_location_for(
+            entry: Mapping[str, object],
+        ) -> tuple[dict[str, object], str, object]:
+            """Build one physicalLocation from an item or per-finding entry.
+
+            Returns ``(physical_location, artifact_uri, loc_line)``. URIs are
+            repo-root-relative per issue #392; entries may carry an absolute
+            path defensively, which is rebased onto the scan root.
+            """
+            loc_file = entry.get("file")
+            artifact_uri = ""
+            loc_line: object = None
+            if loc_file:
+                artifact_uri = str(loc_file).replace("\\", "/")
+                if Path(str(loc_file)).is_absolute():
+                    try:
+                        artifact_uri = str(Path(str(loc_file)).relative_to(Path(path))).replace(
+                            "\\", "/"
+                        )
+                    except ValueError:
+                        artifact_uri = Path(str(loc_file)).name
+                if artifact_uri.startswith("./"):
+                    artifact_uri = artifact_uri[2:]
+                artifact_uri = scan_prefix + artifact_uri
+                physical: dict[str, object] = {
+                    "artifactLocation": {
+                        "uri": artifact_uri,
+                        "uriBaseId": "%SRCROOT%",
+                    }
+                }
+                raw_line = entry.get("line")
+                if isinstance(raw_line, int) and raw_line > 0:
+                    loc_line = raw_line
+                    region: dict[str, object] = {"startLine": raw_line}
+                    raw_end = entry.get("end_line")
+                    if isinstance(raw_end, int) and raw_end > 0:
+                        region["endLine"] = raw_end
+                    raw_col = entry.get("column")
+                    if isinstance(raw_col, int) and raw_col > 0:
+                        region["startColumn"] = raw_col
+                    physical["region"] = region
+                return physical, artifact_uri, loc_line
+            # Rules without a file location point at the scan root in its
+            # repo-root-relative form; absolute roots collapse to "." (#392).
+            return (
+                {
+                    "artifactLocation": {
+                        "uri": scan_prefix if scan_prefix else ".",
+                        "uriBaseId": "%SRCROOT%",
+                    }
+                },
+                scan_prefix if scan_prefix else ".",
+                None,
+            )
+
         for section in results:
             for item in section["items"]:
                 status = item.get("status")
@@ -379,69 +435,25 @@ def doctor(
                     continue
                 rule_id = item.get("rule_id") or item.get("label", "")
                 level = "error" if status == "fail" else "warning"
-                loc_file = item.get("file")
-                artifact_uri = ""
-                loc_line: object = None
-                if loc_file:
-                    artifact_uri = str(loc_file).replace("\\", "/")
-                    if Path(str(loc_file)).is_absolute():
-                        # Defensive: handlers emit scan-root-relative paths; if an
-                        # absolute path ever reaches here, rebase it onto the
-                        # scan root so no filesystem path leaks (#392).
-                        try:
-                            artifact_uri = str(Path(str(loc_file)).relative_to(Path(path))).replace(
-                                "\\", "/"
-                            )
-                        except ValueError:
-                            artifact_uri = Path(str(loc_file)).name
-                    if artifact_uri.startswith("./"):
-                        artifact_uri = artifact_uri[2:]
-                    artifact_uri = scan_prefix + artifact_uri
-                    physical_location: dict[str, object] = {
-                        "artifactLocation": {
-                            "uri": artifact_uri,
-                            "uriBaseId": "%SRCROOT%",
-                        }
-                    }
-                    loc_line = item.get("line")
-                    if isinstance(loc_line, int) and loc_line > 0:
-                        region: dict[str, object] = {"startLine": loc_line}
-                        loc_end_line = item.get("end_line")
-                        if isinstance(loc_end_line, int) and loc_end_line > 0:
-                            region["endLine"] = loc_end_line
-                        loc_column = item.get("column")
-                        if isinstance(loc_column, int) and loc_column > 0:
-                            region["startColumn"] = loc_column
-                        physical_location["region"] = region
-                else:
-                    # Rules without a file location point at the scan root in
-                    # its repo-root-relative form; absolute roots collapse to
-                    # "." so the URI stays a valid relative reference (#392).
-                    physical_location = {
-                        "artifactLocation": {
-                            "uri": scan_prefix if scan_prefix else ".",
-                            "uriBaseId": "%SRCROOT%",
-                        }
-                    }
-                # Stable fingerprint so Code Scanning can match alerts across
-                # runs even when lines shift; without one, most findings share
-                # the same root location and alerts regenerate/duplicate (#392).
-                fingerprint_seed = f"{rule_id}:{artifact_uri}:{loc_line or 0}"
-                sarif_result: dict[str, object] = {
-                    "ruleId": rule_id,
-                    "message": {"text": item.get("value", "")},
-                    "level": level,
-                    "locations": [{"physicalLocation": physical_location}],
-                    "partialFingerprints": {
-                        "primaryLocationLineHash": hashlib.sha256(
-                            fingerprint_seed.encode("utf-8")
-                        ).hexdigest()
-                    },
-                }
+
+                # One SARIF result per finding (issue #395): when a handler
+                # supplies structured ``locations``, each entry becomes its
+                # own result with its own region and message.
+                item_map = cast(Mapping[str, object], item)
+                raw_locations = item_map.get("locations")
+                entries: list[tuple[Mapping[str, object], str]] = []
+                if isinstance(raw_locations, list) and raw_locations:
+                    for raw_entry in raw_locations:
+                        if isinstance(raw_entry, dict):
+                            entry_map = cast(Mapping[str, object], raw_entry)
+                            per_message = str(entry_map.get("message") or item.get("value", ""))
+                            entries.append((entry_map, per_message))
+                if not entries:
+                    entries = [(item_map, str(item.get("value", "")))]
+
                 props: dict[str, object] = {}
                 if item.get("hint"):
                     props["hint"] = item.get("hint", "")
-                item_map = cast(Mapping[str, object], item)
                 for key in FINDING_EVIDENCE_KEYS:
                     val = item_map.get(key)
                     if isinstance(val, str) and val:
@@ -449,9 +461,27 @@ def doctor(
                 analysis = item.get("analysis")
                 if analysis:
                     props["analysis"] = analysis
-                if props:
-                    sarif_result["properties"] = props
-                sarif_results.append(sarif_result)
+
+                for entry, message_text in entries:
+                    physical_location, artifact_uri, loc_line = _physical_location_for(entry)
+                    # Stable fingerprint so Code Scanning can match alerts across
+                    # runs even when lines shift (#392).
+                    line_for_seed = loc_line if isinstance(loc_line, int) else 0
+                    fingerprint_seed = f"{rule_id}:{artifact_uri}:{line_for_seed}"
+                    sarif_result: dict[str, object] = {
+                        "ruleId": rule_id,
+                        "message": {"text": message_text},
+                        "level": level,
+                        "locations": [{"physicalLocation": physical_location}],
+                        "partialFingerprints": {
+                            "primaryLocationLineHash": hashlib.sha256(
+                                fingerprint_seed.encode("utf-8")
+                            ).hexdigest()
+                        },
+                    }
+                    if props:
+                        sarif_result["properties"] = props
+                    sarif_results.append(sarif_result)
 
         sarif_output = {
             "version": "2.1.0",

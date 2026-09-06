@@ -124,7 +124,7 @@ def test_scan_before_spec_spec_before_scan_fails(tmp_path: Path) -> None:
     )
     scan = {"scan"}
     spec = {"build_spec"}
-    assert _collect_scan_before_spec(tmp_path, scan, spec) == ["app.py:build_spec"]
+    assert _collect_scan_before_spec(tmp_path, scan, spec)[0] == ["app.py:build_spec"]
     assert _status("scan_before_spec", tmp_path) == "fail"
 
 
@@ -135,13 +135,13 @@ def test_scan_before_spec_correct_order_passes(tmp_path: Path) -> None:
 
 def test_scan_before_spec_spec_without_scan_fails(tmp_path: Path) -> None:
     _write(tmp_path, "app.py", "build_spec()\n")
-    assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"}) == ["app.py:build_spec"]
+    assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"})[0] == ["app.py:build_spec"]
     assert _status("scan_before_spec", tmp_path) == "fail"
 
 
 def test_scan_before_spec_no_spec_passes(tmp_path: Path) -> None:
     _write(tmp_path, "app.py", "scan()\n")
-    assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"}) == []
+    assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"})[0] == []
 
 
 def test_scan_before_spec_custom_names(tmp_path: Path) -> None:
@@ -180,13 +180,13 @@ def test_scan_before_spec_real_openapi_names_correct_order_passes(tmp_path: Path
 
 def test_scan_before_spec_skips_syntax_error(tmp_path: Path) -> None:
     _write(tmp_path, "broken.py", "def f(:\n")
-    assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"}) == []
+    assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"})[0] == []
 
 
 def test_scan_before_spec_dotted_call_target(tmp_path: Path) -> None:
     # attribute-style call that resolves to a leaf name is still matched
     _write(tmp_path, "app.py", "api.build_spec()\napi.scan()\n")
-    assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"}) == ["app.py:build_spec"]
+    assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"})[0] == ["app.py:build_spec"]
 
 
 # ---------------------------------------------------------------------------

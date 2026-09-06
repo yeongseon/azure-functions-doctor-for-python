@@ -11,6 +11,7 @@ from typing import Optional
 from azure_functions_doctor.compatibility import Catalog, load_catalog
 from azure_functions_doctor.deploy_config import (
     flex_deployment_storage_shape,
+    local_settings_values,
 )
 from azure_functions_doctor.handlers._helpers import (
     _HOST_JSON_MISSING,
@@ -46,12 +47,12 @@ def _infra_declares_linux_fx_version(path: Path) -> bool:
     for infra in iter_project_files(path, ("*.bicep", "*.json")):
         if infra.name == "local.settings.json":
             continue
-            try:
-                text = infra.read_text(encoding="utf-8")
-            except OSError:
-                continue
-            if _LINUX_FX_KEY_RE.search(text):
-                return True
+        try:
+            text = infra.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if _LINUX_FX_KEY_RE.search(text):
+            return True
     return False
 
 
@@ -185,6 +186,7 @@ def _evaluate_flex_deprecated_settings(
     app_settings: dict[str, str],
     *,
     catalog: Optional[Catalog] = None,
+    local_settings: Optional[dict[str, str]] = None,
 ) -> HandlerResult:
     """Warn on legacy app settings that Flex Consumption ignores (issue #350).
 
@@ -215,7 +217,23 @@ def _evaluate_flex_deprecated_settings(
         "replacement mechanism."
     )
     detail = "\n".join(lines)
-    result = _create_result("fail", detail)
+    # Cite the declaring file when the deprecated setting is visible in
+    # local.settings.json (the common case); infra-only settings stay at the
+    # scan root (issue #394).
+    local_snapshot = local_settings or {}
+    locations: list[dict[str, object]] = [
+        {
+            "file": "local.settings.json" if name in local_snapshot else None,
+            "message": f"Deprecated Flex Consumption app setting: {name}",
+        }
+        for name in present[:10]
+    ]
+    result = _create_result(
+        "fail",
+        detail,
+        file="local.settings.json" if present and present[0] in local_snapshot else None,
+        locations=locations,
+    )
     result["severity"] = "warning"
     result["gate"] = False
     expected = "No deprecated legacy app settings on Flex Consumption"
@@ -370,6 +388,7 @@ class DeploymentHandlers:
         return _evaluate_flex_deprecated_settings(
             target_config.hosting_plan.value,
             target_config.app_settings,
+            local_settings=dict(local_settings_values(path)),
         )
 
     @_rule_handler

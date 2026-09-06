@@ -101,6 +101,7 @@ If `--output` is omitted, JSON is printed to stdout.
 | `last_verified` | string (optional) | ISO date when the catalog fact was last verified against the source. |
 | `catalog_version` | string (optional) | Version of the compatibility catalog the fact came from. |
 | `analysis` | object (optional) | Analysis provenance block; `type` is `deterministic` for every built-in rule. |
+| `locations` | array (optional) | Per-finding locations (`file`/`line`/`end_line`/`column`/`message`). SARIF emits one result per entry instead of collapsing onto the first location; the scalar `file`/`line` fields remain the single-location form. |
 | `hint` | string (optional) | Human-readable remediation guidance. |
 | `hint_url` | string (optional) | Supporting documentation link. |
 

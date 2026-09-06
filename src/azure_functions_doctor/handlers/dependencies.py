@@ -225,7 +225,8 @@ class DependencyHandlers:
         except OSError as exc:
             return _handle_specific_exceptions(f"reading {target}", exc)
         unpinned: list[str] = []
-        for raw in content.splitlines():
+        finding_lines: list[dict[str, object]] = []
+        for line_no, raw in enumerate(content.splitlines(), start=1):
             line = raw.strip()
             if not line or line.startswith("#") or line.startswith("-"):
                 continue
@@ -238,6 +239,13 @@ class DependencyHandlers:
             specifiers = list(requirement.specifier)
             if not specifiers:
                 unpinned.append(f"- {requirement.name} (no version specifier)")
+                finding_lines.append(
+                    {
+                        "file": target,
+                        "line": line_no,
+                        "message": f"{requirement.name} (no version specifier)",
+                    }
+                )
                 continue
             has_upper_bound = any(
                 spec.operator in ("==", "===", "~=", "<", "<=") for spec in specifiers
@@ -245,6 +253,13 @@ class DependencyHandlers:
             if not has_upper_bound:
                 bounds = ",".join(str(spec) for spec in specifiers)
                 unpinned.append(f"- {requirement.name} ({bounds}; no upper bound)")
+                finding_lines.append(
+                    {
+                        "file": target,
+                        "line": line_no,
+                        "message": f"{requirement.name} ({bounds}; no upper bound)",
+                    }
+                )
         if not unpinned:
             return _create_result("pass", f"{target} dependencies are pinned/bounded")
         detail = "\n".join(
@@ -256,4 +271,4 @@ class DependencyHandlers:
                 "keep deployments reproducible.",
             ]
         )
-        return _create_result("fail", detail)
+        return _create_result("fail", detail, file=target, locations=finding_lines[:10])
