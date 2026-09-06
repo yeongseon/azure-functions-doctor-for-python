@@ -86,7 +86,8 @@
           "functions_runtime_lifecycle",
           "hosting_plan_lifecycle",
           "flex_runtime_config",
-          "flex_deprecated_settings"
+          "flex_deprecated_settings",
+          "flex_deployment_storage"
         ]
       },
       "required": {

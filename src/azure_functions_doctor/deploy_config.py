@@ -252,6 +252,32 @@ def _deployment_storage_from_json(node: object) -> Optional[str]:
     return None
 
 
+def flex_deployment_storage_shape(project_path: Path) -> Optional[dict[str, object]]:
+    """Return the Flex ``functionAppConfig.deployment.storage`` object from infra.
+
+    Scans deployable infra JSON files for a ``deployment.storage`` block and
+    returns the first one found, or ``None`` when none is declared. Raw ``.bicep``
+    files are not statically parsed for nested shapes, so a project expressed only
+    in bicep yields ``None`` (the deployment-storage check then skips gracefully).
+    ``local.settings.json`` is excluded by :func:`_iter_infra_files`.
+    """
+    for candidate, kind in _iter_infra_files(project_path):
+        if kind != "json":
+            continue
+        try:
+            data = json.loads(candidate.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeDecodeError, OSError):
+            continue
+        for obj in _walk_json(data):
+            deployment = obj.get("deployment")
+            if not isinstance(deployment, dict):
+                continue
+            storage = deployment.get("storage")
+            if isinstance(storage, dict):
+                return storage
+    return None
+
+
 def _has_function_app_config(node: object) -> bool:
     return any("functionAppConfig" in obj for obj in _walk_json(node))
 
