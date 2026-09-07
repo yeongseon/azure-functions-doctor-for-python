@@ -43,6 +43,6 @@ jobs:
           soak-venv/bin/pip install azure-functions-doctor
           echo "doctor version: $(soak-venv/bin/azure-functions-doctor --version)"
 
-      - name: Soak (gate: health, contract, baseline)
+      - name: Soak (health, contract, baseline gate)
         run: |
           PATH="$PWD/soak-venv/bin:$PATH" python scripts/soak_cookbook.py "$PWD/cookbook/examples"
