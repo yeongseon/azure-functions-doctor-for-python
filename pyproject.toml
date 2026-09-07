@@ -36,6 +36,7 @@ Homepage = "https://yeongseon.dev/azure-functions-python/doctor/"
 Documentation = "https://yeongseon.dev/azure-functions-python/doctor/"
 Repository = "https://github.com/yeongseon/azure-functions-doctor-python"
 Issues = "https://github.com/yeongseon/azure-functions-doctor-python/issues"
+Changelog = "https://github.com/yeongseon/azure-functions-doctor-python/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
