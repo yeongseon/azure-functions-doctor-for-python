@@ -256,8 +256,17 @@ The default ruleset includes checks for:
 
 ## Examples
 
-- [examples/v2/http-trigger/README.md](examples/v2/http-trigger/README.md)
-- [examples/v2/multi-trigger/README.md](examples/v2/multi-trigger/README.md)
+| Scenario | Example | Demonstrates |
+| --- | --- | --- |
+| Healthy v2 HTTP app | [http-trigger](examples/v2/http-trigger/README.md) | Reference project; docs/e2e/Action anchor |
+| Multi-trigger + blueprint | [multi-trigger](examples/v2/multi-trigger/README.md) | Several trigger kinds in one app |
+| Healthy Flex Consumption | [flex-consumption](examples/v2/flex-consumption/README.md) | `functionAppConfig.runtime`, managed-identity deployment storage |
+| Unsupported Flex runtime | [broken-flex-runtime-config](examples/v2/broken-flex-runtime-config/README.md) | `check_flex_runtime_config` failure |
+| Legacy settings on Flex | [broken-flex-deprecated-settings](examples/v2/broken-flex-deprecated-settings/README.md) | Deprecated app-setting warnings |
+| Missing storage auth | [broken-flex-deployment-storage](examples/v2/broken-flex-deployment-storage/README.md) | Deployment-storage shape warnings |
+| Emulator leak in infra | [broken-dev-storage-leak](examples/v2/broken-dev-storage-leak/README.md) | `UseDevelopmentStorage=true` shipped in bicep |
+| Legacy `~3` pin | [broken-legacy-extension-version](examples/v2/broken-legacy-extension-version/README.md) | Extension-version warn + v3 lifecycle failure |
+| Monorepo subdirectory | [monorepo](examples/monorepo/README.md) | SARIF repo-root rebasing (`services/api`) |
 
 ## Requirements
 
