@@ -71,4 +71,6 @@ class ProjectHandlers:
                 + f" ({expected_order[-1]} innermost).",
             ]
         )
-        return _create_result("fail", detail)
+        return _create_result(
+            "fail", detail, file=inverted[0].rsplit(":", 1)[0] if inverted else None
+        )

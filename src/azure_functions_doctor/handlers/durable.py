@@ -67,4 +67,6 @@ class DurableHandlers:
                 "Fix: move nondeterministic work into activity functions.",
             ]
         )
-        return _create_result("fail", detail)
+        return _create_result(
+            "fail", detail, file=flagged[0].split(" ->")[0].rsplit(":", 1)[0] if flagged else None
+        )

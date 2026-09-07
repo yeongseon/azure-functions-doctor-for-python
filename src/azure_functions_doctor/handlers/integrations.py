@@ -179,7 +179,9 @@ class IntegrationHandlers:
                 "Fix: require authentication (e.g. AuthLevel.FUNCTION) for LangGraph routes.",
             ]
         )
-        return _create_result("fail", detail)
+        return _create_result(
+            "fail", detail, file=flagged[0].rsplit(":", 1)[0] if flagged else None
+        )
 
     @_rule_handler
     def _handle_unsupported_metadata_version(
@@ -235,4 +237,6 @@ class IntegrationHandlers:
                 "opentelemetry-* package), or disable activate_trace_context.",
             ]
         )
-        return _create_result("fail", detail)
+        return _create_result(
+            "fail", detail, file=activations[0].rsplit(":", 1)[0] if activations else None
+        )

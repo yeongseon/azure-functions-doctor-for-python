@@ -509,7 +509,15 @@ class DeploymentHandlers:
                 f"Fix: target a supported Python runtime ({supported_range}).",
             ]
         )
-        return _create_result("fail", detail)
+        return _create_result(
+            "fail",
+            detail,
+            file=findings[0][0] if findings else None,
+            locations=[
+                {"file": loc, "message": f"linuxFxVersion Python|{ver} is unsupported"}
+                for loc, ver in findings[:10]
+            ],
+        )
 
     @_rule_handler
     def _handle_dev_storage_connection(
@@ -548,7 +556,15 @@ class DeploymentHandlers:
                 "local.settings.json.",
             ]
         )
-        return _create_result("fail", detail)
+        return _create_result(
+            "fail",
+            detail,
+            file=findings[0] if findings else None,
+            locations=[
+                {"file": loc, "message": "Dev-storage emulator connection ships to production"}
+                for loc in findings[:10]
+            ],
+        )
 
     @_rule_handler
     def _handle_host_json_property(
