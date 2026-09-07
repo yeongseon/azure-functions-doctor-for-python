@@ -117,6 +117,7 @@ def test_openapi_version_mixing_skips_syntax_error(tmp_path: Path) -> None:
 
 
 def test_scan_before_spec_spec_before_scan_fails(tmp_path: Path) -> None:
+    _write(tmp_path, "requirements.txt", "azure-functions-openapi==0.24.0\n")
     _write(
         tmp_path,
         "app.py",
@@ -129,11 +130,13 @@ def test_scan_before_spec_spec_before_scan_fails(tmp_path: Path) -> None:
 
 
 def test_scan_before_spec_correct_order_passes(tmp_path: Path) -> None:
+    _write(tmp_path, "requirements.txt", "azure-functions-openapi==0.24.0\n")
     _write(tmp_path, "app.py", "scan()\nbuild_spec()\n")
     assert _status("scan_before_spec", tmp_path) == "pass"
 
 
 def test_scan_before_spec_spec_without_scan_fails(tmp_path: Path) -> None:
+    _write(tmp_path, "requirements.txt", "azure-functions-openapi==0.24.0\n")
     _write(tmp_path, "app.py", "build_spec()\n")
     assert _collect_scan_before_spec(tmp_path, {"scan"}, {"build_spec"})[0] == ["app.py:build_spec"]
     assert _status("scan_before_spec", tmp_path) == "fail"
@@ -145,6 +148,7 @@ def test_scan_before_spec_no_spec_passes(tmp_path: Path) -> None:
 
 
 def test_scan_before_spec_custom_names(tmp_path: Path) -> None:
+    _write(tmp_path, "requirements.txt", "azure-functions-openapi==0.24.0\n")
     _write(tmp_path, "app.py", "make_spec()\ndiscover()\n")
     assert (
         _status(
@@ -156,10 +160,18 @@ def test_scan_before_spec_custom_names(tmp_path: Path) -> None:
     )
 
 
+def test_scan_before_spec_skips_without_openapi_dependency(tmp_path: Path) -> None:
+    """Non-OpenAPI build() calls (e.g. durable-graph .build()) must not trip (#426)."""
+    _write(tmp_path, "app.py", "graph = GraphBuilder(nodes).build()\n")
+    _write(tmp_path, "requirements.txt", "azure-functions-durable-graph==0.3.0\n")
+    assert _status("scan_before_spec", tmp_path) == "skip"
+
+
 def test_scan_before_spec_real_openapi_names_default_condition(tmp_path: Path) -> None:
     # Regression (#248): the real azure-functions-openapi call names must be
     # recognised by the built-in default names baked into the handler, so the
     # rule fires even though v2.json's condition does not re-list them.
+    _write(tmp_path, "requirements.txt", "azure-functions-openapi==0.24.0\n")
     _write(
         tmp_path,
         "app.py",
@@ -170,6 +182,7 @@ def test_scan_before_spec_real_openapi_names_default_condition(tmp_path: Path) -
 
 def test_scan_before_spec_real_openapi_names_correct_order_passes(tmp_path: Path) -> None:
     # Regression (#248): scanning before building the spec passes with defaults.
+    _write(tmp_path, "requirements.txt", "azure-functions-openapi==0.24.0\n")
     _write(
         tmp_path,
         "app.py",
