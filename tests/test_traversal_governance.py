@@ -83,7 +83,6 @@ def test_dev_storage_skips_local_settings_template(tmp_path: Path) -> None:
 
     from azure_functions_doctor.handlers.registry import HandlerRegistry
 
-
     rule = cast(
         Rule,
         {
@@ -92,7 +91,7 @@ def test_dev_storage_skips_local_settings_template(tmp_path: Path) -> None:
             "required": False,
             "condition": {},
         },
-)
+    )
     registry = HandlerRegistry()
     result = registry.handle(rule, tmp_path)
     assert result["status"] == "pass"

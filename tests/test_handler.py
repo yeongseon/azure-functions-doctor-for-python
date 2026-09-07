@@ -159,6 +159,7 @@ def test_compare_python_version_from_python_version_file(tmp_path: Path) -> None
     assert ".python-version" in result["detail"]
     assert "unsupported target" not in result["detail"]
 
+
 def test_compare_func_core_tools_version_pass(monkeypatch: MonkeyPatch) -> None:
     """Test that the func Core Tools version check passes when version meets minimum."""
     from azure_functions_doctor import handlers

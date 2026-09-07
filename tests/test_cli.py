@@ -415,8 +415,13 @@ def test_cli_sarif_output_emits_per_file_and_per_line_locations(tmp_path: Path) 
     fallback_results = [r for r in sarif_results if _uri(r) == "."]
     assert fallback_results, "expected fallback results located at '.'"
 
-    # AST-based rule: the flagged route carries a per-line region.
-    ast_results = [r for r in sarif_results if _uri(r) == "function_app.py"]
+    # AST-based rule: the flagged route carries a per-line region. Filter by
+    # ruleId: decorator_order now also emits located function_app.py results.
+    ast_results = [
+        r
+        for r in sarif_results
+        if _uri(r) == "function_app.py" and r["ruleId"] == "check_endpoint_metadata"
+    ]
     assert ast_results, "expected a SARIF result located at function_app.py"
     region = next(
         r["locations"][0]["physicalLocation"]["region"]
@@ -424,6 +429,11 @@ def test_cli_sarif_output_emits_per_file_and_per_line_locations(tmp_path: Path) 
         if "region" in r["locations"][0]["physicalLocation"]
     )
     assert region["startLine"] == handler_line
+
+    # The inverted decorator order is now located too (per-line wiring).
+    decorator_results = [r for r in sarif_results if r["ruleId"] == "check_decorator_order"]
+    assert decorator_results, "expected located decorator-order findings"
+    assert decorator_results[0]["locations"][0]["physicalLocation"]["region"]["startLine"] > 0
     assert region["endLine"] >= region["startLine"]
     assert region["startColumn"] >= 1
 

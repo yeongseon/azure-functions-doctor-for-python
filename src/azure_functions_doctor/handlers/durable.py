@@ -67,6 +67,18 @@ class DurableHandlers:
                 "Fix: move nondeterministic work into activity functions.",
             ]
         )
+        first = flagged[0] if flagged else None
         return _create_result(
-            "fail", detail, file=flagged[0].split(" ->")[0].rsplit(":", 1)[0] if flagged else None
+            "fail",
+            detail,
+            file=first[0].split(" ->")[0].rsplit(":", 1)[0] if first else None,
+            line=first[1] if first else None,
+            locations=[
+                {
+                    "file": lbl.split(" ->")[0].rsplit(":", 1)[0],
+                    "line": ln,
+                    "message": f"Nondeterministic orchestrator call: {lbl}",
+                }
+                for lbl, ln in flagged[:10]
+            ],
         )

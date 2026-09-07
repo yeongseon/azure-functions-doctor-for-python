@@ -174,13 +174,25 @@ class IntegrationHandlers:
         detail = "\n".join(
             [
                 "Anonymous-auth routes detected in a LangGraph project:",
-                *[f"- {loc}" for loc in flagged[:10]],
+                *[f"- {loc}" for loc, _ln in flagged[:10]],
                 "",
                 "Fix: require authentication (e.g. AuthLevel.FUNCTION) for LangGraph routes.",
             ]
         )
+        first = flagged[0] if flagged else None
         return _create_result(
-            "fail", detail, file=flagged[0].rsplit(":", 1)[0] if flagged else None
+            "fail",
+            detail,
+            file=first[0].rsplit(":", 1)[0] if first else None,
+            line=first[1] if first else None,
+            locations=[
+                {
+                    "file": lbl.rsplit(":", 1)[0],
+                    "line": ln,
+                    "message": f"Anonymous-auth route: {lbl}",
+                }
+                for lbl, ln in flagged[:10]
+            ],
         )
 
     @_rule_handler
@@ -237,6 +249,25 @@ class IntegrationHandlers:
                 "opentelemetry-* package), or disable activate_trace_context.",
             ]
         )
+
+        def _activation_locations(labels: list[str]) -> list[dict[str, object]]:
+            out: list[dict[str, object]] = []
+            for loc in labels[:10]:
+                file_part, _, line_part = loc.rpartition(":")
+                out.append(
+                    {
+                        "file": file_part,
+                        "line": int(line_part) if line_part.isdigit() else None,
+                        "message": f"Trace-context activation without opentelemetry: {loc}",
+                    }
+                )
+            return out
+
+        first_loc = activations[0].rsplit(":", 1) if activations else None
         return _create_result(
-            "fail", detail, file=activations[0].rsplit(":", 1)[0] if activations else None
+            "fail",
+            detail,
+            file=first_loc[0] if first_loc else None,
+            line=int(first_loc[1]) if first_loc and first_loc[1].isdigit() else None,
+            locations=_activation_locations(activations),
         )
