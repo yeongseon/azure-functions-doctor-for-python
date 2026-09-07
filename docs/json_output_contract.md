@@ -57,6 +57,18 @@ If `--output` is omitted, JSON is printed to stdout.
 
 ## Field reference
 
+### Machine-readable schema
+
+The contract ships as a JSON Schema in the wheel: [`schemas/output-contract-2.0.schema.json`](https://github.com/yeongseon/azure-functions-doctor-python/blob/main/src/azure_functions_doctor/schemas/output-contract-2.0.schema.json) (draft-07). Consumers validate with `jsonschema`:
+
+```python
+import json, jsonschema
+schema = json.load(open("output-contract-2.0.schema.json"))
+jsonschema.validate(json.load(open("doctor-report.json")), schema)
+```
+
+Strict on identity and semantics (rule_id shape, status/severity/tier enums); permissive on additive fields for 0.x evolution. Field *meaning* changes require a migration note per the [semver policy](semver_policy.md).
+
 ### Top level
 
 | Field | Type | Description |
