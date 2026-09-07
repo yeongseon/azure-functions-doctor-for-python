@@ -32,6 +32,22 @@ from typing import Any
 BASELINE_PATH = Path(__file__).resolve().parent / "cookbook_soak_baseline.json"
 DOCTOR_BIN = shutil.which("azure-functions-doctor")
 
+# Machine-level rules depend on the HOST (func CLI, venv, interpreter), not the
+# project: they legitimately differ between a developer laptop and the CI
+# runner (first real run flagged every project with check_func_cli). The
+# contract documents them as environment-dependent; exclude from the baseline
+# comparison while still health/contract-checking their output.
+MACHINE_LEVEL_RULES = frozenset(
+    {
+        "check_venv",
+        "check_python_executable",
+        "check_python_version",
+        "check_python_runtime_lifecycle",
+        "check_func_cli",
+        "check_func_core_tools_version",
+    }
+)
+
 
 def discover_projects(examples_dir: Path) -> list[Path]:
     """Every cookbook example directory that ships a function_app.py."""
@@ -99,7 +115,7 @@ def main() -> int:
             failures.append(f"{name}: rc={rc} {error}")
             continue
         found = findings(data)
-        rule_ids = sorted({rule for rule, _file in found})
+        rule_ids = sorted({rule for rule, _file in found if rule not in MACHINE_LEVEL_RULES})
         next_baseline[name] = rule_ids
         for rule, file_ref in found:
             if file_ref.startswith("/"):
