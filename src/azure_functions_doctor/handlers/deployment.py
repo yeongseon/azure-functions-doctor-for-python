@@ -186,7 +186,7 @@ def _evaluate_flex_deprecated_settings(
     app_settings: dict[str, str],
     *,
     catalog: Optional[Catalog] = None,
-    local_settings: Optional[dict[str, str]] = None,
+    setting_sources: Optional[dict[str, str]] = None,
 ) -> HandlerResult:
     """Warn on legacy app settings that Flex Consumption ignores (issue #350).
 
@@ -217,13 +217,12 @@ def _evaluate_flex_deprecated_settings(
         "replacement mechanism."
     )
     detail = "\n".join(lines)
-    # Cite the declaring file when the deprecated setting is visible in
-    # local.settings.json (the common case); infra-only settings stay at the
-    # scan root (issue #394).
-    local_snapshot = local_settings or {}
+    # Cite the declaring file per deprecated setting (#394/#408): local.settings
+    # entries map to local.settings.json; infra entries carry ingest provenance.
+    sources = setting_sources or {}
     locations: list[dict[str, object]] = [
         {
-            "file": "local.settings.json" if name in local_snapshot else None,
+            "file": sources.get(name),
             "message": f"Deprecated Flex Consumption app setting: {name}",
         }
         for name in present[:10]
@@ -231,7 +230,7 @@ def _evaluate_flex_deprecated_settings(
     result = _create_result(
         "fail",
         detail,
-        file="local.settings.json" if present and present[0] in local_snapshot else None,
+        file=sources.get(present[0]) if present else None,
         locations=locations,
     )
     result["severity"] = "warning"
@@ -357,12 +356,18 @@ class DeploymentHandlers:
         linux_fx_present = (
             hosting_plan == FLEX_CONSUMPTION_PLAN and _infra_declares_linux_fx_version(path)
         )
-        return _evaluate_flex_runtime_config(
+        result = _evaluate_flex_runtime_config(
             hosting_plan,
             runtime_name,
             runtime_version,
             linux_fx_present=linux_fx_present,
         )
+        if result["status"] not in ("pass", "skip") and target_config is not None:
+            source = target_config.runtime_name.source
+            if source and not source.startswith("unknown"):
+                result["file"] = source
+                result.setdefault("locations", [{"file": source}])
+        return result
 
     @_rule_handler
     def _handle_flex_deprecated_settings(
@@ -385,10 +390,13 @@ class DeploymentHandlers:
                 "Deployment target could not be resolved; "
                 "Flex deprecated-app-settings check skipped.",
             )
+        setting_sources = {**target_config.app_settings_files}
+        for local_name in local_settings_values(path):
+            setting_sources.setdefault(local_name, "local.settings.json")
         return _evaluate_flex_deprecated_settings(
             target_config.hosting_plan.value,
             target_config.app_settings,
-            local_settings=dict(local_settings_values(path)),
+            setting_sources=setting_sources,
         )
 
     @_rule_handler
@@ -414,7 +422,12 @@ class DeploymentHandlers:
         storage = (
             flex_deployment_storage_shape(path) if hosting_plan == FLEX_CONSUMPTION_PLAN else None
         )
-        return _evaluate_flex_deployment_storage(hosting_plan, storage)
+        result = _evaluate_flex_deployment_storage(hosting_plan, storage)
+        if result["status"] not in ("pass", "skip") and target_config is not None:
+            source = target_config.deployment_storage.source
+            if source and not source.startswith("unknown"):
+                result["file"] = source
+        return result
 
     @_rule_handler
     def _handle_functions_extension_version(

@@ -100,6 +100,9 @@ class TargetConfig:
     extension_version: ResolvedField
     deployment_storage: ResolvedField
     app_settings: dict[str, str] = field(default_factory=dict)
+    # Provenance for each ingested app setting: setting name -> declaring file
+    # (repo-root-relative), so deploy-rule findings can cite the source (#408).
+    app_settings_files: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def unknown(cls) -> "TargetConfig":
@@ -112,6 +115,7 @@ class TargetConfig:
             extension_version=blank,
             deployment_storage=blank,
             app_settings={},
+            app_settings_files={},
         )
 
 
@@ -125,6 +129,7 @@ class _IaCScan:
     extension_version: Optional[ResolvedField] = None
     deployment_storage: Optional[ResolvedField] = None
     app_settings: dict[str, str] = field(default_factory=dict)
+    app_settings_files: dict[str, str] = field(default_factory=dict)
 
 
 def _shared_traversal() -> Callable[[Path, Union[str, tuple[str, ...], list[str]]], Iterator[Path]]:
@@ -319,6 +324,7 @@ def _scan_json_file(text: str, rel: str, scan: _IaCScan) -> None:
     settings = _app_settings_from_json(data)
     for name, value in settings.items():
         scan.app_settings.setdefault(name, value)
+        scan.app_settings_files.setdefault(name, rel)
     ext = settings.get("FUNCTIONS_EXTENSION_VERSION")
     if ext is not None and scan.extension_version is None:
         scan.extension_version = ResolvedField(ext, rel)
@@ -341,6 +347,7 @@ def _scan_bicep_file(text: str, rel: str, scan: _IaCScan) -> None:
             scan.runtime_version = ResolvedField(match.group(1), rel)
     for name, value in re.findall(r"name:\s*'([^']+)'\s*\n?\s*value:\s*'([^']*)'", text):
         scan.app_settings.setdefault(name, value)
+        scan.app_settings_files.setdefault(name, rel)
     ext = scan.app_settings.get("FUNCTIONS_EXTENSION_VERSION")
     if ext is not None and scan.extension_version is None:
         scan.extension_version = ResolvedField(ext, rel)
@@ -464,4 +471,5 @@ def resolve_target_config(
         extension_version=_resolve_field(None, iac.extension_version, local.extension_version),
         deployment_storage=_resolve_field(None, iac.deployment_storage, local.deployment_storage),
         app_settings=app_settings,
+        app_settings_files=dict(iac.app_settings_files),
     )
