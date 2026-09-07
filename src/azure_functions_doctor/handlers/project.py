@@ -63,7 +63,7 @@ class ProjectHandlers:
                 "Inverted decorator order detected:",
                 *[
                     f"- {fn}: @{expected_order[-1]} is outside @{expected_order[0]}"
-                    for fn in inverted[:10]
+                    for fn, _ln in inverted[:10]
                 ],
                 "",
                 "Fix: reorder to @app.route -> "
@@ -71,6 +71,18 @@ class ProjectHandlers:
                 + f" ({expected_order[-1]} innermost).",
             ]
         )
+        first = inverted[0] if inverted else None
         return _create_result(
-            "fail", detail, file=inverted[0].rsplit(":", 1)[0] if inverted else None
+            "fail",
+            detail,
+            file=first[0].rsplit(":", 1)[0] if first else None,
+            line=first[1] if first else None,
+            locations=[
+                {
+                    "file": lbl.rsplit(":", 1)[0],
+                    "line": ln,
+                    "message": f"Inverted decorator order on {lbl}",
+                }
+                for lbl, ln in inverted[:10]
+            ],
         )

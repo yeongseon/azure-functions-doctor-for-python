@@ -369,8 +369,10 @@ def _validate_http_above_binding(
     return any(validate_idx < binding_idx for binding_idx in binding_indices)
 
 
-def _collect_inverted_decorator_order(path: Path, expected_order: list[str]) -> list[str]:
-    """Return "file:function" labels whose decorators violate *expected_order*.
+def _collect_inverted_decorator_order(
+    path: Path, expected_order: list[str]
+) -> list[tuple[str, int]]:
+    """Return "(file:function, lineno)" pairs whose decorators violate *expected_order*.
 
     *expected_order* lists decorator leaf names from **outermost to innermost**
     (the intended top-to-bottom stacking). For the validation/logging pairing
@@ -385,7 +387,7 @@ def _collect_inverted_decorator_order(path: Path, expected_order: list[str]) -> 
     SDK ``FunctionBuilder`` instead of the handler, so validation is inactive and
     no endpoint metadata is emitted -- a silent "dead handler".
     """
-    inverted: list[str] = []
+    inverted: list[tuple[str, int]] = []
     for py_file, content in _iter_project_py_contents(path):
         try:
             tree = ast.parse(content)
@@ -407,10 +409,10 @@ def _collect_inverted_decorator_order(path: Path, expected_order: list[str]) -> 
             if len(present) >= 2:
                 actual = sorted(present, key=lambda name: positions[name])
                 if actual != present:
-                    inverted.append(label)
+                    inverted.append((label, node.decorator_list[0].lineno))
                     continue
             if _validate_http_above_binding(node, app_aliases):
-                inverted.append(label)
+                inverted.append((label, node.decorator_list[0].lineno))
     return inverted
 
 
@@ -661,15 +663,17 @@ def _project_imports_langgraph(path: Path) -> bool:
     return False
 
 
-def _collect_anonymous_auth_routes(path: Path, flag_missing_auth_level: bool = False) -> list[str]:
-    """Return "file:function" labels for routes using anonymous auth.
+def _collect_anonymous_auth_routes(
+    path: Path, flag_missing_auth_level: bool = False
+) -> list[tuple[str, int]]:
+    """Return "(file:function, lineno)" pairs for routes using anonymous auth.
 
     A route is flagged when a decorator keyword ``auth_level`` resolves to
     ``AuthLevel.ANONYMOUS`` (an attribute whose leaf is ``ANONYMOUS``) or to the
     string ``"anonymous"`` (case-insensitive). When *flag_missing_auth_level* is
     True, routes without any ``auth_level`` keyword are also reported.
     """
-    flagged: list[str] = []
+    flagged: list[tuple[str, int]] = []
     for py_file, content in _iter_project_py_contents(path):
         try:
             tree = ast.parse(content)
@@ -698,16 +702,16 @@ def _collect_anonymous_auth_routes(path: Path, flag_missing_auth_level: bool = F
                 label = f"{py_file.relative_to(path)}:{node.name}"
                 if auth_kw is None:
                     if flag_missing_auth_level:
-                        flagged.append(label)
+                        flagged.append((label, dec.lineno))
                     continue
                 if isinstance(auth_kw, ast.Attribute) and auth_kw.attr == "ANONYMOUS":
-                    flagged.append(label)
+                    flagged.append((label, dec.lineno))
                 elif (
                     isinstance(auth_kw, ast.Constant)
                     and isinstance(auth_kw.value, str)
                     and auth_kw.value.lower() == "anonymous"
                 ):
-                    flagged.append(label)
+                    flagged.append((label, dec.lineno))
     return flagged
 
 
@@ -825,15 +829,15 @@ def _project_declares_opentelemetry(path: Path) -> bool:
 
 def _collect_orchestrator_nondeterminism(
     path: Path, blocklist: set[str], decorator_names: set[str]
-) -> list[str]:
-    """Return "file:function -> call" labels for nondeterministic orchestrator calls.
+) -> list[tuple[str, int]]:
+    """Return "(file:function -> call, lineno)" pairs for nondeterministic calls.
 
     Finds functions decorated with any name in *decorator_names* (matched by
     decorator leaf name, e.g. ``orchestration_trigger``) and reports calls whose
     dotted name matches an entry in *blocklist* either exactly or as a dotted
     suffix (``endswith("." + entry)``).
     """
-    flagged: list[str] = []
+    flagged: list[tuple[str, int]] = []
     for py_file, content in _iter_project_py_contents(path):
         try:
             tree = ast.parse(content)
@@ -853,7 +857,9 @@ def _collect_orchestrator_nondeterminism(
                     continue
                 for entry in blocklist:
                     if dotted == entry or dotted.endswith("." + entry):
-                        flagged.append(f"{py_file.relative_to(path)}:{node.name} -> {dotted}")
+                        flagged.append(
+                            (f"{py_file.relative_to(path)}:{node.name} -> {dotted}", sub.lineno)
+                        )
                         break
     return flagged
 

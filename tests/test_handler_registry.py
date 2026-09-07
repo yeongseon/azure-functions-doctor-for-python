@@ -910,6 +910,7 @@ def test_extension_bundle_overbroad_upper_fails() -> None:
         assert result["status"] == "fail"
         assert "does not match" in result["detail"]
 
+
 def test_extension_bundle_nonzero_upper_minor_fails() -> None:
     """[4.0.0, 5.1.0) widens past the exclusive 5.0.0 bound and must fail."""
     registry = HandlerRegistry()
@@ -943,7 +944,6 @@ def test_extension_bundle_malformed_range_fails() -> None:
         result = registry.handle(rule, tmp_path)
         assert result["status"] == "fail"
         assert "not a valid range" in result["detail"]
-
 
 
 def test_local_settings_security_no_file() -> None:

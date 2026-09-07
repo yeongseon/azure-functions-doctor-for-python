@@ -182,9 +182,7 @@ class TestDoctorIntegration:
         assert item["status"] == "skip"
 
 
-def _find_item(
-    results: list[SectionResult], rule_id: str
-) -> Optional[CheckResult]:
+def _find_item(results: list[SectionResult], rule_id: str) -> Optional[CheckResult]:
     for section in results:
         for item in section["items"]:
             if item["rule_id"] == rule_id:

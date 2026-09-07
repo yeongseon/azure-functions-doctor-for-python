@@ -127,9 +127,7 @@ def test_profile_development_runs_dev_env_checks() -> None:
         results = doctor.run_all_checks()
 
         rule_ids = {
-            str(item.get("rule_id", ""))
-            for section in results
-            for item in section["items"]
+            str(item.get("rule_id", "")) for section in results for item in section["items"]
         }
         assert rule_ids == {
             "check_venv",
@@ -149,9 +147,7 @@ def test_profile_deploy_excludes_dev_and_integration() -> None:
         results = doctor.run_all_checks()
 
         rule_ids = {
-            str(item.get("rule_id", ""))
-            for section in results
-            for item in section["items"]
+            str(item.get("rule_id", "")) for section in results for item in section["items"]
         }
         # Developer-environment checks are excluded.
         assert "check_venv" not in rule_ids

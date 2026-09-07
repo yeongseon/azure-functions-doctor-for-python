@@ -368,9 +368,14 @@ class RuntimeHandlers:
         if target_config is not None:
             runtime_version = target_config.extension_version.value
             hosting_plan = target_config.hosting_plan.value
-        return _evaluate_functions_runtime_lifecycle(
+        result = _evaluate_functions_runtime_lifecycle(
             runtime_version, hosting_plan, today=date.today()
         )
+        if result["status"] not in ("pass", "skip") and target_config is not None:
+            source = target_config.extension_version.source
+            if source and not source.startswith("unknown"):
+                result["file"] = source.removeprefix("local:")
+        return result
 
     @_rule_handler
     def _handle_hosting_plan_lifecycle(
@@ -379,4 +384,9 @@ class RuntimeHandlers:
         """Check the resolved hosting plan against its published retirement date."""
         target_config = context.get("target_config") if context is not None else None
         hosting_plan = target_config.hosting_plan.value if target_config is not None else None
-        return _evaluate_hosting_plan_lifecycle(hosting_plan, today=date.today())
+        result = _evaluate_hosting_plan_lifecycle(hosting_plan, today=date.today())
+        if result["status"] not in ("pass", "skip") and target_config is not None:
+            source = target_config.hosting_plan.source
+            if source and not source.startswith("unknown"):
+                result["file"] = source.removeprefix("local:")
+        return result

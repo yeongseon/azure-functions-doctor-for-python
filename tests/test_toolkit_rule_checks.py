@@ -231,7 +231,9 @@ def test_langgraph_anonymous_auth_attribute_fails(tmp_path: Path) -> None:
         "function_app.py",
         _langgraph_app("@app.route(route='x', auth_level=func.AuthLevel.ANONYMOUS)"),
     )
-    assert _collect_anonymous_auth_routes(tmp_path) == ["function_app.py:handler"]
+    assert [lbl for lbl, _ln in _collect_anonymous_auth_routes(tmp_path)] == [
+        "function_app.py:handler"
+    ]
     assert _status("langgraph_anonymous_auth", tmp_path) == "fail"
 
 
@@ -273,9 +275,9 @@ def test_langgraph_anonymous_auth_flag_missing(tmp_path: Path) -> None:
         _langgraph_app("@app.route(route='x')"),
     )
     assert _collect_anonymous_auth_routes(tmp_path) == []
-    assert _collect_anonymous_auth_routes(tmp_path, flag_missing_auth_level=True) == [
-        "function_app.py:handler"
-    ]
+    assert [
+        lbl for lbl, _ln in _collect_anonymous_auth_routes(tmp_path, flag_missing_auth_level=True)
+    ] == ["function_app.py:handler"]
 
 
 def test_langgraph_anonymous_auth_skips_syntax_error(tmp_path: Path) -> None:
@@ -301,7 +303,7 @@ def test_durable_nondeterminism_flags_calls(tmp_path: Path) -> None:
         "    return x\n",
     )
     flagged = _collect_orchestrator_nondeterminism(tmp_path, _BLOCK, _DECOS)
-    assert flagged == ["function_app.py:orch -> random.randint"]
+    assert [lbl for lbl, _ln in flagged] == ["function_app.py:orch -> random.randint"]
     assert _status("durable_nondeterminism", tmp_path) == "fail"
 
 
@@ -334,7 +336,7 @@ def test_durable_nondeterminism_dotted_suffix_match(tmp_path: Path) -> None:
         "    return datetime.datetime.now()\n",
     )
     flagged = _collect_orchestrator_nondeterminism(tmp_path, {"datetime.now"}, _DECOS)
-    assert flagged == ["function_app.py:orch -> datetime.datetime.now"]
+    assert [lbl for lbl, _ln in flagged] == ["function_app.py:orch -> datetime.datetime.now"]
 
 
 def test_durable_nondeterminism_skips_syntax_error(tmp_path: Path) -> None:
