@@ -57,6 +57,14 @@ If `--output` is omitted, JSON is printed to stdout.
 
 ## Field reference
 
+### Location semantics
+
+Findings carry `file`/`line` (single-location form) or `locations` (per-finding
+form) whenever the rule can attribute a project artifact. Environment-level
+checks (virtual environment, Python executable, Core Tools, interpreter
+lifecycle) intentionally have **no file location** and fall back to the
+scan-root URI — that is the correct semantic, not a gap.
+
 ### Machine-readable schema
 
 The contract ships as a JSON Schema in the wheel: [`schemas/output-contract-2.0.schema.json`](https://github.com/yeongseon/azure-functions-doctor-python/blob/main/src/azure_functions_doctor/schemas/output-contract-2.0.schema.json) (draft-07). Consumers validate with `jsonschema`:

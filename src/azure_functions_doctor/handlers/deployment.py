@@ -452,12 +452,14 @@ class DeploymentHandlers:
                 "fail",
                 "FUNCTIONS_EXTENSION_VERSION is not set in local.settings.json; "
                 f"pin it to '{expected}' for the current Azure Functions runtime.",
+                file="local.settings.json",
             )
         if str(current).strip() != expected:
             return _create_result(
                 "fail",
                 f"FUNCTIONS_EXTENSION_VERSION is '{current}', expected '{expected}'. "
                 "Legacy runtimes (~1/~2/~3) are retired; target the v4 runtime.",
+                file="local.settings.json",
             )
         return _create_result("pass", f"FUNCTIONS_EXTENSION_VERSION is '{expected}'")
 
@@ -556,7 +558,11 @@ class DeploymentHandlers:
         condition = rule.get("condition", {}) or {}
         jsonpath = condition.get("jsonpath")
         if not jsonpath or not isinstance(jsonpath, str):
-            return _create_result("fail", "Missing or invalid 'jsonpath' in condition")
+            return _create_result(
+                "fail",
+                "Missing or invalid 'jsonpath' in condition",
+                file="host.json",
+            )
         host_path = path / "host.json"
         if not host_path.exists():
             return _create_result("fail", "host.json not found")
@@ -575,7 +581,11 @@ class DeploymentHandlers:
         """Check that host.json declares \"version\": \"2.0\"."""
         host_path = path / "host.json"
         if not host_path.exists():
-            return _create_result("fail", "host.json not found")
+            return _create_result(
+                "fail",
+                "host.json not found",
+                file="host.json",
+            )
         try:
             host_data = json.loads(host_path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc:
@@ -622,6 +632,7 @@ class DeploymentHandlers:
                 "fail",
                 "local.settings.json is tracked by git and may expose secrets"
                 " — add it to .gitignore",
+                file="local.settings.json",
             )
         return _create_result("pass", "local.settings.json is not tracked by git")
 
@@ -632,7 +643,11 @@ class DeploymentHandlers:
         """Check that extensionBundle in host.json uses the recommended v4 range."""
         host_path = path / "host.json"
         if not host_path.exists():
-            return _create_result("fail", "host.json not found")
+            return _create_result(
+                "fail",
+                "host.json not found",
+                file="host.json",
+            )
         try:
             host_data = json.loads(host_path.read_text(encoding="utf-8"))
         except Exception as exc:
