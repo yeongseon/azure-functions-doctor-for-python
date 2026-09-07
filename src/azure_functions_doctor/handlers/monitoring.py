@@ -68,6 +68,7 @@ class MonitoringHandlers:
                     "Connection string is set, but a legacy instrumentation key is "
                     "also configured; remove it (instrumentation-key ingestion ended "
                     "2025-03-31)." + auth_note,
+                    file="local.settings.json",
                 )
             return _create_result(
                 "pass",
@@ -80,6 +81,7 @@ class MonitoringHandlers:
                 "Only a legacy Application Insights instrumentation key is configured; "
                 "instrumentation-key ingestion ended 2025-03-31. Set "
                 "APPLICATIONINSIGHTS_CONNECTION_STRING instead." + auth_note,
+                file="local.settings.json",
             )
 
         if auth:
@@ -89,12 +91,14 @@ class MonitoringHandlers:
                 "(APPLICATIONINSIGHTS_AUTHENTICATION_STRING) is configured, but "
                 "APPLICATIONINSIGHTS_CONNECTION_STRING is missing; set the connection "
                 "string to enable telemetry.",
+                file="local.settings.json",
             )
 
         return _create_result(
             "fail",
             "Application Insights is not configured; set "
             "APPLICATIONINSIGHTS_CONNECTION_STRING to enable telemetry.",
+            file="local.settings.json",
         )
 
     @_rule_handler
@@ -136,6 +140,7 @@ class MonitoringHandlers:
                 "fail",
                 f"host.json logging.logLevel.default '{log_level['default']}' "
                 "is not a recognized log level.",
+                file="host.json",
             )
         conflicts: list[str] = []
         for category, level in log_level.items():

@@ -65,7 +65,11 @@ class DependencyHandlers:
             )
             if not rule.get("required", True):
                 detail += " (optional)"
-            return _create_result("fail", detail)
+            return _create_result(
+                "fail",
+                detail,
+                file="requirements.txt",
+            )
         detail = f"{req_path} not found and pyproject.toml declares no dependencies"
         if not rule.get("required", True):
             detail += " (optional)"
@@ -80,7 +84,11 @@ class DependencyHandlers:
         target = parse_target(condition)
 
         if not target:
-            return _create_result("fail", "Missing package name")
+            return _create_result(
+                "fail",
+                "Missing package name",
+                file="requirements.txt",
+            )
 
         import_path_str: str = str(target)
         spec = importlib.util.find_spec(import_path_str)
@@ -96,7 +104,11 @@ class DependencyHandlers:
         condition = rule.get("condition", {}) or {}
         params = parse_package(condition)
         if params is None:
-            return _create_result("fail", "Missing 'package' in condition")
+            return _create_result(
+                "fail",
+                "Missing 'package' in condition",
+                file="requirements.txt",
+            )
         package_name, req_file = params
         normalized_target = canonicalize_name(package_name)
         req_path = path / Path(req_file)
@@ -153,7 +165,11 @@ class DependencyHandlers:
         condition = rule.get("condition", {}) or {}
         params = parse_package(condition)
         if params is None:
-            return _create_result("fail", "Missing 'package' in condition")
+            return _create_result(
+                "fail",
+                "Missing 'package' in condition",
+                file="requirements.txt",
+            )
         package_name, req_file = params
         req_path = path / Path(req_file)
         if not req_path.exists():
