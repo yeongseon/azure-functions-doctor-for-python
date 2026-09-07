@@ -416,6 +416,21 @@ def _collect_inverted_decorator_order(
     return inverted
 
 
+def _project_declares_openapi_dep(path: Path) -> bool:
+    """Return True when ``azure-functions-openapi`` is declared in
+    ``requirements.txt``. Missing/unreadable file counts as not declared; the
+    scan-before-spec and version-mixing rules are meaningless without it
+    (generic ``build``/``create_spec`` call names belong to other libraries).
+    """
+    req_path = path / "requirements.txt"
+    if not req_path.exists():
+        return False
+    content = _read_project_python_file(req_path)
+    if content is None:
+        return False
+    return canonicalize_name("azure-functions-openapi") in _parse_requirements_names(content)
+
+
 def _project_declares_validation_dep(path: Path) -> bool:
     """Return True when ``azure-functions-validation`` is declared in
     ``requirements.txt``. Missing or unreadable file counts as not declared.

@@ -17,6 +17,7 @@ from azure_functions_doctor.handlers._helpers import (
     _collect_unsupported_metadata_versions,
     _create_result,
     _project_activates_trace_context,
+    _project_declares_openapi_dep,
     _project_declares_opentelemetry,
     _project_declares_validation_dep,
     _project_imports_langgraph,
@@ -102,6 +103,11 @@ class IntegrationHandlers:
         self, rule: Rule, path: Path, context: Optional[RuleContext] = None
     ) -> HandlerResult:
         """Detect when the OpenAPI spec is built before endpoints are scanned."""
+        if not _project_declares_openapi_dep(path):
+            return _create_result(
+                "skip",
+                "azure-functions-openapi not declared; scan-before-spec check skipped",
+            )
         condition = rule.get("condition", {}) or {}
         scan_names = set(
             condition.get("scan_names")
