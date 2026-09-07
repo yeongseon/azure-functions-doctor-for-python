@@ -51,6 +51,7 @@ nav:
   - Reference:
       - Architecture: architecture.md
       - Supported Versions: supported_versions.md
+      - Catalog Operations: catalog_operations.md
       - Comparison vs Official Skill: comparison.md
       - Semver Policy: semver_policy.md
   - Contributing:
