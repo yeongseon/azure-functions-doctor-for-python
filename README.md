@@ -80,6 +80,32 @@ pip install -e .
 
 ## Quick Start
 
+**3 minutes, install to first fixed finding.** Clone this repo (for the demo
+fixture), install, run the doctor on a project that ships a real deploy-risk
+bug, then fix what it points at:
+
+```bash
+pip install azure-functions-doctor
+git clone https://github.com/yeongseon/azure-functions-doctor-python.git
+cd azure-functions-doctor-python
+
+# 1) Run the doctor on a broken fixture (dev-storage emulator leaked into infra)
+azure-functions-doctor doctor --path examples/v2/broken-dev-storage-leak
+
+# 2) Read the finding — it names the file, the risk, and the fix:
+#    Dev-storage emulator connection in deployable config (ships to production):
+#    - main.bicep
+#    Fix: provision a real storage account connection ...
+
+# 3) Fix it: point AzureWebJobsStorage at a real storage account in main.bicep,
+#    keep UseDevelopmentStorage=true only in local.settings.json. Re-run:
+#    the warning is gone and the exit code returns to 0.
+```
+
+Exit codes make it a CI gate: `0` when required checks pass, `1` on any
+required failure; optional findings warn without gating (`--profile` selects
+`minimal` / `deploy` / `development` / `full`, [details](#what-it-does)).
+
 Run the doctor in the current project:
 
 ```bash
@@ -191,9 +217,31 @@ The same command runs in CI pipelines — see [CI Integration](#ci-integration) 
 
 ## CI Integration
 
-Use `azure-functions-doctor` as a CI gate to block deployments on required failures.
+**Recipe — gate a PR job on the deploy profile** (exit 1 only on required
+failures; optional findings warn in the log):
 
-### GitHub Actions (CLI)
+```yaml
+- name: Pre-deploy health gate
+  run: |
+    pip install "azure-functions-doctor>=0.20,<1"
+    azure-functions-doctor doctor --path . --profile deploy --format junit --output doctor.xml
+```
+
+**Recipe — official GitHub Action with Code Scanning** (see
+[docs/examples/ci_integration.md](docs/examples/ci_integration.md) for the
+full set: Azure DevOps, pre-commit, VS Code, and a minimal SARIF recipe):
+
+```yaml
+- uses: yeongseon/azure-functions-doctor@v1
+  with:
+    path: .
+    profile: deploy
+    format: sarif
+    output: doctor.sarif
+    upload-sarif: true
+```
+
+## GitHub Actions (CLI)
 
 ```yaml
 - name: Run azure-functions-doctor
